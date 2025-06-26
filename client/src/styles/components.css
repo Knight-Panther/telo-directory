@@ -297,3 +297,67 @@
     color: #666;
     font-style: italic;
 }
+
+/* Add these styles to client/src/styles/components.css - SAFE ADDITIONS ONLY */
+
+/* Clear button for search bar (positioned inside existing search bar) */
+.search-bar {
+    position: relative; /* Add this to your existing .search-bar rule */
+}
+
+.clear-button {
+    position: absolute;
+    right: 100px; /* Position before search button */
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50%;
+    font-size: 14px;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.clear-button:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+/* Adjust input padding to make room for clear button */
+.search-input {
+    padding-right: 45px !important; /* Override existing padding-right */
+}
+
+/* Reset section styles */
+.reset-section {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.reset-all-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.reset-all-btn:hover {
+    background: #218838;
+}
+
+/* Clear filters button enhancement (only modify what's needed) */
+.clear-filters-btn {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+.clear-filters-btn:hover {
+    background: #c82333 !important;
+}

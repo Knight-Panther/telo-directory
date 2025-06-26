@@ -1,4 +1,4 @@
-// server/routes/admin/businesses.js
+// server/routes/admin/businesses.js - Complete fixed version
 const express = require("express");
 const Business = require("../../models/Business");
 const { verifyAdmin } = require("../../middleware/auth");
@@ -42,6 +42,27 @@ router.get("/", async (req, res) => {
             },
         });
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get single business by ID for editing (ADD THIS - IT WAS MISSING!)
+router.get("/:id", async (req, res) => {
+    try {
+        const business = await Business.findById(req.params.id);
+
+        if (!business) {
+            return res.status(404).json({ error: "Business not found" });
+        }
+
+        res.json(business);
+    } catch (error) {
+        // Handle invalid ObjectId format
+        if (error.name === "CastError") {
+            return res
+                .status(400)
+                .json({ error: "Invalid business ID format" });
+        }
         res.status(500).json({ error: error.message });
     }
 });

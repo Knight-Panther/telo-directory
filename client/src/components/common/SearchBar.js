@@ -1,9 +1,18 @@
-// client/src/components/common/SearchBar.js
-import React, { useState } from "react";
+// client/src/components/common/SearchBar.js - Enhanced with clear functionality
+import React, { useState, useEffect } from "react";
 import "../../styles/components.css";
 
-const SearchBar = ({ onSearch, placeholder = "Search businesses..." }) => {
-    const [searchTerm, setSearchTerm] = useState("");
+const SearchBar = ({
+    onSearch,
+    searchTerm: externalSearchTerm = "",
+    placeholder = "Search businesses...",
+}) => {
+    const [searchTerm, setSearchTerm] = useState(externalSearchTerm);
+
+    // Sync with external search term (when parent resets)
+    useEffect(() => {
+        setSearchTerm(externalSearchTerm);
+    }, [externalSearchTerm]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -16,6 +25,11 @@ const SearchBar = ({ onSearch, placeholder = "Search businesses..." }) => {
         // onSearch(e.target.value);
     };
 
+    const handleClear = () => {
+        setSearchTerm("");
+        onSearch(""); // Immediately trigger search with empty term
+    };
+
     return (
         <form className="search-bar" onSubmit={handleSubmit}>
             <input
@@ -25,6 +39,19 @@ const SearchBar = ({ onSearch, placeholder = "Search businesses..." }) => {
                 placeholder={placeholder}
                 className="search-input"
             />
+
+            {/* Show clear button if there's text */}
+            {searchTerm && (
+                <button
+                    type="button"
+                    onClick={handleClear}
+                    className="clear-button"
+                    title="Clear search"
+                >
+                    ✕
+                </button>
+            )}
+
             <button type="submit" className="search-button">
                 Search
             </button>

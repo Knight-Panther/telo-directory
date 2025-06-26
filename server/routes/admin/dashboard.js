@@ -1,8 +1,9 @@
-// server/routes/admin/dashboard.js
+// server/routes/admin/dashboard.js - Enhanced system monitoring
 const express = require("express");
 const Business = require("../../models/Business");
 const Category = require("../../models/Category");
 const { verifyAdmin } = require("../../middleware/auth");
+const { getHealthStatus } = require("../../config/database"); // Import health status
 const fs = require("fs");
 const path = require("path");
 const router = express.Router();
@@ -96,11 +97,11 @@ router.get("/charts", async (req, res) => {
     }
 });
 
-// System status
+// Enhanced system status with database health
 router.get("/system", async (req, res) => {
     try {
-        // Database status
-        const dbStatus = "connected"; // Mongoose connection state
+        // Get enhanced database health status
+        const dbHealth = await getHealthStatus();
 
         // Calculate storage used
         let storageUsed = 0;
@@ -124,9 +125,17 @@ router.get("/system", async (req, res) => {
         const uptime = process.uptime();
 
         res.json({
+            // Enhanced database information
             database: {
-                status: dbStatus,
-                connected: true,
+                status: dbHealth.status,
+                connected: dbHealth.database.connected,
+                readyState: dbHealth.database.readyStateText,
+                host: dbHealth.database.host,
+                port: dbHealth.database.port,
+                name: dbHealth.database.name,
+                connectionAttempts: dbHealth.stats.connectionAttempts,
+                maxRetries: dbHealth.stats.maxRetries,
+                lastHealthCheck: dbHealth.timestamp,
             },
             storage: {
                 usedMB: parseFloat(storageMB),
@@ -137,10 +146,22 @@ router.get("/system", async (req, res) => {
             system: {
                 uptime: Math.floor(uptime / 60), // minutes
                 memoryMB: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+                memoryTotal: Math.round(memoryUsage.rss / 1024 / 1024),
+                environment: process.env.NODE_ENV || "development",
+                nodeVersion: process.version,
+                platform: process.platform,
             },
+            // Overall health status
+            overallHealth:
+                dbHealth.status === "healthy" ? "healthy" : "degraded",
+            timestamp: new Date().toISOString(),
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            error: error.message,
+            overallHealth: "error",
+            timestamp: new Date().toISOString(),
+        });
     }
 });
 

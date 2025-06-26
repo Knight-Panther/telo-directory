@@ -1,4 +1,4 @@
-// server/routes/public/businesses.js
+// server/routes/public/businesses.js - COMPLETE FIXED VERSION
 const express = require("express");
 const Business = require("../../models/Business");
 const Category = require("../../models/Category");
@@ -19,10 +19,14 @@ router.get("/", async (req, res) => {
         // Build search query
         const query = {};
 
+        // FIXED: Add mobile, businessId, and city to search
         if (search) {
             query.$or = [
                 { businessName: { $regex: search, $options: "i" } },
                 { shortDescription: { $regex: search, $options: "i" } },
+                { mobile: { $regex: search, $options: "i" } }, // ✅ NOW INCLUDES MOBILE
+                { businessId: { $regex: search, $options: "i" } }, // ✅ NOW INCLUDES BUSINESS ID
+                { city: { $regex: search, $options: "i" } }, // ✅ NOW INCLUDES CITY
             ];
         }
 

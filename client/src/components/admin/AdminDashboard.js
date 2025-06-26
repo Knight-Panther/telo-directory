@@ -1,5 +1,5 @@
-// client/src/components/admin/AdminDashboard.js
-import React from "react";
+// client/src/components/admin/AdminDashboard.js - Enhanced logout
+import React, { useState } from "react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
 import DashboardStats from "./DashboardStats";
@@ -11,12 +11,37 @@ import BusinessForm from "./BusinessForm";
 import CategoryManager from "./CategoryManager";
 import "../../styles/admin.css";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ onLogout }) => {
     const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    const handleLogout = () => {
-        authService.logout();
-        navigate("/admin");
+    const handleLogout = async () => {
+        try {
+            setIsLoggingOut(true);
+
+            // Clear authentication
+            authService.logout();
+
+            // Show immediate feedback
+            // alert("Logged out successfully!");
+
+            // Call parent logout handler to update state
+            if (onLogout) {
+                onLogout();
+            }
+
+            // Navigate to admin login
+            navigate("/admin", { replace: true });
+
+            // Optional: Force page reload to ensure clean state
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+        } catch (error) {
+            alert("Error during logout");
+        } finally {
+            setIsLoggingOut(false);
+        }
     };
 
     return (
@@ -24,8 +49,14 @@ const AdminDashboard = () => {
             <div className="admin-header">
                 <div className="container">
                     <h1>Admin Dashboard</h1>
-                    <button onClick={handleLogout} className="logout-btn">
-                        Logout
+                    <button
+                        onClick={handleLogout}
+                        className={`logout-btn ${
+                            isLoggingOut ? "logging-out" : ""
+                        }`}
+                        disabled={isLoggingOut}
+                    >
+                        {isLoggingOut ? "Logging out..." : "Logout"}
                     </button>
                 </div>
             </div>
