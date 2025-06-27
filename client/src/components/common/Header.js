@@ -26,7 +26,7 @@ const Header = () => {
         <header className="header">
             <div className="container">
                 <Link to="/" className="logo" onClick={handleHomeNavigation}>
-                    <h1>Business Directory</h1>
+                    <h1>TΣLO</h1>
                 </Link>
 
                 <div className="nav-wrapper">

@@ -77,13 +77,11 @@ const MobileFilterWrapper = ({ filters, onFilterChange }) => {
 
         if (filters.categories?.length) {
             tags.push(
-                ...filters.categories
-                    .slice(0, 2)
-                    .map((cat) => ({
-                        type: "category",
-                        value: cat,
-                        label: cat,
-                    }))
+                ...filters.categories.slice(0, 2).map((cat) => ({
+                    type: "category",
+                    value: cat,
+                    label: cat,
+                }))
             );
         }
 

@@ -1579,3 +1579,495 @@
         transform: none !important;
     }
 }
+
+/* ========================================
+   STICKY SEARCH BAR ENHANCEMENTS
+   ======================================== */
+
+/* Enhanced Search Bar */
+.search-bar {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 4px 16px rgba(0, 123, 255, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.search-bar-sticky {
+    max-width: 400px;
+    margin: 0;
+    box-shadow: 0 2px 12px rgba(0, 123, 255, 0.2);
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+    background: transparent;
+    color: #333;
+}
+
+.search-input::placeholder {
+    color: #6c757d;
+}
+
+.clear-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.clear-button:hover {
+    background: #495057;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.search-button {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.search-button:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    box-shadow: 0 4px 16px rgba(0, 123, 255, 0.3);
+}
+
+.search-icon {
+    font-size: 1rem;
+}
+
+.search-text {
+    display: block;
+}
+
+/* ========================================
+   STICKY SEARCH WRAPPER
+   ======================================== */
+
+.sticky-search-wrapper {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    right: 0;
+    z-index: 90; /* Lower than header (100) */
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e9ecef;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(-100%);
+}
+
+.sticky-search-wrapper.is-sticky {
+    transform: translateY(0px); /* Appear right below header */
+    top: 70px; /* Below header height */
+}
+
+.sticky-search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.sticky-search-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+}
+
+/* Filter Toggle Button */
+.filter-toggle-btn {
+    position: relative;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #495057;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.filter-toggle-btn:hover {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    border-color: #007bff;
+    color: #007bff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.filter-icon {
+    font-size: 1.1rem;
+}
+
+.filter-text {
+    font-size: 0.9rem;
+}
+
+.filter-badge {
+    background: #007bff;
+    color: white;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========================================
+   FULL-SCREEN FILTER MODAL
+   ======================================== */
+
+.filter-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: modalOverlayIn 0.3s ease;
+}
+
+@keyframes modalOverlayIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(4px);
+    }
+}
+
+.filter-modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    animation: modalContentIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalContentIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Modal Header */
+.filter-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 32px 20px;
+    border-bottom: 1px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.filter-modal-title h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.filter-subtitle {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.filter-modal-close {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.filter-modal-close:hover {
+    background: #e9ecef;
+    color: #495057;
+    transform: scale(1.05);
+}
+
+/* Modal Body */
+.filter-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 32px;
+}
+
+.filter-modal-body .filter-panel {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.filter-modal-body .filter-header {
+    display: none; /* Hide filter header in modal */
+}
+
+.filter-modal-body .filter-group {
+    margin-bottom: 2rem;
+}
+
+.filter-modal-body .filter-group:last-of-type {
+    margin-bottom: 1rem;
+}
+
+.filter-modal-body .dropdown-trigger {
+    padding: 16px 20px;
+    font-size: 1rem;
+    border-radius: 10px;
+}
+
+.filter-modal-body .filter-tag {
+    font-size: 0.85rem;
+    padding: 8px 14px;
+}
+
+/* Modal Footer */
+.filter-modal-footer {
+    padding: 20px 32px 24px;
+    border-top: 1px solid #e9ecef;
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border-radius: 0 0 16px 16px;
+}
+
+.filter-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.filter-clear-btn,
+.filter-apply-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 0.95rem;
+    min-width: 120px;
+}
+
+.filter-clear-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.filter-clear-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.filter-apply-btn {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.filter-apply-btn:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 123, 255, 0.4);
+}
+
+.apply-count {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+}
+
+/* ========================================
+   HERO SECTION FADE OUT ANIMATION
+   ======================================== */
+
+.hero-section {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hero-section.fade-out {
+    opacity: 0.3;
+    transform: translateY(-20px);
+}
+
+/* ========================================
+   MOBILE FIXES
+   ======================================== */
+
+/* Mobile Footer Fix */
+@media (max-width: 768px) {
+    .footer {
+        margin-top: 0 !important;
+        position: static;
+    }
+
+    /* Also fix the sticky search horizontal layout */
+    .sticky-search-content {
+        flex-direction: row !important; /* Override the column direction */
+        gap: 12px;
+        padding: 8px 0;
+    }
+
+    .search-bar {
+        flex: 1;
+        width: auto;
+        max-width: none;
+    }
+
+    .filter-toggle-btn {
+        flex-shrink: 0;
+        width: auto;
+        min-width: 80px;
+    }
+
+    .filter-modal-content {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+        border-radius: 12px;
+    }
+
+    .filter-modal-header,
+    .filter-modal-body,
+    .filter-modal-footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .filter-modal-actions {
+        flex-direction: column;
+    }
+
+    .filter-clear-btn,
+    .filter-apply-btn {
+        width: 100%;
+    }
+
+    .search-button .search-text {
+        display: none;
+    }
+
+    .filter-text {
+        display: none;
+    }
+
+    /* Enhanced dropdown height for mobile */
+    .dropdown-content {
+        max-height: min(250px, 40vh);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Modal body dropdown fixes */
+    .filter-modal-body .dropdown-content {
+        max-height: min(200px, 30vh) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sticky-search-wrapper.is-sticky {
+        top: 60px;
+    }
+
+    .filter-modal-content {
+        margin: 5px;
+        border-radius: 8px;
+    }
+
+    .search-input {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+
+    .search-button {
+        padding: 12px 20px;
+        min-width: 60px;
+    }
+
+    .sticky-search-content {
+        padding: 6px 0;
+        gap: 8px;
+    }
+
+    .filter-toggle-btn {
+        min-width: 70px;
+        padding: 8px 10px;
+    }
+}

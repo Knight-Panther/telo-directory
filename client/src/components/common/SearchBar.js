@@ -1,4 +1,4 @@
-// client/src/components/common/SearchBar.js - Enhanced with clear functionality
+// client/src/components/common/SearchBar.js
 import React, { useState, useEffect } from "react";
 import "../../styles/components.css";
 
@@ -6,6 +6,8 @@ const SearchBar = ({
     onSearch,
     searchTerm: externalSearchTerm = "",
     placeholder = "Search businesses...",
+    onReset,
+    isSticky = false,
 }) => {
     const [searchTerm, setSearchTerm] = useState(externalSearchTerm);
 
@@ -21,39 +23,44 @@ const SearchBar = ({
 
     const handleChange = (e) => {
         setSearchTerm(e.target.value);
-        // Optional: trigger search on each keystroke with debounce
-        // onSearch(e.target.value);
     };
 
     const handleClear = () => {
         setSearchTerm("");
-        onSearch(""); // Immediately trigger search with empty term
+        onSearch("");
+        if (onReset) onReset();
     };
 
     return (
-        <form className="search-bar" onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={searchTerm}
-                onChange={handleChange}
-                placeholder={placeholder}
-                className="search-input"
-            />
+        <form
+            className={`search-bar ${isSticky ? "search-bar-sticky" : ""}`}
+            onSubmit={handleSubmit}
+        >
+            <div className="search-input-wrapper">
+                <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleChange}
+                    placeholder={placeholder}
+                    className="search-input"
+                />
 
-            {/* Show clear button if there's text */}
-            {searchTerm && (
-                <button
-                    type="button"
-                    onClick={handleClear}
-                    className="clear-button"
-                    title="Clear search"
-                >
-                    ✕
-                </button>
-            )}
+                {/* Show clear button if there's text */}
+                {searchTerm && (
+                    <button
+                        type="button"
+                        onClick={handleClear}
+                        className="clear-button"
+                        title="Clear search"
+                    >
+                        ✕
+                    </button>
+                )}
+            </div>
 
             <button type="submit" className="search-button">
-                Search
+                <span className="search-icon">🔍</span>
+                <span className="search-text">Search</span>
             </button>
         </form>
     );
