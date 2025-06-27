@@ -1,29 +1,35 @@
-// client/src/pages/HomePage.js - Enhanced with navigation reset
+// client/src/pages/HomePage.js - REPLACE ENTIRE FILE
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import SearchBar from "../components/common/SearchBar";
 import FilterPanel from "../components/business/FilterPanel";
+import MobileFilterWrapper from "../components/business/MobileFilterWrapper";
 import BusinessList from "../components/business/BusinessList";
 import "../styles/pages.css";
 
 const HomePage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filters, setFilters] = useState({});
-    const location = useLocation();
+    const [isMobile, setIsMobile] = useState(false);
 
-    // Reset search and filters when navigating to home page
+    // Check screen size
     useEffect(() => {
-        // Check if we came from a navigation (not a page refresh)
-        if (location.state?.resetSearch || location.key !== "default") {
-            setSearchTerm("");
-            setFilters({});
-        }
-    }, [location]);
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
 
-    // Function to reset all search and filters
-    const resetAll = () => {
-        setSearchTerm("");
-        setFilters({});
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
+    // Handle filter changes with proper data structure
+    const handleFilterChange = (newFilters) => {
+        setFilters(newFilters);
+
+        // Debug logging for development
+        if (process.env.NODE_ENV === "development") {
+            console.log("Filter changed:", newFilters);
+        }
     };
 
     return (
@@ -32,34 +38,30 @@ const HomePage = () => {
                 <div className="hero-section">
                     <h1>Business Directory</h1>
                     <p>Find renovation businesses in your area</p>
-                    <SearchBar
-                        onSearch={setSearchTerm}
-                        searchTerm={searchTerm} // Pass current search term
-                    />
-
-                    {/* Add reset button if there are active searches/filters */}
-                    {(searchTerm ||
-                        Object.keys(filters).some((key) => filters[key])) && (
-                        <div className="reset-section">
-                            <button
-                                onClick={resetAll}
-                                className="reset-all-btn"
-                            >
-                                Clear All & Show All Businesses
-                            </button>
-                        </div>
-                    )}
+                    <SearchBar onSearch={setSearchTerm} />
                 </div>
 
                 <div className="content-section">
-                    <aside className="sidebar">
-                        <FilterPanel
-                            filters={filters}
-                            onFilterChange={setFilters}
-                        />
-                    </aside>
+                    {/* Desktop Sidebar */}
+                    {!isMobile && (
+                        <aside className="sidebar">
+                            <FilterPanel
+                                filters={filters}
+                                onFilterChange={handleFilterChange}
+                            />
+                        </aside>
+                    )}
 
                     <main className="main-content">
+                        {/* Mobile Filter Panel */}
+                        {isMobile && (
+                            <MobileFilterWrapper
+                                filters={filters}
+                                onFilterChange={handleFilterChange}
+                            />
+                        )}
+
+                        {/* Business List */}
                         <BusinessList
                             searchTerm={searchTerm}
                             filters={filters}
