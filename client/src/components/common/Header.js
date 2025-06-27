@@ -1,10 +1,19 @@
 // client/src/components/common/Header.js - Enhanced navigation
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/components.css";
 
 const Header = () => {
     const navigate = useNavigate();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const closeMenu = () => {
+        setIsMenuOpen(false);
+    };
 
     // Function to navigate home and reset search
     const handleHomeNavigation = (e) => {
@@ -19,18 +28,60 @@ const Header = () => {
                 <Link to="/" className="logo" onClick={handleHomeNavigation}>
                     <h1>Business Directory</h1>
                 </Link>
-                <nav className="nav">
+
+                <div className="nav-wrapper">
+                    {/* Home always visible on mobile */}
                     <Link
                         to="/"
-                        className="nav-link"
+                        className="nav-link home-link"
                         onClick={handleHomeNavigation}
                     >
                         Home
                     </Link>
-                    <Link to="/admin" className="nav-link">
-                        Admin
-                    </Link>
-                </nav>
+
+                    {/* Burger menu button */}
+                    <button
+                        className={`burger-menu ${isMenuOpen ? "open" : ""}`}
+                        onClick={toggleMenu}
+                        aria-label="Toggle menu"
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                    {/* Navigation menu */}
+                    <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`}>
+                        <Link
+                            to="/about"
+                            className="nav-link"
+                            onClick={closeMenu}
+                        >
+                            About Us
+                        </Link>
+                        <Link
+                            to="/contact"
+                            className="nav-link"
+                            onClick={closeMenu}
+                        >
+                            Contact
+                        </Link>
+                        <Link
+                            to="/send-listing"
+                            className="nav-link"
+                            onClick={closeMenu}
+                        >
+                            Send Listing
+                        </Link>
+                        <Link
+                            to="/admin"
+                            className="nav-link"
+                            onClick={closeMenu}
+                        >
+                            Admin
+                        </Link>
+                    </nav>
+                </div>
             </div>
         </header>
     );

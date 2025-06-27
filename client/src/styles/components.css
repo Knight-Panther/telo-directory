@@ -1025,12 +1025,13 @@
 
 /* Enhanced Description */
 .description {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     color: #666;
     font-size: 0.9rem;
-    line-height: 1.5;
+    line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3; /* Add this for standard compatibility */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -1426,5 +1427,155 @@
     .modern-radio:checked ~ .radiomark {
         background-color: #63b3ed;
         border-color: #63b3ed;
+    }
+}
+
+/* added header burger css */
+/* Add this to your components.css file - Header responsive styles */
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 20px;
+}
+
+.nav-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative; /* ADD THIS LINE */
+}
+
+.home-link {
+    display: block; /* Hidden on desktop, shown on mobile if none-hidden on desktop */
+}
+
+.nav {
+    display: flex;
+    gap: 1rem;
+}
+
+.burger-menu {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    width: 30px;
+    height: 30px;
+    position: relative;
+}
+
+.burger-menu span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #333;
+    margin: 3px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+}
+
+.burger-menu.open span:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.burger-menu.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.burger-menu.open span:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .home-link {
+        display: block; /* Show Home link on mobile */
+    }
+
+    .burger-menu {
+        display: flex;
+    }
+
+    .nav {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 250px;
+        background: white;
+        flex-direction: column;
+        padding: 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 0 0 8px 8px;
+        transform: translateY(-20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        border: 1px solid #e0e0e0;
+    }
+
+    .nav-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .nav .nav-link {
+        padding: 1rem 20px;
+        border-bottom: 1px solid #f0f0f0;
+        display: block;
+    }
+
+    .nav .nav-link:last-child {
+        border-bottom: none;
+    }
+}
+
+/* Tablet styles */
+@media (max-width: 992px) and (min-width: 769px) {
+    .header .container {
+        padding: 1rem 15px;
+    }
+
+    .nav {
+        gap: 0.75rem;
+    }
+
+    .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Small laptop styles */
+@media (max-width: 1200px) and (min-width: 993px) {
+    .nav {
+        gap: 0.8rem;
+    }
+}
+
+/* Add this to prevent flash on resize */
+@media (max-width: 768px) {
+    .nav:not(.nav-open) {
+        display: none !important;
+    }
+
+    .nav.nav-open {
+        display: flex !important;
+    }
+}
+
+/* Prevent flash on larger screens */
+@media (min-width: 769px) {
+    .nav {
+        display: flex !important;
+        position: static !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
     }
 }

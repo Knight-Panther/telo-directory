@@ -1,5 +1,6 @@
 // client/src/pages/HomePage.js - REPLACE ENTIRE FILE
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import SearchBar from "../components/common/SearchBar";
 import FilterPanel from "../components/business/FilterPanel";
 import MobileFilterWrapper from "../components/business/MobileFilterWrapper";
@@ -10,6 +11,7 @@ const HomePage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filters, setFilters] = useState({});
     const [isMobile, setIsMobile] = useState(false);
+    const location = useLocation();
 
     // Check screen size
     useEffect(() => {
@@ -22,6 +24,14 @@ const HomePage = () => {
         return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
+    // Reset search and filters when navigating to home page
+    useEffect(() => {
+        if (location.state?.resetSearch) {
+            setSearchTerm("");
+            setFilters({});
+        }
+    }, [location]);
+
     // Handle filter changes with proper data structure
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
@@ -31,6 +41,11 @@ const HomePage = () => {
             console.log("Filter changed:", newFilters);
         }
     };
+    // Function to reset search and filters
+    const resetToMainPage = () => {
+        setSearchTerm("");
+        setFilters({});
+    };
 
     return (
         <div className="home-page">
@@ -38,7 +53,11 @@ const HomePage = () => {
                 <div className="hero-section">
                     <h1>Business Directory</h1>
                     <p>Find renovation businesses in your area</p>
-                    <SearchBar onSearch={setSearchTerm} />
+                    <SearchBar
+                        onSearch={setSearchTerm}
+                        searchTerm={searchTerm}
+                        onReset={resetToMainPage}
+                    />
                 </div>
 
                 <div className="content-section">

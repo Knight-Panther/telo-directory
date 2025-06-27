@@ -1,4 +1,4 @@
-// server/routes/public/businesses.js - REPLACE ENTIRE FILE
+// server/routes/public/businesses.js - CORRECTED VERSION WITH MOBILE SEARCH FIX
 const express = require("express");
 const Business = require("../../models/Business");
 const Category = require("../../models/Category");
@@ -20,9 +20,14 @@ router.get("/", async (req, res) => {
         // Build search query
         const query = {};
 
-        // Text search (unchanged)
+        // FIXED: Text search now includes mobile and businessId
         if (search) {
-            query.$text = { $search: search };
+            query.$or = [
+                { businessName: { $regex: search, $options: "i" } },
+                { shortDescription: { $regex: search, $options: "i" } },
+                { mobile: { $regex: search, $options: "i" } },
+                { businessId: { $regex: search, $options: "i" } },
+            ];
         }
 
         // Multi-select category filter
@@ -71,21 +76,12 @@ router.get("/", async (req, res) => {
         const skip = (page - 1) * limit;
 
         // Use the optimized sorting strategy
-        // Text search: sort by text score first, then by verified and date
+        // Text search: sort by verified and date
         // Regular filters: sort by verified and date
-        let sortQuery;
-        if (search) {
-            sortQuery = {
-                score: { $meta: "textScore" },
-                verified: -1,
-                createdAt: -1,
-            };
-        } else {
-            sortQuery = {
-                verified: -1,
-                createdAt: -1,
-            };
-        }
+        let sortQuery = {
+            verified: -1,
+            createdAt: -1,
+        };
 
         const businesses = await Business.find(query)
             .sort(sortQuery)
