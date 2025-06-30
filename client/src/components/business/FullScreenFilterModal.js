@@ -86,10 +86,6 @@ const FullScreenFilterModal = ({
                 {/* Modal Footer */}
                 <div className="filter-modal-footer">
                     <div className="filter-modal-actions">
-                        <button className="filter-clear-btn" onClick={onClose}>
-                            Cancel
-                        </button>
-
                         <button
                             className="filter-apply-btn"
                             onClick={handleApply}
@@ -100,6 +96,9 @@ const FullScreenFilterModal = ({
                                     ({getActiveFilterCount()})
                                 </span>
                             )}
+                        </button>
+                        <button className="filter-clear-btn" onClick={onClose}>
+                            Cancel
                         </button>
                     </div>
                 </div>

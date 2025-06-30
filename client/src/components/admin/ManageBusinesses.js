@@ -1,19 +1,30 @@
-// client/src/components/admin/ManageBusinesses.js
+// client/src/components/admin/ManageBusinesses.js (existing code)
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import adminService from "../../services/adminService";
 import LoadingSpinner from "../common/LoadingSpinner";
 import "../../styles/admin.css";
 
 const ManageBusinesses = () => {
-    const [page, setPage] = useState(1);
-    const [search, setSearch] = useState("");
+    const [searchParams, setSearchParams] = useSearchParams();
+    //change here
+    const [searchInput, setSearchInput] = useState(""); // What user types
+    const [searchQuery, setSearchQuery] = useState(""); // What gets sent to API
+
+    // 🔥 GET PAGE FROM URL INSTEAD OF LOCAL STATE
+    const page = parseInt(searchParams.get("page")) || 1;
     const queryClient = useQueryClient();
 
+    //change here
     const { data, isLoading, isError } = useQuery({
-        queryKey: ["admin-businesses", page, search],
-        queryFn: () => adminService.getBusinesses({ page, search, limit: 10 }),
+        queryKey: ["admin-businesses", page, searchQuery],
+        queryFn: () =>
+            adminService.getBusinesses({
+                page,
+                search: searchQuery,
+                limit: 10,
+            }),
     });
 
     const deleteMutation = useMutation({
@@ -31,6 +42,36 @@ const ManageBusinesses = () => {
             queryClient.invalidateQueries(["admin-businesses"]);
         },
     });
+
+    // 🔥 UPDATE URL INSTEAD OF LOCAL STATE
+    const setPage = (newPage) => {
+        const params = new URLSearchParams(searchParams);
+        if (newPage === 1) {
+            params.delete("page"); // Clean URL for page 1
+        } else {
+            params.set("page", newPage.toString());
+        }
+        setSearchParams(params);
+    };
+
+    //change here
+    const handleSearch = (e) => {
+        e.preventDefault();
+        setSearchQuery(searchInput); // This triggers the API call
+        // Reset to page 1 when searching
+        const params = new URLSearchParams(searchParams);
+        params.delete("page");
+        setSearchParams(params);
+    };
+
+    const handleClearSearch = () => {
+        setSearchInput("");
+        setSearchQuery("");
+        // Reset to page 1
+        const params = new URLSearchParams(searchParams);
+        params.delete("page");
+        setSearchParams(params);
+    };
 
     const handleDelete = (id, name) => {
         if (window.confirm(`Delete business "${name}"?`)) {
@@ -54,13 +95,47 @@ const ManageBusinesses = () => {
             </div>
 
             <div className="search-section">
-                <input
-                    type="text"
-                    placeholder="Search businesses..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="search-input-admin"
-                />
+                <form
+                    onSubmit={handleSearch}
+                    style={{
+                        display: "flex",
+                        gap: "8px",
+                        alignItems: "center",
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="Search by name, ID, or mobile..."
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        className="search-input-admin"
+                        style={{ flex: 1 }}
+                    />
+                    <button type="submit" className="btn btn-primary">
+                        Search
+                    </button>
+                    {searchQuery && (
+                        <button
+                            type="button"
+                            onClick={handleClearSearch}
+                            className="btn btn-secondary"
+                        >
+                            Clear
+                        </button>
+                    )}
+                </form>
+
+                {searchQuery && (
+                    <div
+                        style={{
+                            marginTop: "8px",
+                            fontSize: "14px",
+                            color: "#666",
+                        }}
+                    >
+                        Searching for: "{searchQuery}"
+                    </div>
+                )}
             </div>
 
             <div className="businesses-table">
@@ -142,7 +217,7 @@ const ManageBusinesses = () => {
             {/* Pagination */}
             <div className="pagination">
                 <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={!pagination.hasPrev}
                     className="btn btn-secondary"
                 >
@@ -152,7 +227,7 @@ const ManageBusinesses = () => {
                     Page {pagination.currentPage} of {pagination.totalPages}
                 </span>
                 <button
-                    onClick={() => setPage((p) => p + 1)}
+                    onClick={() => setPage(page + 1)}
                     disabled={!pagination.hasNext}
                     className="btn btn-secondary"
                 >

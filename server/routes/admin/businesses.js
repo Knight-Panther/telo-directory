@@ -32,13 +32,20 @@ router.get("/", async (req, res) => {
             .limit(parseInt(limit));
 
         const total = await Business.countDocuments(query);
+        const totalPages = Math.ceil(total / limit);
+
+        // 🔥 FIX: Convert page to number for proper comparison
+        const currentPage = parseInt(page);
 
         res.json({
             businesses,
             pagination: {
-                currentPage: parseInt(page),
-                totalPages: Math.ceil(total / limit),
+                currentPage: currentPage,
+                totalPages: totalPages,
                 totalBusinesses: total,
+                // 🎯 THE CRUCIAL FIX: Use currentPage (number) not page (string)
+                hasNext: currentPage < totalPages,
+                hasPrev: currentPage > 1,
             },
         });
     } catch (error) {
