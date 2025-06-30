@@ -7,6 +7,19 @@ export const adminService = {
         const response = await api.get("/admin/businesses", { params });
         return response.data;
     },
+    // NEW: Get businesses count for a category
+    getCategoryBusinessCount: async (categoryId) => {
+        const response = await api.get(
+            `/admin/categories/${categoryId}/businesses-count`
+        );
+        return response.data;
+    },
+
+    // ENHANCED: Update category (returns migration info)
+    updateCategory: async (id, data) => {
+        const response = await api.put(`/admin/categories/${id}`, data);
+        return response.data;
+    },
 
     getBusiness: async (id) => {
         const response = await api.get(`/admin/businesses/${id}`);
