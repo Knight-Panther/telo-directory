@@ -1975,7 +1975,7 @@
 /* Mobile Footer Fix */
 @media (max-width: 768px) {
     .footer {
-        margin-top: 0 !important;
+        margin-top: auto !important;
         position: static;
     }
 
