@@ -1,6 +1,7 @@
-// client/src/components/business/BusinessCard.js
+// client/src/components/business/BusinessCard.js - REPLACE ENTIRE FILE
 import React from "react";
 import { Link } from "react-router-dom";
+import LazyImage from "../common/LazyImage";
 import "../../styles/components.css";
 
 const BusinessCard = ({ business }) => {
@@ -17,16 +18,24 @@ const BusinessCard = ({ business }) => {
         socialLinks,
     } = business;
 
+    // Handle image loading error
+    const handleImageError = (e) => {
+        e.target.src = "/placeholder-business.png";
+    };
+
     return (
         <div className="business-card">
             <div className="business-image">
                 {profileImage ? (
-                    <img
+                    <LazyImage
                         src={`http://localhost:3000${profileImage}`}
                         alt={businessName}
-                        onError={(e) => {
-                            e.target.src = "/placeholder-business.png";
-                        }}
+                        onError={handleImageError}
+                        placeholder={
+                            <div className="image-placeholder">
+                                <span>{businessName.charAt(0)}</span>
+                            </div>
+                        }
                     />
                 ) : (
                     <div className="image-placeholder">

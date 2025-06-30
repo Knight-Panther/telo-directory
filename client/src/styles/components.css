@@ -2071,3 +2071,264 @@
         padding: 8px 10px;
     }
 }
+
+/* Dropdown Search Input */
+.dropdown-search {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.dropdown-search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.dropdown-search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.dropdown-search-input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* ADD TO client/src/styles/components.css - INSERT AT THE END */
+
+/* ========================================
+   LAZY LOADING IMAGE STYLES
+   ======================================== */
+
+.lazy-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.lazy-image-placeholder {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.lazy-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.4s ease;
+}
+
+.lazy-image.loading {
+    opacity: 0;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+.lazy-image.error {
+    opacity: 0;
+}
+
+/* Loading Shimmer Animation */
+.lazy-loading-indicator,
+.lazy-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.lazy-loading-shimmer {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        transparent 100%
+    );
+    animation: shimmer 2s infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.lazy-loading-shimmer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.8) 50%,
+        transparent 100%
+    );
+    animation: shimmerSlide 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+@keyframes shimmerSlide {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Enhanced Loading States for Different Components */
+
+/* Business Card Image */
+.business-image .lazy-image-placeholder {
+    height: 220px;
+}
+
+.business-image .lazy-loading-indicator::after {
+    content: "📷";
+    font-size: 3rem;
+    color: #6c757d;
+    position: absolute;
+    opacity: 0.5;
+}
+
+/* Business Detail Page Image */
+.business-image-large .lazy-image-placeholder {
+    height: 300px;
+    border-radius: 8px;
+}
+
+.business-image-large .lazy-loading-indicator::after {
+    content: "🖼️";
+    font-size: 4rem;
+    color: #6c757d;
+    position: absolute;
+    opacity: 0.5;
+}
+
+/* Admin Table Image */
+.table-image.lazy-image-container {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+}
+
+.table-image .lazy-image-placeholder {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+}
+
+.table-image .lazy-loading-indicator::after {
+    content: "👤";
+    font-size: 1rem;
+    color: #6c757d;
+    position: absolute;
+    opacity: 0.7;
+}
+
+/* ========================================
+   RESPONSIVE LAZY LOADING ADJUSTMENTS
+   ======================================== */
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .business-image .lazy-image-placeholder {
+        height: 180px;
+    }
+
+    .business-image-large .lazy-image-placeholder {
+        height: 200px;
+    }
+
+    /* Faster animations on mobile for better performance */
+    .lazy-loading-shimmer {
+        animation-duration: 1.5s;
+    }
+
+    .lazy-loading-shimmer::before {
+        animation-duration: 1.5s;
+    }
+}
+
+@media (max-width: 480px) {
+    .business-image .lazy-image-placeholder {
+        height: 160px;
+    }
+
+    /* Even faster on very small screens */
+    .lazy-loading-shimmer {
+        animation-duration: 1s;
+    }
+
+    .lazy-loading-shimmer::before {
+        animation-duration: 1s;
+    }
+}
+
+/* High-end desktop - More sophisticated animations */
+@media (min-width: 1200px) {
+    .lazy-loading-shimmer {
+        animation-duration: 2.5s;
+    }
+
+    .lazy-loading-shimmer::before {
+        animation-duration: 2.5s;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY & PERFORMANCE
+   ======================================== */
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .lazy-image {
+        transition: none;
+    }
+
+    .lazy-loading-shimmer,
+    .lazy-loading-shimmer::before {
+        animation: none;
+    }
+
+    .lazy-loading-indicator {
+        background: #f0f0f0;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .lazy-image-placeholder {
+        background: #fff;
+        border: 2px solid #000;
+    }
+
+    .lazy-loading-indicator {
+        background: #fff;
+        border: 1px solid #000;
+    }
+}

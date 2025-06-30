@@ -1,4 +1,4 @@
-// client/src/components/business/FilterPanel.js - REPLACE ENTIRE FILE
+// client/src/components/business/FilterPanel.js - CORRECTED VERSION
 import React, { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
@@ -7,6 +7,9 @@ import "../../styles/components.css";
 const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const dropdownRefs = useRef({});
+    // Search state for dropdowns
+    const [categorySearch, setCategorySearch] = useState("");
+    const [citySearch, setCitySearch] = useState("");
 
     // Fetch categories and cities
     const { data: categories = [] } = useQuery({
@@ -89,6 +92,9 @@ const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
     // Clear all filters
     const clearAllFilters = () => {
         onFilterChange({});
+        // Reset search terms when clearing filters
+        setCategorySearch("");
+        setCitySearch("");
     };
 
     // Count active filters
@@ -102,19 +108,56 @@ const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
         return count;
     };
 
-    // Render dropdown with checkboxes
+    // Filter functions for search
+    const filterCategories = (categories) => {
+        if (!categorySearch.trim()) return categories;
+        return categories.filter((cat) =>
+            cat.name.toLowerCase().includes(categorySearch.toLowerCase())
+        );
+    };
+
+    const filterCities = (cities) => {
+        if (!citySearch.trim()) return cities;
+        return cities.filter((city) =>
+            city.toLowerCase().includes(citySearch.toLowerCase())
+        );
+    };
+
+    // Enhanced dropdown with search capability
     const renderMultiSelectDropdown = (
         filterType,
         options,
-        currentValues = []
+        currentValues = [],
+        searchTerm = "",
+        setSearchTerm = null
     ) => {
         return (
             <div className="dropdown-content">
+                {/* Search input for categories and cities */}
+                {(filterType === "categories" || filterType === "cities") && (
+                    <div className="dropdown-search">
+                        <input
+                            type="text"
+                            placeholder={`Search ${filterType}...`}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="dropdown-search-input"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </div>
+                )}
+
+                {/* Options */}
                 {options.map((option) => {
+                    // FIXED: Handle different data structures correctly
                     const value =
-                        typeof option === "string" ? option : option.value;
+                        typeof option === "string"
+                            ? option
+                            : option.name || option.value; // Use name for categories, value for others
                     const label =
-                        typeof option === "string" ? option : option.label;
+                        typeof option === "string"
+                            ? option
+                            : option.name || option.label; // Use name for categories, label for others
                     const isSelected = currentValues.includes(value);
 
                     return (
@@ -131,7 +174,7 @@ const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
                                 <input
                                     type="checkbox"
                                     checked={isSelected}
-                                    onChange={() => {}} // Handled by onClick
+                                    onChange={() => {}}
                                     className="modern-checkbox"
                                 />
                                 <span className="checkmark"></span>
@@ -140,11 +183,6 @@ const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
                         </div>
                     );
                 })}
-                {options.length === 0 && (
-                    <div className="dropdown-option disabled">
-                        No options available
-                    </div>
-                )}
             </div>
         );
     };
@@ -285,8 +323,10 @@ const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
                     {openDropdown === "categories" &&
                         renderMultiSelectDropdown(
                             "categories",
-                            categories.map((cat) => cat.name),
-                            filters.categories || []
+                            filterCategories(categories),
+                            filters.categories || [],
+                            categorySearch,
+                            setCategorySearch
                         )}
                 </div>
 
@@ -317,8 +357,10 @@ const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
                     {openDropdown === "cities" &&
                         renderMultiSelectDropdown(
                             "cities",
-                            cities,
-                            filters.cities || []
+                            filterCities(cities),
+                            filters.cities || [],
+                            citySearch,
+                            setCitySearch
                         )}
                 </div>
 

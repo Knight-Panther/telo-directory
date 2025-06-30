@@ -7,15 +7,14 @@ const router = express.Router();
 // Get all businesses with pagination and multi-select filters
 router.get("/", async (req, res) => {
     try {
-        const {
-            page = 1,
-            limit = 12,
-            search = "",
-            categories = "", // Now supports arrays: ?categories[]=Painting&categories[]=Plumbing
-            cities = "", // Now supports arrays: ?cities[]=Tbilisi&cities[]=Batumi
-            businessTypes = "", // Now supports arrays: ?businessTypes[]=individual&businessTypes[]=company
-            verified = "", // Single select (unchanged)
-        } = req.query;
+        const { page = 1, limit = 12, search = "", verified = "" } = req.query;
+
+        // Handle array parameters consistently:
+        const categories =
+            req.query["categories[]"] || req.query.categories || "";
+        const cities = req.query["cities[]"] || req.query.cities || "";
+        const businessTypes =
+            req.query["businessTypes[]"] || req.query.businessTypes || "";
 
         // Build search query
         const query = {};
