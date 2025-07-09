@@ -1,4 +1,4 @@
-// client/src/components/business/BusinessCard.js - REPLACE ENTIRE FILE
+// client/src/components/business/BusinessCard.js
 import React from "react";
 import { Link } from "react-router-dom";
 import LazyImage from "../common/LazyImage";
