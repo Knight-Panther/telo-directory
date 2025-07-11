@@ -1,25 +1,69 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+    "lang": "en",
+    "dir": "ltr",
+    "short_name": "TΣLO",
+    "name": "TΣLO Business Directory",
+    "description": "Find local businesses in your area",
+    "id": "/?source=pwa",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "sizes": "48x48",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "android-chrome-192x192.png",
+            "type": "image/png",
+            "sizes": "192x192",
+            "purpose": "any"
+        },
+        {
+            "src": "android-chrome-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "apple-touch-icon.png",
+            "type": "image/png",
+            "sizes": "180x180"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "categories": ["business", "directory", "local"],
+    "keywords": ["business", "directory", "local", "finder", "TELO", "TΣLO"],
+    "screenshots": [
+        {
+            "src": "mobile-home.png",
+            "type": "image/png",
+            "sizes": "390x844",
+            "form_factor": "narrow",
+            "label": "TΣLO home screen on mobile"
+        },
+        {
+            "src": "mobile-search.png",
+            "type": "image/png",
+            "sizes": "390x844",
+            "form_factor": "narrow",
+            "label": "Search local businesses"
+        },
+        {
+            "src": "desktop-home.png",
+            "type": "image/png",
+            "sizes": "1280x800",
+            "form_factor": "wide",
+            "label": "TΣLO desktop view"
+        },
+        {
+            "src": "desktop-home.png",
+            "type": "image/png",
+            "sizes": "1280x800",
+            "form_factor": "wide",
+            "label": "Business directory results"
+        }
+    ]
 }
