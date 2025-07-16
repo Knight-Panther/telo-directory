@@ -10,3 +10,10 @@ server/.env
 
 # OS files
 .DS_Store
+
+# Ignore all new files in uploads/businesses/
+server/uploads/businesses/*
+
+# Don't ignore .gitkeep in case you use it later
+!server/uploads/businesses/.gitkeep
+
