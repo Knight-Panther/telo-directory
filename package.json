@@ -1,0 +1,19 @@
+{
+    "name": "telo-directory",
+    "version": "1.0.0",
+    "main": "index.js",
+    "directories": {
+        "doc": "docs"
+    },
+    "scripts": {
+        "dev": "concurrently \"npm start --prefix client\" \"npm run server --prefix server\"",
+        "server": "nodemon server.js --watch server"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "concurrently": "^9.1.2"
+    }
+}

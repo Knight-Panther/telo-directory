@@ -1,0 +1,22 @@
+
+User-agent: *
+Allow: /
+
+# Block access to admin or sensitive areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+
+# Allow specific crawlers for images
+User-agent: Googlebot-Image
+Allow: /
+
+# Block crawling of search result pages with parameters to avoid duplicate content
+Disallow: /*?*
+Allow: /*?utm_*
+
+# Sitemap location
+Sitemap: https://www.telo.ge/sitemap.xml
+
+# Crawl delay (optional, be conservative)
+Crawl-delay: 1

@@ -1,0 +1,452 @@
+/* client/src/styles/modals.css */
+
+/* ========================================
+   REPORT ISSUE MODAL STYLES
+   ======================================== */
+
+.report-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: reportModalOverlayIn var(--transition-normal);
+}
+
+@keyframes reportModalOverlayIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(4px);
+    }
+}
+
+.report-modal-content {
+    background: white;
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-modal);
+    animation: reportModalContentIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+@keyframes reportModalContentIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.report-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 32px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    color: white;
+}
+
+.report-modal-title h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.report-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.report-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-md);
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.report-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.report-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+}
+
+.report-issue-types h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.issue-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.issue-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-fast);
+    user-select: none;
+    position: relative;
+}
+
+.issue-checkbox:hover {
+    border-color: var(--primary-blue);
+    background: var(--gray-100);
+}
+
+.issue-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    border: 2px solid var(--gray-400);
+    border-radius: 4px;
+    margin-right: 12px;
+    position: relative;
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.issue-checkbox input:checked ~ .checkmark {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.issue-checkbox input:checked ~ .checkmark:after {
+    content: "";
+    position: absolute;
+    display: block;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.issue-checkbox input:checked ~ .checkbox-label {
+    color: var(--primary-blue);
+}
+
+.report-description-section {
+    margin-bottom: 20px;
+}
+
+.description-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.description-header label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.character-counter {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    font-weight: 500;
+}
+
+.description-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: var(--transition-fast);
+    outline: none;
+}
+
+.description-input:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.description-input:disabled {
+    background: var(--gray-100);
+    color: var(--gray-500);
+    cursor: not-allowed;
+}
+
+.description-input::placeholder {
+    color: var(--gray-500);
+    font-style: italic;
+}
+
+.report-error {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    padding: 12px 16px;
+    border-radius: var(--radius-lg);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-error::before {
+    content: "⚠️";
+    font-size: 1.1rem;
+}
+
+.report-modal-footer {
+    padding: 20px 32px 24px;
+    border-top: 1px solid var(--gray-200);
+    flex-shrink: 0;
+    background: var(--gray-100);
+}
+
+.report-submit-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.report-submit-btn:hover:not(:disabled) {
+    background: var(--gradient-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.report-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Success State Styles */
+.report-success {
+    padding: 40px 32px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.success-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-success);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    font-weight: bold;
+    animation: successIconPulse 0.6s ease-out;
+}
+
+@keyframes successIconPulse {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.report-success h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-700);
+}
+
+.report-success p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+    max-width: 300px;
+}
+
+.success-close-btn {
+    padding: 12px 32px;
+    background: var(--gradient-success);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.success-close-btn:hover {
+    background: linear-gradient(
+        135deg,
+        var(--success-green-dark) 0%,
+        var(--success-green-darker) 100%
+    );
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+    .report-modal-overlay {
+        padding: 15px;
+    }
+
+    .report-modal-content {
+        max-width: 100%;
+        max-height: 95vh;
+        border-radius: var(--radius-lg);
+    }
+
+    .report-modal-header,
+    .report-modal-body,
+    .report-modal-footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .report-modal-header {
+        padding-top: 20px;
+        padding-bottom: 16px;
+    }
+
+    .report-modal-title h2 {
+        font-size: 1.3rem;
+    }
+
+    .report-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .report-modal-body {
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    .issue-checkbox {
+        padding: 10px 14px;
+    }
+
+    .checkbox-label {
+        font-size: 0.9rem;
+    }
+
+    .report-success {
+        padding: 30px 20px;
+    }
+
+    .success-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .report-success h2 {
+        font-size: 1.2rem;
+    }
+
+    .report-success p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-modal-overlay {
+        padding: 10px;
+    }
+
+    .report-modal-header,
+    .report-modal-body,
+    .report-modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .issue-checkbox-group {
+        gap: 12px;
+    }
+
+    .description-input {
+        min-height: 70px;
+    }
+}
