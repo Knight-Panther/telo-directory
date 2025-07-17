@@ -1,4 +1,4 @@
-// client/src/components/admin/ManageBusinesses.js (existing code)
+// client/src/components/admin/ManageBusinesses.js
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
@@ -8,15 +8,18 @@ import "../../styles/admin.css";
 
 const ManageBusinesses = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    //change here
     const [searchInput, setSearchInput] = useState(""); // What user types
     const [searchQuery, setSearchQuery] = useState(""); // What gets sent to API
+
+    // 🔥 NEW: Only add these 2 state variables for confirmation
+    const [showVerificationConfirm, setShowVerificationConfirm] =
+        useState(false);
+    const [verificationData, setVerificationData] = useState(null);
 
     // 🔥 GET PAGE FROM URL INSTEAD OF LOCAL STATE
     const page = parseInt(searchParams.get("page")) || 1;
     const queryClient = useQueryClient();
 
-    //change here
     const { data, isLoading, isError } = useQuery({
         queryKey: ["admin-businesses", page, searchQuery],
         queryFn: () =>
@@ -36,10 +39,23 @@ const ManageBusinesses = () => {
         onError: () => alert("Error deleting business"),
     });
 
+    // 🔥 ENHANCED: Only modify the success callback to add business name
     const verifyMutation = useMutation({
         mutationFn: adminService.toggleVerification,
-        onSuccess: () => {
+        onSuccess: (updatedBusiness) => {
             queryClient.invalidateQueries(["admin-businesses"]);
+            // 🔥 NEW: Show success message with business name
+            const action = updatedBusiness.verified ? "enabled" : "disabled";
+            alert(
+                `✅ Verification ${action} for ${updatedBusiness.businessName}`
+            );
+        },
+        onError: (error) => {
+            alert(
+                `Error updating verification: ${
+                    error.response?.data?.error || error.message
+                }`
+            );
         },
     });
 
@@ -54,7 +70,6 @@ const ManageBusinesses = () => {
         setSearchParams(params);
     };
 
-    //change here
     const handleSearch = (e) => {
         e.preventDefault();
         setSearchQuery(searchInput); // This triggers the API call
@@ -77,6 +92,34 @@ const ManageBusinesses = () => {
         if (window.confirm(`Delete business "${name}"?`)) {
             deleteMutation.mutate(id);
         }
+    };
+
+    // 🔥 NEW: Add verification confirmation handler
+    const handleVerificationToggle = (business) => {
+        const action = business.verified ? "disable" : "enable";
+
+        setVerificationData({
+            businessId: business._id,
+            businessName: business.businessName,
+            currentStatus: business.verified,
+            action: action,
+        });
+        setShowVerificationConfirm(true);
+    };
+
+    // 🔥 NEW: Confirm verification change
+    const confirmVerificationChange = () => {
+        if (verificationData) {
+            verifyMutation.mutate(verificationData.businessId);
+            setShowVerificationConfirm(false);
+            setVerificationData(null);
+        }
+    };
+
+    // 🔥 NEW: Cancel verification change
+    const cancelVerificationChange = () => {
+        setShowVerificationConfirm(false);
+        setVerificationData(null);
     };
 
     if (isLoading) return <LoadingSpinner size="large" />;
@@ -174,6 +217,7 @@ const ManageBusinesses = () => {
                                 <td>{business.city}</td>
                                 <td>{business.businessType}</td>
                                 <td>
+                                    {/* 🔥 ONLY CHANGE: Update onClick to use new handler */}
                                     <button
                                         className={`verify-btn ${
                                             business.verified
@@ -181,9 +225,14 @@ const ManageBusinesses = () => {
                                                 : "unverified"
                                         }`}
                                         onClick={() =>
-                                            verifyMutation.mutate(business._id)
+                                            handleVerificationToggle(business)
                                         }
                                         disabled={verifyMutation.isPending}
+                                        title={
+                                            business.verified
+                                                ? "Click to disable verification"
+                                                : "Click to enable verification"
+                                        }
                                     >
                                         {business.verified ? "✓" : "✗"}
                                     </button>
@@ -234,6 +283,105 @@ const ManageBusinesses = () => {
                     Next
                 </button>
             </div>
+
+            {/* 🔥 NEW: Verification Confirmation Dialog - ONLY ADDITION */}
+            {showVerificationConfirm && verificationData && (
+                <div className="confirmation-overlay">
+                    <div className="confirmation-dialog">
+                        <div className="confirmation-header">
+                            <h3>
+                                {verificationData.action === "enable"
+                                    ? "✅ Enable Verification"
+                                    : "⚠️ Disable Verification"}
+                            </h3>
+                        </div>
+                        <div className="confirmation-content">
+                            <p>
+                                Are you sure you want to{" "}
+                                <strong>
+                                    {verificationData.action} verification
+                                </strong>{" "}
+                                for:
+                            </p>
+                            <div className="business-info-highlight">
+                                <strong>
+                                    "{verificationData.businessName}"
+                                </strong>
+                            </div>
+
+                            {verificationData.action === "enable" ? (
+                                <div className="success-notice">
+                                    <p>
+                                        ✅{" "}
+                                        <strong>
+                                            This will add the verification badge
+                                        </strong>{" "}
+                                        and the business will appear as verified
+                                        to users.
+                                    </p>
+                                    <p>
+                                        📝 <strong>Note:</strong> Only enable
+                                        verification for businesses that have
+                                        been properly reviewed and meet your
+                                        quality standards.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="warning-notice">
+                                    <p>
+                                        ⚠️{" "}
+                                        <strong>
+                                            This will remove the verification
+                                            badge
+                                        </strong>{" "}
+                                        and the business will appear as
+                                        unverified to users.
+                                    </p>
+                                    <p>
+                                        📝 <strong>Tip:</strong> Consider adding
+                                        a note about why verification was
+                                        removed for future reference.
+                                    </p>
+                                </div>
+                            )}
+
+                            <p>
+                                <strong>Do you want to continue?</strong>
+                            </p>
+                        </div>
+                        <div className="confirmation-actions">
+                            <button
+                                onClick={confirmVerificationChange}
+                                className={`btn ${
+                                    verificationData.action === "enable"
+                                        ? "btn-success"
+                                        : "btn-danger"
+                                }`}
+                                disabled={verifyMutation.isPending}
+                            >
+                                {verifyMutation.isPending
+                                    ? `${
+                                          verificationData.action === "enable"
+                                              ? "Enabling"
+                                              : "Disabling"
+                                      }...`
+                                    : `Yes, ${
+                                          verificationData.action === "enable"
+                                              ? "Enable"
+                                              : "Disable"
+                                      } Verification`}
+                            </button>
+                            <button
+                                onClick={cancelVerificationChange}
+                                className="btn btn-secondary"
+                                disabled={verifyMutation.isPending}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

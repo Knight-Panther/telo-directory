@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import adminService from "../../services/adminService";
 import businessService from "../../services/businessService";
 import LoadingSpinner from "../common/LoadingSpinner";
+import { getImageUrl, getPlaceholderData } from "../../utils/imageHelper";
 
 const BusinessForm = () => {
     const { id } = useParams();
@@ -26,6 +27,7 @@ const BusinessForm = () => {
         },
     });
     const [imageFile, setImageFile] = useState(null);
+    const [showImageModal, setShowImageModal] = useState(false);
 
     // Fetch categories
     const { data: categories = [] } = useQuery({
@@ -108,7 +110,10 @@ const BusinessForm = () => {
                 },
             }));
         } else {
-            setFormData((prev) => ({ ...prev, [name]: value }));
+            // Handle mobile field specifically - remove all spaces
+            const processedValue =
+                name === "mobile" ? value.replace(/\s/g, "") : value;
+            setFormData((prev) => ({ ...prev, [name]: processedValue }));
         }
     };
 
@@ -198,11 +203,82 @@ const BusinessForm = () => {
 
                 <div className="form-group">
                     <label>Profile Image</label>
+
+                    {/* Show current image preview if editing and image exists */}
+                    {isEdit && business?.profileImage && (
+                        <div className="current-image-preview">
+                            <div className="image-info">
+                                <img
+                                    src={getImageUrl(
+                                        business.profileImage,
+                                        "thumbnail"
+                                    )}
+                                    alt={`${formData.businessName} current profile`}
+                                    className="image-thumbnail"
+                                    onClick={() => setShowImageModal(true)}
+                                    style={{ cursor: "pointer" }}
+                                />
+                                <span className="image-filename">
+                                    Current:{" "}
+                                    {business.profileImage.split("/").pop()}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Show placeholder if editing but no image */}
+                    {isEdit && !business?.profileImage && (
+                        <div className="no-image-placeholder">
+                            <div
+                                className="image-thumbnail placeholder"
+                                style={{
+                                    backgroundColor: getPlaceholderData(
+                                        formData.businessName
+                                    ).backgroundColor,
+                                }}
+                            >
+                                {
+                                    getPlaceholderData(formData.businessName)
+                                        .letter
+                                }
+                            </div>
+                            <span className="image-filename">
+                                No image uploaded
+                            </span>
+                        </div>
+                    )}
+
+                    {/* File input */}
                     <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => setImageFile(e.target.files[0])}
                     />
+
+                    {/* Simple modal for full image view */}
+                    {showImageModal && (
+                        <div
+                            className="image-modal"
+                            onClick={() => setShowImageModal(false)}
+                        >
+                            <div className="modal-content">
+                                <img
+                                    src={getImageUrl(
+                                        business.profileImage,
+                                        "detail"
+                                    )}
+                                    alt={`${formData.businessName} full profile`}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                                <button
+                                    className="close-modal"
+                                    onClick={() => setShowImageModal(false)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="form-section">
