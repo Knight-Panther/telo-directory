@@ -1,12 +1,12 @@
-// client/src/pages/BusinessDetailPage.js - REPLACE ENTIRE COMPONENT
+// client/src/pages/BusinessDetailPage.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // UPDATED: Added useEffect import
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import businessService from "../services/businessService";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import LazyImage from "../components/common/LazyImage";
-import ReportIssueModal from "../components/modals/ReportIssueModal"; // NEW: Added for report functionality
+import ReportIssueModal from "../components/modals/ReportIssueModal";
 import {
     getImageUrl,
     getPlaceholderData,
@@ -24,7 +24,8 @@ import "../styles/pages.css";
  * - Error boundary patterns
  * - Image optimization with lazy loading
  * - Progressive enhancement (desktop full view, mobile collapsed)
- * - Report Issue Modal Integration (NEW)
+ * - Report Issue Modal Integration
+ * - FIXED: Auto scroll to top on page load (laptop screen issue resolved)
  */
 const BusinessDetailPage = () => {
     const { id } = useParams(); // Extract business ID from URL (/business/:id)
@@ -35,8 +36,29 @@ const BusinessDetailPage = () => {
     const [isSecondaryInfoExpanded, setIsSecondaryInfoExpanded] =
         useState(false);
 
-    // NEW: State for report issue modal
+    // State for report issue modal
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+    // FIXED: Auto scroll to top when component mounts or ID changes
+    // This resolves the issue where pages opened at the bottom on laptop screens
+    useEffect(() => {
+        // Scroll to top immediately when component mounts
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth", // Smooth scroll for better UX
+        });
+
+        // Alternative method for browsers that don't support smooth scrolling
+        // window.scrollTo(0, 0);
+
+        // Optional: Also scroll to top when document is ready (fallback)
+        const timer = setTimeout(() => {
+            window.scrollTo(0, 0);
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, [id]); // Dependency on 'id' ensures scroll-to-top when navigating between different businesses
 
     // React Query hook for data fetching with built-in loading, error, and caching
     // This replaces the need for useState + useEffect + fetch logic
@@ -130,7 +152,7 @@ const BusinessDetailPage = () => {
         window.open(url, "_blank", "noopener,noreferrer");
     };
 
-    // NEW: Handler functions for report issue modal
+    // Handler functions for report issue modal
     const handleReportIssue = () => {
         setIsReportModalOpen(true);
     };
@@ -410,7 +432,7 @@ const BusinessDetailPage = () => {
                                 </span>
                             </div>
 
-                            {/* UPDATED: Report Issue button now opens modal */}
+                            {/* Report Issue button opens modal */}
                             <div className="contact-method">
                                 <span className="contact-label">
                                     Report Issue
@@ -440,7 +462,7 @@ const BusinessDetailPage = () => {
                 </div>
             </div>
 
-            {/* NEW: Report Issue Modal */}
+            {/* Report Issue Modal */}
             <ReportIssueModal
                 isOpen={isReportModalOpen}
                 onClose={handleCloseReportModal}
