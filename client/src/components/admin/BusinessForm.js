@@ -117,6 +117,20 @@ const BusinessForm = () => {
         }
     };
 
+    // 1. ADD this function after handleChange (around line 108):
+    const handleRemoveImage = async () => {
+        if (!window.confirm("Are you sure you want to delete this image?")) {
+            return;
+        }
+        try {
+            console.log("🗑️ Would delete:", business.profileImage);
+            alert("Image deleted! (Frontend mock - backend coming next)");
+            queryClient.invalidateQueries(["admin-business", id]);
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    };
+
     if (isEdit && isLoading) return <LoadingSpinner size="large" />;
 
     return (
@@ -204,10 +218,10 @@ const BusinessForm = () => {
                 <div className="form-group">
                     <label>Profile Image</label>
 
-                    {/* Show current image preview if editing and image exists */}
+                    {/* ENHANCED: Added delete button overlay */}
                     {isEdit && business?.profileImage && (
                         <div className="current-image-preview">
-                            <div className="image-info">
+                            <div className="image-container">
                                 <img
                                     src={getImageUrl(
                                         business.profileImage,
@@ -218,6 +232,17 @@ const BusinessForm = () => {
                                     onClick={() => setShowImageModal(true)}
                                     style={{ cursor: "pointer" }}
                                 />
+                                {/* NEW: Delete button overlay */}
+                                <button
+                                    type="button"
+                                    className="delete-overlay-btn"
+                                    onClick={handleRemoveImage}
+                                    title="Delete this image"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div className="image-info">
                                 <span className="image-filename">
                                     Current:{" "}
                                     {business.profileImage.split("/").pop()}
@@ -226,7 +251,7 @@ const BusinessForm = () => {
                         </div>
                     )}
 
-                    {/* Show placeholder if editing but no image */}
+                    {/* UNCHANGED: Your existing placeholder */}
                     {isEdit && !business?.profileImage && (
                         <div className="no-image-placeholder">
                             <div
@@ -248,14 +273,23 @@ const BusinessForm = () => {
                         </div>
                     )}
 
-                    {/* File input */}
+                    {/* ENHANCED: Disabled when image exists */}
                     <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => setImageFile(e.target.files[0])}
+                        disabled={isEdit && business?.profileImage}
                     />
 
-                    {/* Simple modal for full image view */}
+                    {/* NEW: Warning message when disabled */}
+                    {isEdit && business?.profileImage && (
+                        <div className="upload-blocked-message">
+                            ⚠️ Please delete current image first to upload a new
+                            one
+                        </div>
+                    )}
+
+                    {/* UNCHANGED: Your existing modal */}
                     {showImageModal && (
                         <div
                             className="image-modal"
