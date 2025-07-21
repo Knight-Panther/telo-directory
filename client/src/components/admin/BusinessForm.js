@@ -216,7 +216,7 @@ const BusinessForm = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Profile Image</label>
+                    <label>Profile Image *</label>
 
                     {/* ENHANCED: Added delete button overlay */}
                     {isEdit && business?.profileImage && (
@@ -279,7 +279,16 @@ const BusinessForm = () => {
                         accept="image/*"
                         onChange={(e) => setImageFile(e.target.files[0])}
                         disabled={isEdit && business?.profileImage}
+                        required={!isEdit || !business?.profileImage}
                     />
+
+                    {/*Required message for new businesses */}
+                    {!isEdit && (
+                        <div className="required-message">
+                            📷 Profile image is required for new business
+                            listings
+                        </div>
+                    )}
 
                     {/* NEW: Warning message when disabled */}
                     {isEdit && business?.profileImage && (
