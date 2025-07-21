@@ -65,7 +65,7 @@ const BusinessCard = ({ business }) => {
 
     return (
         <>
-            <div className="business-card">
+            <div className="business-card business-card-mobile-horizontal">
                 {/* UPDATED: New Facebook-style circular image container */}
                 <div className="business-image-circular-container">
                     <div className="business-image-circular">

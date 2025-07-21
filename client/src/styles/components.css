@@ -2104,6 +2104,163 @@
    MEDIA QUERIES - SMALL MOBILE
    ======================================== */
 @media (max-width: 480px) {
+    .business-card-mobile-horizontal {
+        display: grid;
+        grid-template-columns: auto 1fr; /* Image column + Content column */
+        grid-template-rows: 1fr;
+        gap: var(--spacing-md); /* 12px gap between image and content */
+        align-items: center;
+        padding: var(--spacing-md); /* Reduce overall card padding */
+    }
+
+    /* Mobile: Image container takes only necessary space */
+    .business-card-mobile-horizontal .business-image-circular-container {
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Align to top */
+        padding: var(--spacing-xs); /* Minimal padding around image */
+        min-height: auto; /* Remove fixed height */
+        background: transparent; /* Remove background for cleaner look */
+    }
+
+    /* Mobile: Smaller circular image - 90px as requested */
+    .business-card-mobile-horizontal .business-image-circular {
+        width: 90px;
+        height: 90px;
+        border-width: 2px; /* Slightly thinner border for mobile */
+        flex-shrink: 0; /* Prevent shrinking */
+    }
+
+    /* Mobile: Adjust placeholder text size */
+    .business-card-mobile-horizontal .image-placeholder-circular {
+        font-size: 1.8rem; /* Smaller font for 90px container */
+    }
+
+    /* Mobile: Verification badge - keep same position relative to image */
+    .business-card-mobile-horizontal .verified-badge-circular {
+        width: 22px;
+        height: 22px;
+        font-size: 0.65rem;
+        top: 2px;
+        right: 2px;
+        border-width: 1px;
+    }
+    /* Mobile: Business info takes remaining horizontal space */
+    .business-card-mobile-horizontal .business-info {
+        grid-column: 2;
+        grid-row: 1;
+        padding: 0; /* Remove padding since card already has padding */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        min-width: 0; /* Allow content to shrink if needed */
+    }
+
+    /* Mobile: Business name header adjustments */
+    .business-card-mobile-horizontal .business-name-header {
+        margin-bottom: var(--spacing-xs); /* Tighter spacing */
+        align-items: flex-start; /* Align to top */
+        gap: var(--spacing-xs);
+    }
+
+    /* Mobile: Business name font adjustments */
+    .business-card-mobile-horizontal .business-name a {
+        font-size: 1rem; /* Slightly smaller for mobile horizontal */
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Limit to 2 lines */
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    /* Mobile: Icon group positioning */
+    .business-card-mobile-horizontal .icon-group {
+        gap: 6px; /* Tighter gap between icons */
+        align-self: flex-start; /* Align to top */
+    }
+
+    /* Mobile: Adjust button sizes for horizontal layout */
+    .business-card-mobile-horizontal .favorite-btn-small,
+    .business-card-mobile-horizontal .report-btn-small {
+        padding: 0.25rem 0.375rem;
+        font-size: 0.7rem;
+        min-width: 30px;
+        min-height: 30px; /* Ensure touch-friendly size */
+    }
+
+    /* Mobile: Star rating adjustments */
+    .business-card-mobile-horizontal .star-rating {
+        margin-bottom: var(--spacing-xs); /* Reduce spacing */
+    }
+
+    /* Mobile: Use small star rating variant */
+    .business-card-mobile-horizontal .star-rating-medium {
+        gap: 3px;
+    }
+
+    .business-card-mobile-horizontal .star-rating-medium .star {
+        font-size: 0.75rem;
+    }
+
+    .business-card-mobile-horizontal .star-rating-medium .rating-number {
+        font-size: 0.8rem;
+    }
+
+    .business-card-mobile-horizontal .star-rating-medium .rating-quality {
+        font-size: 0.65rem;
+    }
+
+    /* Mobile: Business meta tags - tighter spacing */
+    .business-card-mobile-horizontal .business-meta {
+        gap: 0.25rem; /* Tighter gaps between tags */
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .business-card-mobile-horizontal .business-meta span {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem; /* Smaller padding */
+    }
+
+    /* Mobile: Description adjustments */
+    .business-card-mobile-horizontal .description {
+        font-size: 0.85rem;
+        line-height: 1.3;
+        margin-bottom: var(--spacing-sm);
+        -webkit-line-clamp: 2; /* Limit to 2 lines on mobile horizontal */
+        line-clamp: 2;
+    }
+
+    /* Mobile: Contact section adjustments */
+    .business-card-mobile-horizontal .business-contact {
+        font-size: 0.8rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    /* Mobile: Social links adjustments */
+    .business-card-mobile-horizontal .social-links {
+        gap: 0.25rem;
+    }
+
+    .business-card-mobile-horizontal .social-links a {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Mobile: Hover effects adjustments for touch devices */
+    .business-card-mobile-horizontal:hover {
+        transform: none; /* Disable hover lift on mobile */
+    }
+
+    .business-card-mobile-horizontal:hover .business-image-circular {
+        transform: none; /* Disable image scaling on mobile */
+    }
+
+    .business-card-mobile-horizontal:hover .business-image-circular img {
+        transform: none; /* Disable image zoom on mobile */
+    }
+
     .business-image-circular-container {
         min-height: 140px;
         padding: var(--spacing-md);
