@@ -2268,22 +2268,72 @@
    BUSINESS CARD REPORT BUTTON STYLES
    ======================================== */
 
-/* NEW: Business name header with report button */
+/* Business name header with report button */
 .business-name-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(
+        --spacing-sm
+    ); /* Reduced because star rating will add spacing */
     gap: var(--spacing-sm);
 }
 
 /* Ensure business name takes available space */
 .business-name-header .business-name {
     flex: 1;
-    margin-bottom: 0; /* Remove existing margin since container handles it */
+    margin-bottom: 0;
 }
 
-/* NEW: Small report button for business cards */
+/* Icon group container for heart + report buttons */
+.icon-group {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* 12px gap between heart and flag as requested */
+    flex-shrink: 0; /* Prevent icons from shrinking */
+}
+
+/* Heart/Favorite button styles */
+.favorite-btn-small {
+    background: none;
+    border: 1px solid var(--danger-red);
+    color: var(--danger-red);
+    padding: 0.375rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    width: auto;
+    height: fit-content;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.favorite-btn-small:hover {
+    background: var(--danger-red);
+    color: white;
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: var(--shadow-sm);
+}
+
+.favorite-btn-small.favorited {
+    background: var(--danger-red);
+    color: white;
+    border-color: var(--danger-red);
+    animation: heartPulse 0.3s ease-out;
+}
+
+.favorite-btn-small.favorited:hover {
+    background: var(--danger-red-dark);
+    border-color: var(--danger-red-dark);
+    transform: translateY(-1px) scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+/* Small report button for business cards */
 .report-btn-small {
     background: none;
     border: 1px solid var(--danger-red);
@@ -2299,7 +2349,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* Prevent button from shrinking */
+    flex-shrink: 0;
     line-height: 1;
 }
 
@@ -2310,14 +2360,35 @@
     box-shadow: var(--shadow-sm);
 }
 
+/* Active states for both buttons */
+.favorite-btn-small:active,
 .report-btn-small:active {
     transform: translateY(0);
 }
 
-/* Focus state for accessibility */
+/* Focus states for accessibility */
+.favorite-btn-small:focus,
 .report-btn-small:focus {
     outline: 2px solid var(--danger-red);
     outline-offset: 2px;
+}
+
+/* Heart pulse animation */
+@keyframes heartPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* NEW: Star rating positioning in business card */
+.business-rating {
+    margin-bottom: var(--spacing-md);
 }
 
 /* ========================================
@@ -2347,5 +2418,242 @@
         padding: 0.2rem 0.3rem;
         font-size: 0.7rem;
         min-width: 24px;
+    }
+}
+
+/* ========================================
+   STAR RATING COMPONENT STYLES
+   ======================================== */
+
+/* Star Rating Container */
+.star-rating {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Stars Container */
+.stars-container {
+    display: flex;
+    gap: 1px;
+    position: relative;
+}
+
+/* Individual Star Wrapper */
+.star-wrapper {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+}
+
+/* Star Base Styling */
+.star {
+    display: inline-block;
+    font-size: inherit;
+    line-height: 1;
+    color: #e5e5e5; /* Light gray for empty stars */
+    transition: var(--transition-fast);
+}
+
+/* Empty Star (Background) */
+.star-empty {
+    position: relative;
+    z-index: 1;
+}
+
+/* Filled Star (Overlay) */
+.star-filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    color: #ffd700; /* Gold color for filled stars */
+    z-index: 2;
+    white-space: nowrap;
+}
+
+/* Rating Info Container */
+.rating-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+/* Rating Number */
+.rating-number {
+    font-weight: 600;
+    color: var(--gray-700);
+    line-height: 1;
+}
+
+/* Rating Quality Text */
+.rating-quality {
+    font-size: 0.75em;
+    color: var(--gray-500);
+    font-weight: 500;
+    line-height: 1;
+    text-transform: capitalize;
+}
+
+/* Size Variants for Star Rating */
+
+/* Medium Size (default for business cards) */
+.star-rating-medium {
+    gap: var(--spacing-sm);
+}
+
+.star-rating-medium .star {
+    font-size: 0.9rem;
+}
+
+.star-rating-medium .rating-number {
+    font-size: 0.9rem;
+}
+
+.star-rating-medium .rating-quality {
+    font-size: 0.7rem;
+}
+
+/* Small Size (for mobile) */
+.star-rating-small {
+    gap: 4px;
+}
+
+.star-rating-small .star {
+    font-size: 0.75rem;
+}
+
+.star-rating-small .rating-number {
+    font-size: 0.8rem;
+}
+
+.star-rating-small .rating-quality {
+    display: none; /* Hide quality text on small */
+}
+
+/* Screen Reader Only Text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Tablet adjustments */
+@media (max-width: 768px) {
+    .business-name-header {
+        gap: var(--spacing-xs);
+    }
+
+    .icon-group {
+        gap: 8px; /* Slightly less gap on tablet */
+    }
+
+    .favorite-btn-small,
+    .report-btn-small {
+        padding: 0.25rem 0.375rem;
+        font-size: 0.75rem;
+        min-width: 28px;
+    }
+
+    .star-rating-medium {
+        gap: 4px;
+    }
+
+    .star-rating-medium .star {
+        font-size: 0.8rem;
+    }
+
+    .star-rating-medium .rating-number {
+        font-size: 0.85rem;
+    }
+
+    .star-rating-medium .rating-quality {
+        display: none; /* Hide on mobile for space */
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    .business-name-header {
+        align-items: center;
+        gap: 6px;
+    }
+
+    .icon-group {
+        gap: 6px; /* Minimal gap on mobile but ensuring touch targets */
+    }
+
+    .favorite-btn-small,
+    .report-btn-small {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.7rem;
+        min-width: 32px; /* Ensure touch target accessibility */
+        min-height: 32px; /* Minimum touch target size */
+    }
+
+    .star-rating {
+        gap: 3px;
+    }
+
+    .star-rating-medium .star {
+        font-size: 0.75rem;
+    }
+
+    .star-rating-medium .rating-number {
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY & SPECIAL STATES
+   ======================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .favorite-btn-small,
+    .report-btn-small {
+        border-width: 2px;
+    }
+
+    .star-empty {
+        color: #666;
+    }
+
+    .star-filled {
+        color: #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .favorite-btn-small,
+    .report-btn-small,
+    .star,
+    .star-filled {
+        transition: none;
+    }
+
+    .favorite-btn-small:hover,
+    .report-btn-small:hover {
+        transform: none;
+    }
+
+    @keyframes heartPulse {
+        from,
+        to {
+            transform: none;
+        }
     }
 }
