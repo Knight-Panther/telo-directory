@@ -1424,7 +1424,15 @@
 }
 
 .business-info {
+    position: relative; /* Create positioning context */
     padding: var(--spacing-xl);
+}
+
+.business-info .icon-group {
+    position: absolute;
+    bottom: var(--spacing-xl); /* Match business-info padding */
+    right: var(--spacing-xl); /* Match business-info padding */
+    z-index: 10; /* Ensure it's above other content */
 }
 
 .business-name {
@@ -1511,9 +1519,74 @@
     gap: var(--spacing-sm);
     flex-wrap: wrap;
 }
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+/* SVG sizing within social icons */
+.social-icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+/* Facebook - Official Blue */
+.social-icon.facebook {
+    background: #1877f2;
+    color: white;
+}
+.social-icon.facebook:hover {
+    background: #166fe5;
+    box-shadow: var(--shadow-lg);
+    transform: var(--hover-lift);
+}
+
+/* Instagram - Official Gradient */
+.social-icon.instagram {
+    background: radial-gradient(
+        circle at 30% 107%,
+        #fdf497 0%,
+        #fdf497 5%,
+        #fd5949 45%,
+        #d6249f 60%,
+        #285aeb 90%
+    );
+    color: white;
+}
+
+.social-icon.instagram:hover {
+    background: radial-gradient(
+        circle at 30% 107%,
+        #fdf497 0%,
+        #fdf497 5%,
+        #fd5949 45%,
+        #d6249f 60%,
+        #285aeb 90%
+    );
+    box-shadow: var(--shadow-lg);
+    transform: var(--hover-lift);
+    filter: brightness(1.1);
+}
+
+/* TikTok - Official Black */
+.social-icon.tiktok {
+    background: #000;
+    color: white;
+}
+
+.social-icon.tiktok:hover {
+    background: #333;
+    box-shadow: var(--shadow-lg);
+    transform: var(--hover-lift);
+}
 
 .social-links a {
-    background: var(--gradient-primary);
     color: white;
     text-decoration: none;
     padding: 0.375rem var(--spacing-md);
@@ -1918,6 +1991,10 @@
     .business-info {
         padding: var(--spacing-lg);
     }
+    .business-info .icon-group {
+        bottom: var(--spacing-lg);
+        right: var(--spacing-lg);
+    }
 
     .no-results {
         padding: var(--spacing-2xl) var(--spacing-lg);
@@ -2177,8 +2254,10 @@
     }
     /* Mobile: Icon group positioning */
     .business-card-mobile-horizontal .icon-group {
-        gap: 6px; /* Tighter gap between icons */
-        align-self: flex-start; /* Align to top */
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        z-index: 10;
     }
 
     /* Mobile: Adjust button sizes for horizontal layout */
@@ -2246,6 +2325,15 @@
     .business-card-mobile-horizontal .social-links a {
         font-size: 0.7rem;
         padding: 0.25rem 0.5rem;
+    }
+    .business-card-mobile-horizontal .social-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .business-card-mobile-horizontal .social-icon svg {
+        width: 16px;
+        height: 16px;
     }
 
     /* Mobile: Hover effects adjustments for touch devices */
@@ -2644,6 +2732,7 @@
 .business-name-header .business-name {
     flex: 1;
     margin-bottom: 0;
+    padding-right: 0; /* Remove any right padding since icons are now absolute */
 }
 
 /* Icon group container for heart + report buttons */
@@ -2918,6 +3007,25 @@
         color: #000;
         border: 2px solid #000;
     }
+    .social-icon {
+        border: 2px solid white;
+    }
+
+    .social-icon.facebook {
+        background: #000;
+        border-color: #1877f2;
+    }
+
+    .social-icon.instagram {
+        background: #000;
+        border-color: #e4405f;
+    }
+
+    .social-icon.tiktok {
+        background: #fff;
+        color: #000;
+        border-color: #000;
+    }
 }
 
 /* Reduced motion support */
@@ -2951,6 +3059,14 @@
     .verified-badge-circular {
         animation: none;
     }
+    .social-icon {
+        transition: none;
+    }
+
+    .social-icon:hover {
+        transform: none;
+        filter: none;
+    }
 
     @keyframes heartPulse {
         from,
@@ -2958,4 +3074,10 @@
             transform: none;
         }
     }
+}
+
+/* Focus states for accessibility */
+.social-icon:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
 }
