@@ -1290,25 +1290,51 @@
     opacity: 1;
 }
 
-.business-image {
+/* UPDATED: Container for the circular image layout - centers the circular image within available space */
+.business-image-circular-container {
     position: relative;
-    height: 220px;
-    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-xl); /* Padding around the circular image */
     background: var(--gradient-gray);
+    min-height: 200px; /* Minimum height to ensure consistent card heights */
 }
 
-.business-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* UPDATED: Circular image container - Facebook-style 1:1 aspect ratio */
+.business-image-circular {
+    position: relative;
+    width: 220px; /* Fixed size that adapts well to card width */
+    height: 220px;
+    border-radius: var(--radius-full); /* Perfect circle */
+    overflow: hidden;
+    background: var(--gradient-gray);
+    border: 3px solid white; /* White border like Facebook profiles */
+    box-shadow: var(--shadow-md); /* Subtle shadow for depth */
     transition: var(--transition-normal);
 }
 
-.business-card:hover .business-image img {
-    transform: scale(1.05);
+/* UPDATED: Image styling within circular container */
+.business-image-circular img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures proper cropping within circle */
+    transition: var(--transition-normal);
 }
 
-.image-placeholder {
+/* UPDATED: Hover effect for circular images */
+.business-card:hover .business-image-circular {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-blue);
+}
+
+.business-card:hover .business-image-circular img {
+    transform: scale(1.1); /* Slight zoom on image itself */
+}
+
+/* UPDATED: Circular placeholder for businesses without photos */
+.image-placeholder-circular {
     width: 100%;
     height: 100%;
     background: var(--gradient-gray-hover);
@@ -1321,7 +1347,7 @@
     transition: var(--transition-normal);
 }
 
-.business-card:hover .image-placeholder {
+.business-card:hover .image-placeholder-circular {
     background: linear-gradient(
         135deg,
         var(--gray-300) 0%,
@@ -1330,24 +1356,28 @@
     color: var(--gray-600);
 }
 
-.verified-badge {
+/* UPDATED: Circular verification badge positioned outside the image */
+.verified-badge-circular {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 10px;
+    right: 10px;
     background: var(--gradient-success);
     color: white;
     border-radius: var(--radius-full);
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: bold;
     box-shadow: var(--shadow-sm);
+    border: 2px solid white; /* White border to separate from background */
     animation: pulse 2s infinite;
+    z-index: 10; /* Ensure it's above the image */
 }
 
+/* UPDATED: Pulse animation for circular verification badge */
 @keyframes pulse {
     0% {
         box-shadow: var(--shadow-sm);
@@ -1358,6 +1388,39 @@
     100% {
         box-shadow: var(--shadow-sm);
     }
+}
+
+/* ========================================
+   LAZY LOADING SUPPORT FOR CIRCULAR IMAGES
+   ======================================== */
+
+/* Lazy loading placeholder for circular images */
+.business-image-circular .lazy-image-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.business-image-circular .lazy-loading-indicator {
+    border-radius: var(--radius-full);
+}
+
+.business-image-circular .lazy-loading-indicator::after {
+    content: "👤";
+    font-size: 2.5rem;
+    color: var(--gray-500);
+    position: absolute;
+    opacity: 0.5;
+}
+
+/* Shimmer effect for circular images */
+.business-image-circular .lazy-loading-shimmer {
+    border-radius: var(--radius-full);
+}
+
+.business-image-circular .lazy-loading-shimmer::before {
+    border-radius: var(--radius-full);
 }
 
 .business-info {
@@ -1747,6 +1810,27 @@
    MEDIA QUERIES - MOBILE
    ======================================== */
 @media (max-width: 768px) {
+    .business-image-circular-container {
+        min-height: 160px;
+        padding: var(--spacing-lg);
+    }
+    .business-image-circular {
+        width: 120px;
+        height: 120px;
+        border-width: 2px; /* Thinner border on mobile */
+    }
+    .image-placeholder-circular {
+        font-size: 2.5rem;
+    }
+    .verified-badge-circular {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+        top: 6px;
+        right: 6px;
+        border-width: 1px;
+    }
+
     .home-link {
         display: block;
     }
@@ -1829,14 +1913,6 @@
 
     .business-card {
         border-radius: var(--radius-md);
-    }
-
-    .business-image {
-        height: 180px;
-    }
-
-    .business-image .lazy-image-placeholder {
-        height: 180px;
     }
 
     .business-info {
@@ -2028,6 +2104,28 @@
    MEDIA QUERIES - SMALL MOBILE
    ======================================== */
 @media (max-width: 480px) {
+    .business-image-circular-container {
+        min-height: 140px;
+        padding: var(--spacing-md);
+    }
+
+    .business-image-circular {
+        width: 100px;
+        height: 100px;
+    }
+
+    .image-placeholder-circular {
+        font-size: 2rem;
+    }
+
+    .verified-badge-circular {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+        top: 4px;
+        right: 4px;
+    }
+
     .search-input {
         padding: 12px 45px 12px 16px;
         font-size: 0.9rem;
@@ -2075,14 +2173,6 @@
 
     .business-grid {
         gap: var(--spacing-md);
-    }
-
-    .business-image {
-        height: 160px;
-    }
-
-    .business-image .lazy-image-placeholder {
-        height: 160px;
     }
 
     .business-info {
@@ -2166,6 +2256,24 @@
 
     .filter-panel {
         padding: 1.75rem;
+    }
+
+    .business-image-circular-container {
+        min-height: 180px;
+        padding: var(--spacing-lg);
+    }
+
+    .business-image-circular {
+        width: 130px;
+        height: 130px;
+    }
+
+    .verified-badge-circular {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+        top: 8px;
+        right: 8px;
     }
 }
 
@@ -2340,6 +2448,23 @@
     .modern-radio:checked ~ .radiomark {
         background-color: #63b3ed;
         border-color: #63b3ed;
+    }
+
+    .business-image-circular {
+        border-color: #4a5568;
+    }
+
+    .business-image-circular-container {
+        background: var(--gray-800);
+    }
+
+    .image-placeholder-circular {
+        background: #4a5568;
+        color: #cbd5e0;
+    }
+
+    .verified-badge-circular {
+        border-color: #4a5568;
     }
 }
 
@@ -2621,6 +2746,21 @@
     .star-filled {
         color: #000;
     }
+    .business-image-circular {
+        border-color: #000;
+        border-width: 2px;
+    }
+
+    .verified-badge-circular {
+        border-color: #000;
+        background: #000;
+    }
+
+    .image-placeholder-circular {
+        background: #fff;
+        color: #000;
+        border: 2px solid #000;
+    }
 }
 
 /* Reduced motion support */
@@ -2635,6 +2775,24 @@
     .favorite-btn-small:hover,
     .report-btn-small:hover {
         transform: none;
+    }
+
+    .business-image-circular,
+    .business-image-circular img,
+    .image-placeholder-circular {
+        transition: none;
+    }
+
+    .business-card:hover .business-image-circular {
+        transform: none;
+    }
+
+    .business-card:hover .business-image-circular img {
+        transform: none;
+    }
+
+    .verified-badge-circular {
+        animation: none;
     }
 
     @keyframes heartPulse {

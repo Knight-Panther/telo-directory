@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import LazyImage from "../common/LazyImage";
-import StarRating from "../common/StarRating"; // Import StarRating component
+import StarRating from "../common/StarRating";
 import ReportIssueModal from "../modals/ReportIssueModal";
 import "../../styles/components.css";
 
@@ -20,25 +20,25 @@ const BusinessCard = ({ business }) => {
         socialLinks,
     } = business;
 
-    // State for report issue modal (PRESERVED)
+    // State for report issue modal
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     // State for favorites functionality
-    const [isFavorited, setIsFavorited] = useState(false); // Placeholder state
+    const [isFavorited, setIsFavorited] = useState(false);
 
-    // Handle image loading error (PRESERVED)
+    // Handle image loading error
     const handleImageError = (e) => {
         e.target.src = "/placeholder-business.png";
     };
 
-    // Handler functions for report issue modal (PRESERVED)
+    // Handler functions for report issue modal
     const handleReportIssue = (e) => {
         e.preventDefault(); // Prevent navigation when clicking report
         e.stopPropagation(); // Prevent event bubbling
         setIsReportModalOpen(true);
     };
 
-    // Close modal handler (PRESERVED)
+    // Close modal handler
     const handleCloseReportModal = () => {
         setIsReportModalOpen(false);
     };
@@ -66,24 +66,30 @@ const BusinessCard = ({ business }) => {
     return (
         <>
             <div className="business-card">
-                <div className="business-image">
-                    {profileImage ? (
-                        <LazyImage
-                            src={`http://localhost:3000${profileImage}`}
-                            alt={businessName}
-                            onError={handleImageError}
-                            placeholder={
-                                <div className="image-placeholder">
-                                    <span>{businessName.charAt(0)}</span>
-                                </div>
-                            }
-                        />
-                    ) : (
-                        <div className="image-placeholder">
-                            <span>{businessName.charAt(0)}</span>
-                        </div>
+                {/* UPDATED: New Facebook-style circular image container */}
+                <div className="business-image-circular-container">
+                    <div className="business-image-circular">
+                        {profileImage ? (
+                            <LazyImage
+                                src={`http://localhost:3000${profileImage}`}
+                                alt={businessName}
+                                onError={handleImageError}
+                                placeholder={
+                                    <div className="image-placeholder-circular">
+                                        <span>{businessName.charAt(0)}</span>
+                                    </div>
+                                }
+                            />
+                        ) : (
+                            <div className="image-placeholder-circular">
+                                <span>{businessName.charAt(0)}</span>
+                            </div>
+                        )}
+                    </div>
+                    {/* UPDATED: Verification badge positioned outside circular image */}
+                    {verified && (
+                        <span className="verified-badge-circular">✓</span>
                     )}
-                    {verified && <span className="verified-badge">✓</span>}
                 </div>
 
                 <div className="business-info">
