@@ -1,9 +1,19 @@
 /* client/src/styles/pages.css */
-/* Home Page */
-/* hero section */
+/* ========================================
+   Base style up to 480px;
+   Small Mobile to Large Mobile (480px+);
+   Tablet Portrait (768px+);
+   Large Tablet / Small Desktop (1024px+);
+   Desktop (1200px+);
+   ======================================== */
+
+/* ========================================
+   HOME PAGE - Mobile First
+   ======================================== */
+/* Hero section - Base Mobile */
 .hero-section {
     text-align: center;
-    padding: var(--spacing-4xl) 0;
+    padding: var(--grid-gap-medium) var(--spacing-sm);
     background: var(--gradient-hero);
     margin-bottom: var(--spacing-2xl);
     position: relative;
@@ -16,43 +26,45 @@
 }
 
 .hero-section h1 {
-    font-size: var(--font-size-8xl);
+    font-size: var(--font-size-6xl);
     margin-bottom: var(--spacing-sm);
     color: var(--gray-700);
     font-weight: var(--font-weight-bold);
 }
 
 .hero-section p {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-lg);
     color: var(--medium-gray);
-    margin-bottom: var(--spacing-3xl);
+    margin-bottom: var(--spacing-2xl);
     max-width: var(--content-max-width);
     margin-left: auto;
     margin-right: auto;
     line-height: var(--line-height-normal);
+    padding: 0 var(--spacing-lg);
 }
 
-/* Content sectino */
+/* Content section - Mobile First */
 .content-section {
     display: grid;
-    grid-template-columns: var(--sidebar-width-desktop) 1fr;
-    gap: var(--grid-gap-xl);
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
     align-items: start;
-    padding-top: var(--spacing-lg);
+    padding-top: 0;
 }
 
 .sidebar {
-    position: sticky;
-    top: var(--sidebar-top-desktop);
+    position: static;
 }
 
 .main-content {
     min-height: var(--min-content-height);
 }
 
-/* Business Detail individual dynamic Page */
+/* ========================================
+   BUSINESS DETAIL PAGE (INDIVIDUALLY RENDERED) - Mobile First
+   ======================================== */
 .business-detail-page {
-    padding: var(--spacing-2xl) 0;
+    padding: var(--spacing-sm) 0;
     min-height: var(--min-page-height);
     background: var(--gray-100);
 }
@@ -130,12 +142,12 @@
     border: var(--border-width-thin) solid var(--gray-200);
 }
 
-/* Business header section with image and primary info */
+/* Business header section with image and primary info - Mobile First */
 .business-header {
     display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: var(--grid-gap-2xl);
-    padding: var(--spacing-4xl);
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-medium);
+    padding: var(--grid-gap-medium);
     border-bottom: var(--border-width-thin) solid var(--gray-150);
 }
 
@@ -147,7 +159,7 @@
 
 .business-image-large img {
     width: 100%;
-    height: var(--business-image-height-large);
+    height: var(--business-image-height-mobile);
     object-fit: cover;
     transition: transform var(--transition-normal);
 }
@@ -160,7 +172,7 @@
 
 .image-placeholder-large {
     width: 100%;
-    height: var(--business-image-height-large);
+    height: var(--business-image-height-mobile);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -205,7 +217,7 @@
 }
 
 .business-title {
-    font-size: var(--font-size-8xl);
+    font-size: var(--font-size-6xl);
     font-weight: var(--font-weight-bold);
     color: var(--dark-blue);
     margin: 0 0 var(--spacing-sm) 0;
@@ -223,14 +235,11 @@
     margin: 0;
 }
 
-/* Meta information grid */
+/* Meta information grid - Mobile First */
 .business-meta-grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(var(--grid-min-width-small), 1fr)
-    );
-    gap: var(--grid-gap-medium);
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
 }
 
 .meta-item {
@@ -310,9 +319,10 @@
     box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
 }
 
-/* Social media actions */
+/* Social media actions - Mobile First */
 .social-actions {
     display: flex;
+    flex-direction: column;
     gap: var(--spacing-lg);
 }
 
@@ -346,9 +356,9 @@
     font-size: var(--font-size-2xl);
 }
 
-/* Secondary information section */
+/* Secondary information section - Mobile First */
 .business-secondary-info {
-    padding: var(--spacing-2xl) var(--spacing-4xl);
+    padding: var(--spacing-lg) var(--grid-gap-medium);
     background: var(--gray-100);
     border-bottom: var(--border-width-thin) solid var(--gray-200);
 }
@@ -366,9 +376,11 @@
     font-size: var(--font-size-3xl);
 }
 
-/* Mobile toggle button - hidden on desktop */
+/* Mobile toggle button - Mobile First */
 .mobile-toggle {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--primary-blue);
     color: var(--white);
     border: none;
@@ -385,18 +397,25 @@
     transform: var(--transform-scale-medium);
 }
 
-/* Secondary content - always visible on desktop */
+/* Secondary content - Mobile First (hidden by default) */
 .secondary-content {
+    max-height: var(--mobile-content-min-height);
+    overflow: hidden;
+    opacity: var(--opacity-0);
     transition: var(--transition-normal);
+}
+
+/* Show secondary content when expanded */
+.secondary-content.expanded {
+    max-height: var(--mobile-content-max-height);
+    opacity: var(--opacity-100);
+    margin-top: var(--spacing-lg);
 }
 
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(var(--grid-min-width-medium), 1fr)
-    );
-    gap: var(--grid-gap-large);
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-medium);
 }
 
 .info-item {
@@ -450,9 +469,9 @@
     border: var(--border-width-thin) solid var(--verification-unverified-border);
 }
 
-/* Contact section */
+/* Contact section - Mobile First */
 .contact-section {
-    padding: var(--spacing-2xl) var(--spacing-4xl);
+    padding: var(--spacing-lg) var(--grid-gap-medium);
 }
 
 .contact-section h3 {
@@ -463,11 +482,8 @@
 
 .contact-grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(var(--grid-min-width-medium), 1fr)
-    );
-    gap: var(--grid-gap-large);
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-medium);
 }
 
 .contact-method {
@@ -574,22 +590,11 @@
 }
 
 /* ========================================
-   RESPONSIVE DESIGNS
+   RESPONSIVE BREAKPOINTS (Mobile-First)
    ======================================== */
-/* This is for Homepage.js */
-@media (max-width: 1024px) {
-    .content-section {
-        grid-template-columns: var(--sidebar-width-tablet) 1fr;
-        gap: var(--grid-gap-large);
-    }
 
-    .sidebar {
-        top: var(--sidebar-top-tablet);
-    }
-}
-
-/* This is for Hero section in HomePage.js */
-@media (max-width: 768px) {
+/* Small Mobile to Large Mobile (480px+) */
+@media (min-width: 480px) {
     .hero-section {
         padding: var(--spacing-2xl) var(--spacing-lg);
     }
@@ -603,29 +608,13 @@
         margin-bottom: var(--spacing-2xl);
     }
 
-    .content-section {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-lg);
-        padding-top: 0;
-    }
-
-    .sidebar {
-        position: static;
-    }
-    /* this is subgroup for details page */
     .business-detail-page {
         padding: var(--spacing-lg) 0;
     }
 
     .business-header {
-        grid-template-columns: 1fr;
         gap: var(--grid-gap-large);
         padding: var(--spacing-2xl);
-    }
-
-    .business-image-large img,
-    .image-placeholder-large {
-        height: var(--business-image-height-mobile);
     }
 
     .business-title {
@@ -637,88 +626,127 @@
         gap: var(--spacing-lg);
     }
 
-    .social-actions {
-        flex-direction: column;
-    }
-
     .business-secondary-info,
     .contact-section {
         padding: var(--grid-gap-medium) var(--spacing-2xl);
     }
-
-    .info-grid,
-    .contact-grid {
-        grid-template-columns: 1fr;
-        gap: var(--grid-gap-medium);
-    }
 }
 
-/* This belongs to Hero section in HomePage.js */
-@media (max-width: 480px) {
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
     .hero-section {
-        padding: var(--grid-gap-medium) var(--spacing-sm);
+        padding: var(--spacing-4xl) 0;
     }
 
     .hero-section h1 {
-        font-size: var(--font-size-6xl);
+        font-size: var(--font-size-8xl);
     }
 
     .hero-section p {
-        font-size: var(--font-size-lg);
-        padding: 0 var(--spacing-lg);
+        font-size: var(--font-size-2xl);
+        margin-bottom: var(--spacing-3xl);
+        padding: 0;
     }
-    /* This is subgroup for details page for 480p */
+
+    .content-section {
+        padding-top: var(--spacing-lg);
+    }
+
     .business-detail-page {
-        padding: var(--spacing-sm) 0;
+        padding: var(--spacing-2xl) 0;
     }
 
     .business-header {
-        padding: var(--grid-gap-medium);
-        gap: var(--grid-gap-medium);
+        gap: var(--grid-gap-2xl);
+        padding: var(--spacing-4xl);
+    }
+
+    .business-image-large img,
+    .image-placeholder-large {
+        height: var(--business-image-height-large);
     }
 
     .business-title {
-        font-size: var(--font-size-6xl);
+        font-size: var(--font-size-8xl);
     }
 
     .business-meta-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(var(--grid-min-width-small), 1fr)
+        );
+        gap: var(--grid-gap-medium);
     }
 
-    /* Show mobile toggle button */
+    .social-actions {
+        flex-direction: row;
+    }
+
     .mobile-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: none;
     }
 
-    /* Hide secondary content by default on mobile */
     .secondary-content {
-        max-height: var(--mobile-content-min-height);
-        overflow: hidden;
-        opacity: var(--opacity-0);
+        max-height: none;
+        overflow: visible;
+        opacity: 1;
+        margin-top: 0;
     }
 
-    /* Show secondary content when expanded */
-    .secondary-content.expanded {
-        max-height: var(--mobile-content-max-height);
-        opacity: var(--opacity-100);
-        margin-top: var(--spacing-lg);
+    .business-secondary-info {
+        padding: var(--spacing-2xl) var(--spacing-4xl);
     }
 
-    .business-secondary-info,
     .contact-section {
-        padding: var(--spacing-lg) var(--grid-gap-medium);
+        padding: var(--spacing-2xl) var(--spacing-4xl);
+    }
+
+    .info-grid,
+    .contact-grid {
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(var(--grid-min-width-medium), 1fr)
+        );
+        gap: var(--grid-gap-large);
     }
 
     .error-actions {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        align-items: flex-start;
     }
 
     .error-actions .btn {
-        width: 100%;
-        max-width: 200px;
+        width: auto;
+        max-width: none;
+    }
+}
+
+/* Large Tablet / Small Desktop (1024px+) */
+@media (min-width: 1024px) {
+    .content-section {
+        grid-template-columns: var(--sidebar-width-tablet) 1fr;
+        gap: var(--grid-gap-large);
+    }
+
+    .sidebar {
+        position: sticky;
+        top: var(--sidebar-top-tablet);
+    }
+
+    .business-header {
+        grid-template-columns: 350px 1fr;
+    }
+}
+
+/* Desktop (1200px+) */
+@media (min-width: 1200px) {
+    .content-section {
+        grid-template-columns: var(--sidebar-width-desktop) 1fr;
+        gap: var(--grid-gap-xl);
+    }
+
+    .sidebar {
+        top: var(--sidebar-top-desktop);
     }
 }
 

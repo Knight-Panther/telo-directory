@@ -324,22 +324,6 @@
     text-align: center;
 }
 
-.mobile-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--spacing-xs);
-    color: var(--primary-blue);
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    justify-content: center;
-}
-
-.mobile-toggle:hover {
-    color: var(--primary-blue-dark);
-}
 
 .filter-preview {
     display: flex;
@@ -1064,13 +1048,13 @@
 
 .verified-badge-circular {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 8px;
+    left: 8px;
     background: var(--gradient-success);
     color: white;
     border-radius: var(--radius-full);
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1892,75 +1876,12 @@
     background: var(--success-green-darker);
 }
 
-.hero-section {
-    transition: var(--transition-slow);
-    padding: 1.3rem 0.4rem;
-}
 
-.hero-section.fade-out {
-    opacity: 0.3;
-    transform: translateY(-20px);
-}
 
-.hero-section h1 {
-    font-size: 1.6rem;
-}
 
-.hero-section p {
-    font-size: 0.9rem;
-    padding: 0 0.85rem;
-}
 
-/* Secondary Content (Mobile Toggle) */
-.secondary-content {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-}
 
-.secondary-content.expanded {
-    max-height: 1800px;
-    opacity: 1;
-}
 
-.business-detail-page {
-    padding: 0.4rem 0;
-}
-
-.business-header {
-    padding: 1.3rem;
-    gap: 1.3rem;
-    grid-template-columns: 1fr;
-}
-
-.business-title {
-    font-size: 1.6rem;
-}
-
-.business-meta-grid {
-    grid-template-columns: 1fr;
-}
-
-.business-secondary-info,
-.contact-section {
-    padding: 1.3rem 1.7rem;
-}
-
-.info-grid,
-.contact-grid {
-    grid-template-columns: 1fr;
-    gap: 1.3rem;
-}
-
-.content-section {
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-    padding-top: 0;
-}
-
-.sidebar {
-    position: static;
-}
 
 /* ========================================
    LOADING SPINNER STYLES - CONSOLIDATED
