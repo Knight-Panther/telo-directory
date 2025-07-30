@@ -5,6 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import adminService from "../../services/adminService";
 import LoadingSpinner from "../common/LoadingSpinner";
 import "../../styles/admin.css";
+import { getImageUrl } from "../../utils/imageHelper";
 
 const ManageBusinesses = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -122,6 +123,12 @@ const ManageBusinesses = () => {
         setVerificationData(null);
     };
 
+    // BUSINESS CLICK HANDLER IN ADMIN PANEL:
+    const handleBusinessNameClick = (businessId) => {
+        const businessUrl = `/business/${businessId}`;
+        window.open(businessUrl, "_blank", "noopener,noreferrer");
+    };
+
     if (isLoading) return <LoadingSpinner size="large" />;
     if (isError)
         return <div className="error-message">Error loading businesses</div>;
@@ -200,13 +207,24 @@ const ManageBusinesses = () => {
                                     <div className="business-cell">
                                         {business.profileImage && (
                                             <img
-                                                src={`http://localhost:3000${business.profileImage}`}
+                                                src={getImageUrl(
+                                                    business.profileImage,
+                                                    "thumbnail"
+                                                )}
                                                 alt={business.businessName}
                                                 className="table-image"
                                             />
                                         )}
                                         <div>
-                                            <strong>
+                                            <strong
+                                                className="clickable-business-name"
+                                                onClick={() =>
+                                                    handleBusinessNameClick(
+                                                        business._id
+                                                    )
+                                                }
+                                                title="Click to view business page"
+                                            >
                                                 {business.businessName}
                                             </strong>
                                             <small>{business.businessId}</small>

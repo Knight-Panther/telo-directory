@@ -454,6 +454,15 @@
     font-size: 0.8rem;
 }
 
+/* ADD THESE NEW RULES HERE: */
+.clickable-business-name {
+    cursor: pointer;
+}
+
+.clickable-business-name:hover {
+    opacity: 0.8;
+}
+
 .verify-btn {
     width: 30px;
     height: 30px;
