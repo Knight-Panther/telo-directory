@@ -1,0 +1,301 @@
+/* ========================================
+   CSS CUSTOM PROPERTIES (DESIGN TOKENS) - components.css, modals.css, pages.css
+   ======================================== */
+:root {
+    /* Colors */
+    --primary-blue: #007bff;
+    --primary-blue-dark: #0056b3;
+    --primary-blue-darker: #004085;
+    --success-green: #28a745;
+    --success-green-dark: #20c997;
+    --success-green-darker: #218838;
+    --danger-red: #dc3545;
+    --danger-red-dark: #c82333;
+    --danger-red-darker: #a71e2a;
+    --warning-orange: #ff6b6b;
+    --warning-orange-light: #feca57;
+    --warning-orange-dark: #ee5a52;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #6c757d;
+    --gray-600: #495057;
+    --gray-700: #333;
+    --gray-800: #2d3748;
+    --gray-900: #1a202c;
+    --white: #ffffff;
+    --black: #000000;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(
+        135deg,
+        var(--primary-blue) 0%,
+        var(--primary-blue-dark) 100%
+    );
+    --gradient-primary-hover: linear-gradient(
+        135deg,
+        var(--primary-blue-dark) 0%,
+        var(--primary-blue-darker) 100%
+    );
+    --gradient-success: linear-gradient(
+        135deg,
+        var(--success-green) 0%,
+        var(--success-green-dark) 100%
+    );
+    --gradient-danger: linear-gradient(
+        135deg,
+        var(--danger-red) 0%,
+        var(--danger-red-dark) 100%
+    );
+    --gradient-danger-hover: linear-gradient(
+        135deg,
+        var(--danger-red-dark) 0%,
+        var(--danger-red-darker) 100%
+    );
+    --gradient-gray: linear-gradient(
+        135deg,
+        var(--gray-100) 0%,
+        var(--gray-200) 100%
+    );
+    --gradient-gray-hover: linear-gradient(
+        135deg,
+        var(--gray-200) 0%,
+        var(--gray-300) 100%
+    );
+    --gradient-warning: linear-gradient(
+        135deg,
+        var(--warning-orange) 0%,
+        var(--warning-orange-light) 100%
+    );
+    --gradient-warning-alt: linear-gradient(
+        135deg,
+        var(--warning-orange) 0%,
+        var(--warning-orange-dark) 100%
+    );
+
+    /* Shadows */
+    --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 2px 8px rgba(0, 123, 255, 0.2);
+    --shadow-md: 0 4px 16px rgba(0, 123, 255, 0.15);
+    --shadow-lg: 0 4px 8px rgba(0, 123, 255, 0.3);
+    --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.15);
+    --shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.1);
+
+    /* Hover Effects */
+    --hover-lift: translateY(-1px);
+    --hover-lift-scale: translateY(-1px) scale(1.05);
+    --active-press: translateY(0);
+
+    /* Spacing (Mobile-First) */
+    --spacing-xs: 0.25rem; /* 4px */
+    --spacing-sm: 0.5rem; /* 8px */
+    --spacing-md: 0.75rem; /* 12px */
+    --spacing-lg: 1rem; /* 16px */
+    --spacing-xl: 1.5rem; /* 24px */
+    --spacing-2xl: 2rem; /* 32px */
+    --spacing-3xl: 2.5rem; /* 40px */
+    --spacing-4xl: 3rem; /* 48px */
+    --spacing-5xl: 4rem; /* 64px */
+
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 50%;
+    --radius-pill: 20px;
+
+    /* Transitions */
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-slow: all 0.4s ease;
+
+    /* Typography */
+    --font-size-xs: 0.8rem; /* 12.8px */
+    --font-size-sm: 0.85rem; /* 13.6px */
+    --font-size-base: 0.9rem; /* 14.4px */
+    --font-size-md: 0.95rem; /* 15.2px */
+    --font-size-lg: 1rem; /* 16px */
+    --font-size-xl: 1.1rem; /* 17.6px */
+    --font-size-2xl: 1.2rem; /* 19.2px */
+    --font-size-3xl: 1.3rem; /* 20.8px */
+    --font-size-4xl: 1.4rem; /* 22.4px */
+    --font-size-5xl: 1.5rem; /* 24px */
+    --font-size-6xl: 1.8rem; /* 28.8px */
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* Z-index Scale */
+    --z-dropdown: 1000;
+    --z-sticky: 1010;
+    --z-fixed: 1020;
+    --z-modal-backdrop: 1030;
+    --z-modal: 2000;
+    --z-popover: 1040;
+    --z-tooltip: 1050;
+
+    /* Opacity Levels */
+    --opacity-0: 0;
+    --opacity-10: 0.1;
+    --opacity-20: 0.2;
+    --opacity-30: 0.3;
+    --opacity-40: 0.4;
+    --opacity-50: 0.5;
+    --opacity-60: 0.6;
+    --opacity-70: 0.7;
+    --opacity-80: 0.8;
+    --opacity-90: 0.9;
+    --opacity-100: 1;
+
+    /* Border Widths */
+    --border-width-thin: 1px;
+    --border-width-thick: 2px;
+    --border-width-thicker: 3px;
+
+    /* Backdrop Filters */
+    --backdrop-blur-none: blur(0px);
+    --backdrop-blur-sm: blur(4px);
+    --backdrop-blur-md: blur(8px);
+    --backdrop-blur-lg: blur(16px);
+
+    /* Component Sizing */
+    --modal-max-width: 500px;
+    --modal-max-width-mobile: 100%;
+    --modal-max-height-desktop: 90vh;
+    --modal-max-height-mobile: 95vh;
+    --checkbox-size: 20px;
+    --close-button-size: 36px;
+    --success-icon-size-desktop: 60px;
+    --success-icon-size-mobile: 50px;
+    --textarea-min-height-desktop: 80px;
+    --textarea-min-height-mobile: 70px;
+    --checkmark-check-width: 5px;
+    --checkmark-check-height: 10px;
+
+    /* Mobile-First Responsive Padding */
+    --padding-mobile: calc(var(--spacing-lg) * 0.85);
+    --padding-tablet: var(--spacing-lg);
+    --padding-desktop: var(--spacing-xl);
+
+    /* Modal Specific Padding */
+    --modal-padding-desktop: var(--spacing-2xl);
+    --modal-padding-tablet: var(--spacing-xl);
+    --modal-padding-mobile: var(--spacing-lg);
+
+    /* Animation Timing Functions */
+    --ease-out-back: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+
+    /* Extended Colors */
+    --gray-150: #f1f3f5;
+    --dark-blue: #2c3e50;
+    --medium-gray: #666;
+    --facebook-blue: #4267b2;
+    --facebook-blue-dark: #365899;
+    --instagram-pink: #e4405f;
+    --instagram-purple: #c13584;
+    --tiktok-black: #000000;
+    --tiktok-gray: #333333;
+    --warning-yellow: #ffc107;
+    --warning-orange-accent: #fd7e14;
+
+    /* Extended Gradients */
+    --gradient-hero: linear-gradient(
+        135deg,
+        var(--gray-100) 0%,
+        var(--gray-200) 100%
+    );
+    --gradient-facebook: linear-gradient(
+        135deg,
+        var(--facebook-blue) 0%,
+        var(--facebook-blue-dark) 100%
+    );
+    --gradient-instagram: linear-gradient(
+        135deg,
+        var(--instagram-pink) 0%,
+        var(--instagram-purple) 100%
+    );
+    --gradient-tiktok: linear-gradient(
+        135deg,
+        var(--tiktok-black) 0%,
+        var(--tiktok-gray) 100%
+    );
+    --gradient-warning-badge: linear-gradient(
+        135deg,
+        var(--warning-yellow) 0%,
+        var(--warning-orange-accent) 100%
+    );
+
+    /* Extended Typography */
+    --font-size-7xl: 2rem; /* 32px */
+    --font-size-8xl: 2.5rem; /* 40px */
+    --font-family-mono: "Courier New", monospace;
+
+    /* Letter Spacing */
+    --letter-spacing-tight: 0.5px;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 1px;
+
+    /* Layout Dimensions */
+    --sidebar-width-desktop: 280px;
+    --sidebar-width-tablet: 240px;
+    --sidebar-top-desktop: 120px;
+    --sidebar-top-tablet: 100px;
+    --content-max-width: 600px;
+    --business-image-height-large: 350px;
+    --business-image-height-mobile: 250px;
+    --min-content-height: 400px;
+    --min-page-height: calc(100vh - 120px);
+
+    /* Extended Border */
+    --border-width-accent: 4px;
+    --border-accent-color: var(--primary-blue);
+
+    /* Error States */
+    --error-bg: #f8d7da;
+    --error-border: #f5c6cb;
+    --error-text: #721c24;
+
+    /* Social Media */
+    --social-btn-size: 40px;
+
+    /* Extended Badge */
+    --badge-radius: 25px;
+    --badge-radius-small: 12px;
+    --badge-radius-medium: 15px;
+
+    /* Grid System */
+    --grid-min-width-small: 200px;
+    --grid-min-width-medium: 250px;
+    --grid-gap-small: 1rem;
+    --grid-gap-medium: 1.5rem;
+    --grid-gap-large: 2rem;
+    --grid-gap-xl: 2.5rem;
+    --grid-gap-2xl: 3rem;
+
+    /* Transform Effects */
+    --transform-lift-small: translateY(-2px);
+    --transform-lift-arrow: translateX(-4px);
+    --transform-scale-small: scale(1.05);
+    --transform-scale-medium: scale(1.1);
+
+    /* Verification States */
+    --verification-verified-bg: rgba(40, 167, 69, 0.1);
+    --verification-verified-border: rgba(40, 167, 69, 0.3);
+    --verification-unverified-bg: rgba(108, 117, 125, 0.1);
+    --verification-unverified-border: rgba(108, 117, 125, 0.3);
+
+    /* Mobile Collapse */
+    --mobile-content-max-height: 1000px;
+    --mobile-content-min-height: 0;
+}

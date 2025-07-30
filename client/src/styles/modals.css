@@ -10,47 +10,47 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 2000;
+    background: rgba(var(--black), var(--opacity-60));
+    backdrop-filter: var(--backdrop-blur-sm);
+    z-index: var(--z-modal);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: var(--spacing-xl);
     animation: reportModalOverlayIn var(--transition-normal);
 }
 
 @keyframes reportModalOverlayIn {
     from {
-        opacity: 0;
-        backdrop-filter: blur(0px);
+        opacity: var(--opacity-0);
+        backdrop-filter: var(--backdrop-blur-none);
     }
     to {
-        opacity: 1;
-        backdrop-filter: blur(4px);
+        opacity: var(--opacity-100);
+        backdrop-filter: var(--backdrop-blur-sm);
     }
 }
 
 .report-modal-content {
-    background: white;
+    background: var(--white);
     border-radius: var(--radius-xl);
     width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
+    max-width: var(--modal-max-width);
+    max-height: var(--modal-max-height-desktop);
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow-modal);
-    animation: reportModalContentIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: reportModalContentIn 0.4s var(--ease-out-back);
     overflow: hidden;
 }
 
 @keyframes reportModalContentIn {
     from {
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
+        opacity: var(--opacity-0);
+        transform: scale(0.9) translateY(var(--spacing-xl));
     }
     to {
-        opacity: 1;
+        opacity: var(--opacity-100);
         transform: scale(1) translateY(0);
     }
 }
@@ -59,73 +59,74 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 24px 32px 20px;
-    border-bottom: 1px solid var(--gray-200);
+    padding: var(--spacing-xl) var(--modal-padding-desktop) var(--spacing-xl);
+    border-bottom: var(--border-width-thin) solid var(--gray-200);
     flex-shrink: 0;
-    background: linear-gradient(135deg, #ff6b6b, #feca57);
-    color: white;
+    background: var(--gradient-warning);
+    color: var(--white);
 }
 
 .report-modal-title h2 {
-    margin: 0 0 4px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
+    margin: 0 0 var(--spacing-xs);
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--white);
 }
 
 .report-subtitle {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.9rem;
+    color: rgba(255, 255, 255, var(--opacity-90));
+    font-size: var(--font-size-base);
     margin: 0;
 }
 
 .report-modal-close {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, var(--opacity-20));
+    border: var(--border-width-thin) solid
+        rgba(255, 255, 255, var(--opacity-30));
     border-radius: var(--radius-md);
-    width: 36px;
-    height: 36px;
+    width: var(--close-button-size);
+    height: var(--close-button-size);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    color: white;
+    font-size: var(--font-size-5xl);
+    color: var(--white);
     transition: var(--transition-fast);
     flex-shrink: 0;
 }
 
 .report-modal-close:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, var(--opacity-30));
     transform: scale(1.05);
 }
 
 .report-modal-body {
     flex: 1;
     overflow-y: auto;
-    padding: 24px 32px;
+    padding: var(--spacing-xl) var(--modal-padding-desktop);
 }
 
 .report-issue-types h3 {
-    margin: 0 0 20px 0;
-    font-size: 1.1rem;
-    font-weight: 600;
+    margin: 0 0 var(--spacing-xl) 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
     color: var(--gray-700);
 }
 
 .issue-checkbox-group {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
 }
 
 .issue-checkbox {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 12px 16px;
-    border: 2px solid var(--gray-200);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: var(--border-width-thick) solid var(--gray-200);
     border-radius: var(--radius-lg);
     transition: var(--transition-fast);
     user-select: none;
@@ -139,17 +140,17 @@
 
 .issue-checkbox input[type="checkbox"] {
     position: absolute;
-    opacity: 0;
+    opacity: var(--opacity-0);
     cursor: pointer;
 }
 
 .checkmark {
-    height: 20px;
-    width: 20px;
-    background-color: white;
-    border: 2px solid var(--gray-400);
-    border-radius: 4px;
-    margin-right: 12px;
+    height: var(--checkbox-size);
+    width: var(--checkbox-size);
+    background-color: var(--white);
+    border: var(--border-width-thick) solid var(--gray-400);
+    border-radius: var(--radius-sm);
+    margin-right: var(--spacing-md);
     position: relative;
     transition: var(--transition-fast);
     flex-shrink: 0;
@@ -166,16 +167,16 @@
     display: block;
     left: 6px;
     top: 2px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
+    width: var(--checkmark-check-width);
+    height: var(--checkmark-check-height);
+    border: solid var(--white);
+    border-width: 0 var(--border-width-thick) var(--border-width-thick) 0;
     transform: rotate(45deg);
 }
 
 .checkbox-label {
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
     color: var(--gray-700);
 }
 
@@ -184,44 +185,44 @@
 }
 
 .report-description-section {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-xl);
 }
 
 .description-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-sm);
 }
 
 .description-header label {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
     color: var(--gray-700);
 }
 
 .character-counter {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     color: var(--gray-500);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .description-input {
     width: 100%;
-    padding: 12px 16px;
-    border: 2px solid var(--gray-200);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: var(--border-width-thick) solid var(--gray-200);
     border-radius: var(--radius-lg);
-    font-size: 0.9rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
     resize: vertical;
-    min-height: 80px;
+    min-height: var(--textarea-min-height-desktop);
     transition: var(--transition-fast);
     outline: none;
 }
 
 .description-input:focus {
     border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    box-shadow: var(--shadow-focus);
 }
 
 .description-input:disabled {
@@ -236,119 +237,119 @@
 }
 
 .report-error {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    color: white;
-    padding: 12px 16px;
+    background: var(--gradient-warning-alt);
+    color: var(--white);
+    padding: var(--spacing-md) var(--spacing-lg);
     border-radius: var(--radius-lg);
-    font-size: 0.9rem;
-    margin-bottom: 20px;
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-xl);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-sm);
 }
 
 .report-error::before {
     content: "⚠️";
-    font-size: 1.1rem;
+    font-size: var(--font-size-xl);
 }
 
 .report-modal-footer {
-    padding: 20px 32px 24px;
-    border-top: 1px solid var(--gray-200);
+    padding: var(--spacing-xl) var(--modal-padding-desktop) var(--spacing-xl);
+    border-top: var(--border-width-thin) solid var(--gray-200);
     flex-shrink: 0;
     background: var(--gray-100);
 }
 
 .report-submit-btn {
     width: 100%;
-    padding: 14px 24px;
+    padding: var(--spacing-lg) var(--spacing-xl);
     background: var(--gradient-primary);
-    color: white;
+    color: var(--white);
     border: none;
     border-radius: var(--radius-lg);
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: var(--transition-normal);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--spacing-sm);
 }
 
 .report-submit-btn:hover:not(:disabled) {
     background: var(--gradient-primary-hover);
-    transform: translateY(-1px);
+    transform: var(--hover-lift);
     box-shadow: var(--shadow-lg);
 }
 
 .report-submit-btn:disabled {
-    opacity: 0.6;
+    opacity: var(--opacity-60);
     cursor: not-allowed;
     transform: none;
 }
 
 /* Success State Styles */
 .report-success {
-    padding: 40px 32px;
+    padding: var(--spacing-3xl) var(--modal-padding-desktop);
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: var(--spacing-xl);
 }
 
 .success-icon {
-    width: 60px;
-    height: 60px;
+    width: var(--success-icon-size-desktop);
+    height: var(--success-icon-size-desktop);
     background: var(--gradient-success);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
-    color: white;
-    font-weight: bold;
+    font-size: var(--font-size-6xl);
+    color: var(--white);
+    font-weight: var(--font-weight-bold);
     animation: successIconPulse 0.6s ease-out;
 }
 
 @keyframes successIconPulse {
     0% {
         transform: scale(0);
-        opacity: 0;
+        opacity: var(--opacity-0);
     }
     50% {
         transform: scale(1.1);
     }
     100% {
         transform: scale(1);
-        opacity: 1;
+        opacity: var(--opacity-100);
     }
 }
 
 .report-success h2 {
     margin: 0;
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
     color: var(--gray-700);
 }
 
 .report-success p {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: var(--font-size-md);
     color: var(--gray-600);
-    line-height: 1.5;
+    line-height: var(--line-height-normal);
     max-width: 300px;
 }
 
 .success-close-btn {
-    padding: 12px 32px;
+    padding: var(--spacing-md) var(--modal-padding-desktop);
     background: var(--gradient-success);
-    color: white;
+    color: var(--white);
     border: none;
     border-radius: var(--radius-lg);
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: var(--transition-normal);
 }
@@ -359,7 +360,7 @@
         var(--success-green-dark) 0%,
         var(--success-green-darker) 100%
     );
-    transform: translateY(-1px);
+    transform: var(--hover-lift);
     box-shadow: var(--shadow-md);
 }
 
@@ -369,84 +370,84 @@
 
 @media (max-width: 768px) {
     .report-modal-overlay {
-        padding: 15px;
+        padding: var(--spacing-lg);
     }
 
     .report-modal-content {
-        max-width: 100%;
-        max-height: 95vh;
+        max-width: var(--modal-max-width-mobile);
+        max-height: var(--modal-max-height-mobile);
         border-radius: var(--radius-lg);
     }
 
     .report-modal-header,
     .report-modal-body,
     .report-modal-footer {
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: var(--modal-padding-tablet);
+        padding-right: var(--modal-padding-tablet);
     }
 
     .report-modal-header {
-        padding-top: 20px;
-        padding-bottom: 16px;
+        padding-top: var(--spacing-xl);
+        padding-bottom: var(--spacing-lg);
     }
 
     .report-modal-title h2 {
-        font-size: 1.3rem;
+        font-size: var(--font-size-3xl);
     }
 
     .report-subtitle {
-        font-size: 0.85rem;
+        font-size: var(--font-size-sm);
     }
 
     .report-modal-body {
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding-top: var(--spacing-xl);
+        padding-bottom: var(--spacing-xl);
     }
 
     .issue-checkbox {
-        padding: 10px 14px;
+        padding: var(--spacing-sm) var(--spacing-lg);
     }
 
     .checkbox-label {
-        font-size: 0.9rem;
+        font-size: var(--font-size-base);
     }
 
     .report-success {
-        padding: 30px 20px;
+        padding: var(--spacing-3xl) var(--modal-padding-tablet);
     }
 
     .success-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+        width: var(--success-icon-size-mobile);
+        height: var(--success-icon-size-mobile);
+        font-size: var(--font-size-5xl);
     }
 
     .report-success h2 {
-        font-size: 1.2rem;
+        font-size: var(--font-size-2xl);
     }
 
     .report-success p {
-        font-size: 0.9rem;
+        font-size: var(--font-size-base);
     }
 }
 
 @media (max-width: 480px) {
     .report-modal-overlay {
-        padding: 10px;
+        padding: var(--spacing-sm);
     }
 
     .report-modal-header,
     .report-modal-body,
     .report-modal-footer {
-        padding-left: 16px;
-        padding-right: 16px;
+        padding-left: var(--modal-padding-mobile);
+        padding-right: var(--modal-padding-mobile);
     }
 
     .issue-checkbox-group {
-        gap: 12px;
+        gap: var(--spacing-md);
     }
 
     .description-input {
-        min-height: 70px;
+        min-height: var(--textarea-min-height-mobile);
     }
 }
