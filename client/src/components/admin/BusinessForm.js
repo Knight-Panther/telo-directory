@@ -117,17 +117,16 @@ const BusinessForm = () => {
         }
     };
 
-    // 1. ADD this function after handleChange (around line 108):
     const handleRemoveImage = async () => {
         if (!window.confirm("Are you sure you want to delete this image?")) {
             return;
         }
         try {
-            console.log("🗑️ Would delete:", business.profileImage);
-            alert("Image deleted! (Frontend mock - backend coming next)");
+            await adminService.deleteBusinessImage(id);
             queryClient.invalidateQueries(["admin-business", id]);
+            alert("Image deleted successfully!");
         } catch (error) {
-            alert(`Error: ${error.message}`);
+            alert(`Error: ${error.response?.data?.error || error.message}`);
         }
     };
 

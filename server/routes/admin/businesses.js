@@ -146,13 +146,84 @@ router.put(
 // Delete business
 router.delete("/:id", async (req, res) => {
     try {
-        const business = await Business.findByIdAndDelete(req.params.id);
+        // First find the business to get image path before deletion
+        const business = await Business.findById(req.params.id);
 
         if (!business) {
             return res.status(404).json({ error: "Business not found" });
         }
 
-        res.json({ message: "Business deleted successfully" });
+        const imagePath = business.profileImage;
+
+        // Delete business from database
+        await Business.findByIdAndDelete(req.params.id);
+
+        // Clean up associated image file (if exists)
+        if (imagePath && imagePath.startsWith("/uploads/")) {
+            const fs = require("fs");
+            const path = require("path");
+            const fullPath = path.join(__dirname, "../../", imagePath);
+
+            try {
+                if (fs.existsSync(fullPath)) {
+                    fs.unlinkSync(fullPath);
+                }
+            } catch (fileError) {
+                console.error(
+                    "File deletion error during business deletion:",
+                    fileError
+                );
+                // Continue anyway - business already deleted
+            }
+        }
+
+        res.json({
+            message: "Business and associated image deleted successfully",
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete business image
+router.delete("/:id/image", async (req, res) => {
+    try {
+        const business = await Business.findById(req.params.id);
+
+        if (!business) {
+            return res.status(404).json({ error: "Business not found" });
+        }
+
+        if (!business.profileImage) {
+            return res.status(400).json({ error: "No image to delete" });
+        }
+
+        const imagePath = business.profileImage;
+
+        // Remove image reference from database
+        business.profileImage = "";
+        await business.save();
+
+        // Clean up file system (local files only later we will need to extend to CDNs)
+        if (imagePath.startsWith("/uploads/")) {
+            const fs = require("fs");
+            const path = require("path");
+            const fullPath = path.join(__dirname, "../../", imagePath);
+
+            try {
+                if (fs.existsSync(fullPath)) {
+                    fs.unlinkSync(fullPath);
+                }
+            } catch (fileError) {
+                console.error("File deletion error:", fileError);
+                // Continue anyway - database already updated
+            }
+        }
+
+        res.json({
+            message: "Image deleted successfully",
+            business: business,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

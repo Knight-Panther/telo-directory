@@ -40,6 +40,11 @@ export const adminService = {
         return response.data;
     },
 
+    deleteBusinessImage: async (id) => {
+        const response = await api.delete(`/admin/businesses/${id}/image`);
+        return response.data;
+    },
+
     toggleVerification: async (id) => {
         const response = await api.patch(`/admin/businesses/${id}/verify`);
         return response.data;
