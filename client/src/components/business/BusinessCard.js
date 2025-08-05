@@ -96,7 +96,9 @@ const BusinessCard = ({ business }) => {
                     {/* Enhanced business-name section with heart + report button */}
                     <div className="business-name-header">
                         <h3 className="business-name">
-                            <Link to={`/business/${_id}`}>{businessName}</Link>
+                            <Link to={`/business/${_id}`} target="_blank">
+                                {businessName}
+                            </Link>
                         </h3>
 
                         {/* Icon group with heart and report buttons */}
@@ -146,7 +148,7 @@ const BusinessCard = ({ business }) => {
                         <span className="type">{businessType}</span>
                         <span className="city">{city}</span>
                     </div>
-                    {/* this is clean */}
+
                     {/* Description (PRESERVED - no changes) */}
                     {shortDescription && (
                         <p className="description">{shortDescription}</p>
