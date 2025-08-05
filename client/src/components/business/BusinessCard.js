@@ -96,7 +96,8 @@ const BusinessCard = ({ business }) => {
                     {/* Enhanced business-name section with heart + report button */}
                     <div className="business-name-header">
                         <h3 className="business-name">
-                            <Link to={`/business/${_id}`} target="_blank">
+                            {/* Navigate to business detail page */}
+                            <Link to={`/business/${_id}`}>
                                 {businessName}
                             </Link>
                         </h3>

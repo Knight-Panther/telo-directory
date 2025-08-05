@@ -1,6 +1,6 @@
 // client/src/pages/HomePage.js
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "../components/common/SearchBar";
 import StickySearchWrapper from "../components/common/StickySearchWrapper";
 import FullScreenFilterModal from "../components/business/FullScreenFilterModal";
@@ -15,6 +15,75 @@ const HomePage = () => {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [isSticky, setIsSticky] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
+
+    // Helper function to parse URL parameters into state
+    const parseUrlParams = () => {
+        const urlParams = new URLSearchParams(location.search);
+        const parsedFilters = {};
+        const parsedSearchTerm = urlParams.get('search') || '';
+
+        // Parse categories
+        const categories = urlParams.get('categories');
+        if (categories) {
+            parsedFilters.categories = categories.split(',');
+        }
+
+        // Parse cities
+        const cities = urlParams.get('cities');
+        if (cities) {
+            parsedFilters.cities = cities.split(',');
+        }
+
+        // Parse business types
+        const businessTypes = urlParams.get('businessTypes');
+        if (businessTypes) {
+            parsedFilters.businessTypes = businessTypes.split(',');
+        }
+
+        // Parse verified filter
+        const verified = urlParams.get('verified');
+        if (verified === 'true') {
+            parsedFilters.verified = true;
+        }
+
+        return { parsedFilters, parsedSearchTerm };
+    };
+
+    // Helper function to update URL with current state
+    const updateUrl = (newSearchTerm, newFilters) => {
+        const urlParams = new URLSearchParams();
+
+        // Add search term
+        if (newSearchTerm) {
+            urlParams.set('search', newSearchTerm);
+        }
+
+        // Add filters
+        if (newFilters.categories?.length) {
+            urlParams.set('categories', newFilters.categories.join(','));
+        }
+        if (newFilters.cities?.length) {
+            urlParams.set('cities', newFilters.cities.join(','));
+        }
+        if (newFilters.businessTypes?.length) {
+            urlParams.set('businessTypes', newFilters.businessTypes.join(','));
+        }
+        if (newFilters.verified) {
+            urlParams.set('verified', 'true');
+        }
+
+        // Update URL without triggering a page reload
+        const newUrl = urlParams.toString() ? `/?${urlParams.toString()}` : '/';
+        navigate(newUrl, { replace: true });
+    };
+
+    // Initialize state from URL parameters on component mount
+    useEffect(() => {
+        const { parsedFilters, parsedSearchTerm } = parseUrlParams();
+        setSearchTerm(parsedSearchTerm);
+        setFilters(parsedFilters);
+    }, []);
 
     // Check screen size
     useEffect(() => {
@@ -63,16 +132,24 @@ const HomePage = () => {
     // Handle filter changes
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
+        updateUrl(searchTerm, newFilters);
 
         if (process.env.NODE_ENV === "development") {
             console.log("Filter changed:", newFilters);
         }
     };
 
+    // Handle search term changes
+    const handleSearchChange = (newSearchTerm) => {
+        setSearchTerm(newSearchTerm);
+        updateUrl(newSearchTerm, filters);
+    };
+
     // Function to reset search and filters
     const resetToMainPage = () => {
         setSearchTerm("");
         setFilters({});
+        updateUrl("", {});
     };
 
     // Count active filters
@@ -105,7 +182,7 @@ const HomePage = () => {
             {/* Sticky Search Wrapper */}
             <StickySearchWrapper
                 searchTerm={searchTerm}
-                onSearch={setSearchTerm}
+                onSearch={handleSearchChange}
                 onReset={resetToMainPage}
                 onFilterToggle={handleFilterToggle}
                 activeFilterCount={getActiveFilterCount()}
@@ -125,7 +202,7 @@ const HomePage = () => {
                     <h1>Your Business Directory</h1>
                     <p>Find renovation businesses in your area</p>
                     <SearchBar
-                        onSearch={setSearchTerm}
+                        onSearch={handleSearchChange}
                         searchTerm={searchTerm}
                         onReset={resetToMainPage}
                     />

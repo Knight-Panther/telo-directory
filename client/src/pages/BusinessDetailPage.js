@@ -448,7 +448,12 @@ const BusinessDetailPage = () => {
                         </div>
                     </div>
                     <div className="back-link back-link-bottom">
-                        <Link to="/">Back to All Businesses</Link>
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="back-button"
+                        >
+                            ← Back to All Businesses
+                        </button>
                     </div>
                 </div>
 
