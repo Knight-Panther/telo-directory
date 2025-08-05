@@ -4,7 +4,39 @@ const Business = require("../../models/Business");
 const { verifyAdmin } = require("../../middleware/auth");
 const { upload, processImage } = require("../../middleware/upload");
 const { validateBusiness } = require("../../middleware/validation");
+const fs = require("fs");
+const path = require("path");
 const router = express.Router();
+
+// Helper function to clean up image files
+const cleanupImageFile = (imagePath, context = "operation") => {
+    if (imagePath && imagePath.startsWith("/uploads/")) {
+        const fullPath = path.join(__dirname, "../../", imagePath);
+        
+        try {
+            if (fs.existsSync(fullPath)) {
+                fs.unlinkSync(fullPath);
+            }
+        } catch (fileError) {
+            console.error(`File deletion error during ${context}:`, fileError);
+            // Continue anyway - main operation already completed
+        }
+    }
+};
+
+// Helper function to process social links
+const processSocialLinks = (socialLinks) => {
+    return socialLinks ? JSON.parse(socialLinks) : undefined;
+};
+
+// Helper function to handle image upload
+const handleImageUpload = async (file) => {
+    if (file) {
+        const filename = `${Date.now()}-${file.originalname}`;
+        return await processImage(file.buffer, filename);
+    }
+    return null;
+};
 
 // Apply auth middleware to all admin routes
 router.use(verifyAdmin);
@@ -84,16 +116,12 @@ router.post(
             const businessData = { ...req.body };
 
             // Process social links
-            if (req.body.socialLinks) {
-                businessData.socialLinks = JSON.parse(req.body.socialLinks);
-            }
+            const socialLinks = processSocialLinks(req.body.socialLinks);
+            if (socialLinks) businessData.socialLinks = socialLinks;
 
             // Handle image upload
-            if (req.file) {
-                const filename = `${Date.now()}-${req.file.originalname}`;
-                const imagePath = await processImage(req.file.buffer, filename);
-                businessData.profileImage = imagePath;
-            }
+            const imagePath = await handleImageUpload(req.file);
+            if (imagePath) businessData.profileImage = imagePath;
 
             const business = new Business(businessData);
             await business.save();
@@ -115,16 +143,12 @@ router.put(
             const updateData = { ...req.body };
 
             // Process social links
-            if (req.body.socialLinks) {
-                updateData.socialLinks = JSON.parse(req.body.socialLinks);
-            }
+            const socialLinks = processSocialLinks(req.body.socialLinks);
+            if (socialLinks) updateData.socialLinks = socialLinks;
 
             // Handle image upload
-            if (req.file) {
-                const filename = `${Date.now()}-${req.file.originalname}`;
-                const imagePath = await processImage(req.file.buffer, filename);
-                updateData.profileImage = imagePath;
-            }
+            const imagePath = await handleImageUpload(req.file);
+            if (imagePath) updateData.profileImage = imagePath;
 
             const business = await Business.findByIdAndUpdate(
                 req.params.id,
@@ -158,24 +182,8 @@ router.delete("/:id", async (req, res) => {
         // Delete business from database
         await Business.findByIdAndDelete(req.params.id);
 
-        // Clean up associated image file (if exists)
-        if (imagePath && imagePath.startsWith("/uploads/")) {
-            const fs = require("fs");
-            const path = require("path");
-            const fullPath = path.join(__dirname, "../../", imagePath);
-
-            try {
-                if (fs.existsSync(fullPath)) {
-                    fs.unlinkSync(fullPath);
-                }
-            } catch (fileError) {
-                console.error(
-                    "File deletion error during business deletion:",
-                    fileError
-                );
-                // Continue anyway - business already deleted
-            }
-        }
+        // Clean up associated image file
+        cleanupImageFile(imagePath, "business deletion");
 
         res.json({
             message: "Business and associated image deleted successfully",
@@ -204,21 +212,8 @@ router.delete("/:id/image", async (req, res) => {
         business.profileImage = "";
         await business.save();
 
-        // Clean up file system (local files only later we will need to extend to CDNs)
-        if (imagePath.startsWith("/uploads/")) {
-            const fs = require("fs");
-            const path = require("path");
-            const fullPath = path.join(__dirname, "../../", imagePath);
-
-            try {
-                if (fs.existsSync(fullPath)) {
-                    fs.unlinkSync(fullPath);
-                }
-            } catch (fileError) {
-                console.error("File deletion error:", fileError);
-                // Continue anyway - database already updated
-            }
-        }
+        // Clean up file system
+        cleanupImageFile(imagePath, "image deletion");
 
         res.json({
             message: "Image deleted successfully",
