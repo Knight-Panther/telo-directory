@@ -146,7 +146,7 @@ const BusinessCard = ({ business }) => {
                         <span className="type">{businessType}</span>
                         <span className="city">{city}</span>
                     </div>
-
+                    {/* this is clean */}
                     {/* Description (PRESERVED - no changes) */}
                     {shortDescription && (
                         <p className="description">{shortDescription}</p>
