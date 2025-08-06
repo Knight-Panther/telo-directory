@@ -52,72 +52,34 @@ const AboutPage = () => {
         },
     ];
 
-    // Team Member Component with improved image loading
+    // 🎯 SIMPLIFIED: Team Member Component (removed complex loading logic)
     const TeamMember = ({ member }) => {
-        const [imageLoaded, setImageLoaded] = useState(false);
         const [imageError, setImageError] = useState(false);
-        const [retryCount, setRetryCount] = useState(0);
 
-        const handleImageLoad = useCallback(() => {
-            setImageLoaded(true);
-            setImageError(false);
-        }, []);
-
-        const handleImageError = useCallback(() => {
-            // Retry loading once before giving up
-            if (retryCount < 1) {
-                setRetryCount((prev) => prev + 1);
-                // Force re-render by updating the src
-                setTimeout(() => {
-                    const img = document.querySelector(
-                        `img[alt*="${member.name}"]`
-                    );
-                    if (img) {
-                        img.src = member.photo + `?retry=${retryCount + 1}`;
-                    }
-                }, 100);
-            } else {
-                setImageError(true);
-                if (process.env.NODE_ENV === "development") {
-                    console.warn(
-                        `Failed to load image for ${member.name}: ${member.photo}`
-                    );
-                }
+        const handleImageError = () => {
+            setImageError(true);
+            if (process.env.NODE_ENV === "development") {
+                console.warn(
+                    `Failed to load image for ${member.name}: ${member.photo}`
+                );
             }
-        }, [member.name, member.photo, retryCount]);
+        };
 
         return (
             <div className="team-member">
                 <div className="member-photo">
                     {!imageError ? (
-                        <>
-                            {!imageLoaded && (
-                                <div
-                                    className="photo-placeholder loading"
-                                    aria-label={`Loading photo of ${member.name}`}
-                                >
-                                    {member.initials}
-                                </div>
-                            )}
-                            <img
-                                src={member.photo}
-                                alt={`${member.name} - ${member.title}`}
-                                className={`member-image ${
-                                    imageLoaded ? "loaded" : "loading"
-                                }`}
-                                onLoad={handleImageLoad}
-                                onError={handleImageError}
-                                style={{
-                                    display: imageLoaded ? "block" : "none",
-                                }}
-                                loading="lazy"
-                                key={retryCount}
-                            />
-                        </>
+                        <img
+                            src={member.photo}
+                            alt={`${member.name} - ${member.title}`}
+                            className="member-image"
+                            onError={handleImageError}
+                        />
                     ) : (
                         <div
                             className="photo-placeholder error"
                             aria-label={`Photo unavailable for ${member.name}`}
+                            style={{ backgroundColor: "#007bff" }}
                         >
                             {member.initials}
                         </div>
@@ -179,7 +141,7 @@ const AboutPage = () => {
         return () => window.removeEventListener("scroll", throttledScroll);
     }, [handleScroll]);
 
-    // Preload team images to prevent intermittent loading issues
+    // 🎯 KEEP: Preload team images (since only 4 images)
     useEffect(() => {
         teamMembers.forEach((member) => {
             const img = new Image();
