@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
 import BusinessDetailPage from "./pages/BusinessDetailPage";
 import AdminPage from "./pages/AdminPage";
 import "./App.css";
@@ -28,6 +29,7 @@ function App() {
                     <main className="main-content">
                         <Routes>
                             <Route path="/" element={<HomePage />} />
+                            <Route path="/about" element={<AboutPage />} />
                             <Route
                                 path="/business/:id"
                                 element={<BusinessDetailPage />}

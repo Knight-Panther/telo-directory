@@ -1,0 +1,878 @@
+/* client/src/styles/about.css */
+/* ========================================
+   ABOUT PAGE - Mobile First Responsive Design
+   Base style up to 480px;
+   Small Mobile to Large Mobile (480px+);
+   Tablet Portrait (768px+);
+   Large Tablet / Small Desktop (1024px+);
+   Desktop (1200px+);
+   ======================================== */
+
+/* ========================================
+   ABOUT PAGE LAYOUT - Mobile First
+   ======================================== */
+.about-page {
+    min-height: var(--min-page-height);
+    background: var(--gray-100);
+    padding-top: var(--spacing-sm);
+}
+
+/* ========================================
+   HORIZONTAL STICKY NAVIGATION - Mobile First
+   ======================================== */
+.about-nav {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: var(--white);
+    border-bottom: var(--border-width-thin) solid var(--gray-200);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: all 0.3s ease-in-out;
+}
+
+.about-nav.sticky {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-nav-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.about-nav-container::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-anchor {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.nav-anchor:hover {
+    background: var(--gray-200);
+    color: var(--primary-blue);
+}
+
+.nav-anchor.active {
+    background: var(--primary-blue);
+    color: var(--white);
+    font-weight: var(--font-weight-semibold);
+}
+
+.nav-icon {
+    font-size: var(--font-size-base);
+    flex-shrink: 0;
+}
+
+.nav-title {
+    font-weight: var(--font-weight-medium);
+    display: none;
+}
+
+/* ========================================
+   PAGE HEADER - Mobile First
+   ======================================== */
+.about-header {
+    text-align: center;
+    padding: var(--spacing-lg) var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    background: var(--gradient-hero);
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-sm);
+}
+
+.about-header h1 {
+    font-size: var(--font-size-5xl);
+    margin-bottom: var(--spacing-sm);
+    color: var(--gray-700);
+    font-weight: var(--font-weight-bold);
+}
+
+.about-subtitle {
+    font-size: var(--font-size-base);
+    color: var(--medium-gray);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: var(--line-height-normal);
+}
+
+/* ========================================
+   SECTION LAYOUT - Mobile First - TIGHTER SPACING
+   ======================================== */
+.about-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-md);
+    border-bottom: var(--border-width-thin) solid var(--gray-200);
+    background: var(--gray-100);
+}
+
+.section-icon {
+    font-size: var(--font-size-2xl);
+    flex-shrink: 0;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: var(--font-size-3xl);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.section-content {
+    padding: var(--spacing-lg) var(--spacing-md);
+}
+
+/* ========================================
+   MISSION & VISION SECTION - Mobile First - TIGHTER
+   ======================================== */
+.mission-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.mission-card,
+.vision-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background: var(--gradient-hero);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.mission-card h3,
+.vision-card h3 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: var(--font-size-xl);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.mission-card p,
+.vision-card p {
+    margin: 0;
+    color: var(--gray-600);
+    line-height: var(--line-height-relaxed);
+    font-size: var(--font-size-base);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+}
+
+.value-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.value-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-primary);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    flex-shrink: 0;
+    font-size: var(--font-size-sm);
+}
+
+.value-item h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-base);
+    color: var(--dark-blue);
+}
+
+.value-item p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+/* ========================================
+   HOW IT WORKS SECTION - Mobile First - TIGHTER
+   ======================================== */
+.steps-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+}
+
+.step-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background: var(--gradient-hero);
+    border: var(--border-width-thin) solid var(--gray-200);
+    text-align: center;
+    position: relative;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-primary);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    margin: 0 auto var(--spacing-md);
+}
+
+.step-card h3 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: var(--font-size-lg);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.step-card p {
+    margin: 0;
+    color: var(--gray-600);
+    line-height: var(--line-height-relaxed);
+    font-size: var(--font-size-base);
+}
+
+/* ========================================
+   RULES SECTION - Mobile First - TIGHTER
+   ======================================== */
+.rules-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.rule-category {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background: var(--gradient-hero);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.rule-category h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-lg);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.rules-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rules-list li {
+    padding: var(--spacing-xs) 0;
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+    position: relative;
+    padding-left: var(--spacing-lg);
+}
+
+.rules-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--success-green);
+    font-weight: var(--font-weight-bold);
+}
+
+.quality-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: var(--gradient-primary);
+    border-radius: var(--radius-md);
+    color: var(--white);
+}
+
+.badge-icon {
+    font-size: var(--font-size-4xl);
+    flex-shrink: 0;
+}
+
+.badge-content h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.badge-content p {
+    margin: 0;
+    opacity: var(--opacity-90);
+    line-height: var(--line-height-relaxed);
+}
+
+/* ========================================
+   KEY MESSAGES SECTION - Mobile First - TIGHTER
+   ======================================== */
+.benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+}
+
+.benefit-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.benefit-card.homeowner {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+.benefit-card.business {
+    background: linear-gradient(135deg, #f1f8e9 0%, #fff3e0 100%);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.header-icon {
+    font-size: var(--font-size-2xl);
+}
+
+.benefit-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.benefit-card li {
+    padding: var(--spacing-xs) 0;
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+    position: relative;
+    padding-left: var(--spacing-xl);
+}
+
+.benefit-card li:before {
+    content: "⭐";
+    position: absolute;
+    left: 0;
+    font-size: var(--font-size-sm);
+}
+
+/* ========================================
+   TEAM SECTION - Mobile First - 1 COLUMN ON SMALL DEVICES
+   ======================================== */
+.team-intro {
+    text-align: center;
+    font-size: var(--font-size-base);
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-lg);
+    line-height: var(--line-height-relaxed);
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+}
+
+.team-member {
+    text-align: center;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    background: var(--gradient-hero);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.member-photo {
+    margin-bottom: var(--spacing-sm);
+    position: relative;
+}
+
+.photo-placeholder {
+    width: 70px;
+    height: 70px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-primary);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    margin: 0 auto;
+    border: 3px solid var(--white);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+}
+
+.photo-placeholder.loading {
+    animation: pulse 2s infinite;
+}
+
+.photo-placeholder.error {
+    background: var(--gradient-danger);
+}
+
+.member-image {
+    width: 70px;
+    height: 70px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 3px solid var(--white);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+    margin: 0 auto;
+    display: block;
+}
+
+.member-image.loading {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.member-image.loaded {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.member-info h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-base);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.member-title {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-sm);
+    color: var(--primary-blue);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.member-description {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    line-height: var(--line-height-normal);
+}
+
+/* ========================================
+   CTA SECTION - Mobile First - TIGHTER
+   ======================================== */
+.cta-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.cta-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    text-align: center;
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.homeowner-cta {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+.business-cta {
+    background: linear-gradient(135deg, #f1f8e9 0%, #fff3e0 100%);
+}
+
+.cta-card h3 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: var(--font-size-lg);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.cta-card p {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    transition: var(--transition-normal);
+    border: var(--border-width-thick) solid transparent;
+}
+
+.cta-button.primary {
+    background: var(--gradient-primary);
+    color: var(--white);
+    box-shadow: var(--shadow-sm);
+}
+
+.cta-button.primary:hover {
+    background: var(--gradient-primary-hover);
+    transform: var(--transform-lift-small);
+    box-shadow: var(--shadow-md);
+}
+
+.cta-button.secondary {
+    background: var(--white);
+    color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.cta-button.secondary:hover {
+    background: var(--primary-blue);
+    color: var(--white);
+    transform: var(--transform-lift-small);
+}
+
+.contact-info {
+    text-align: center;
+    padding: var(--spacing-lg);
+    background: var(--gradient-hero);
+    border-radius: var(--radius-md);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.contact-info h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-base);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.contact-info p {
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+}
+
+.contact-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    transition: var(--transition-fast);
+}
+
+.contact-link:hover {
+    color: var(--primary-blue-dark);
+    text-decoration: underline;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS (Mobile-First)
+   ======================================== */
+
+/* Small Mobile to Large Mobile (480px+) */
+@media (min-width: 480px) {
+    .about-nav-container {
+        gap: var(--spacing-sm);
+    }
+
+    .nav-anchor {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-base);
+    }
+
+    .nav-title {
+        display: flex;
+    }
+
+    .about-header {
+        padding: var(--spacing-xl) var(--spacing-lg);
+    }
+
+    .about-header h1 {
+        font-size: var(--font-size-6xl);
+    }
+
+    .about-subtitle {
+        font-size: var(--font-size-lg);
+    }
+
+    .section-header {
+        padding: var(--spacing-lg) var(--spacing-lg);
+    }
+
+    .section-content {
+        padding: var(--spacing-lg) var(--spacing-lg);
+    }
+
+    .values-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .photo-placeholder,
+    .member-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .photo-placeholder {
+        font-size: var(--font-size-2xl);
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+    }
+}
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+    .about-nav-container {
+        padding: var(--spacing-md) var(--spacing-2xl);
+        gap: var(--spacing-md);
+    }
+
+    .nav-anchor {
+        font-size: var(--font-size-lg);
+    }
+
+    .about-header {
+        padding: var(--spacing-2xl) var(--spacing-2xl);
+    }
+
+    .about-header h1 {
+        font-size: var(--font-size-7xl);
+    }
+
+    .about-subtitle {
+        font-size: var(--font-size-xl);
+    }
+
+    .section-header {
+        padding: var(--spacing-xl) var(--spacing-2xl);
+    }
+
+    .section-header h2 {
+        font-size: var(--font-size-4xl);
+    }
+
+    .section-content {
+        padding: var(--spacing-xl) var(--spacing-2xl);
+    }
+
+    .mission-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .values-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .steps-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-lg);
+    }
+
+    .rules-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .benefits-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-lg);
+    }
+
+    .cta-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+}
+
+/* Large Tablet / Small Desktop (1024px+) */
+@media (min-width: 1024px) {
+    .step-card:hover {
+        transform: var(--transform-lift-small);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .team-member:hover {
+        transform: var(--transform-lift-small);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .team-member:hover .photo-placeholder {
+        transform: scale(1.05);
+    }
+
+    .team-member:hover .member-image {
+        transform: scale(1.05);
+    }
+
+    .value-item:hover {
+        transform: var(--transform-lift-small);
+        box-shadow: var(--shadow-md);
+    }
+}
+
+/* Desktop (1200px+) */
+@media (min-width: 1200px) {
+    .about-header {
+        padding: var(--spacing-4xl) var(--spacing-4xl);
+    }
+
+    .section-header {
+        padding: var(--spacing-2xl) var(--spacing-4xl);
+    }
+
+    .section-content {
+        padding: var(--spacing-2xl) var(--spacing-4xl);
+    }
+
+    .steps-grid {
+        gap: var(--spacing-xl);
+    }
+
+    .team-grid {
+        gap: var(--spacing-xl);
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY & PERFORMANCE
+   ======================================== */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .about-nav,
+    .nav-anchor,
+    .cta-button,
+    .step-card,
+    .team-member,
+    .value-item {
+        transition: none;
+        transform: none;
+    }
+
+    .nav-anchor:hover,
+    .step-card:hover,
+    .team-member:hover,
+    .value-item:hover {
+        transform: none;
+    }
+
+    .photo-placeholder.loading {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+}
+
+.about-nav-container,
+.member-image,
+.photo-placeholder {
+    will-change: transform;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .about-section,
+    .mission-card,
+    .vision-card,
+    .step-card,
+    .rule-category,
+    .benefit-card,
+    .team-member,
+    .cta-card,
+    .contact-info {
+        border: var(--border-width-thick) solid var(--black);
+    }
+
+    .nav-anchor {
+        border: var(--border-width-thin) solid var(--gray-400);
+    }
+
+    .nav-anchor.active {
+        border: var(--border-width-thick) solid var(--primary-blue);
+    }
+}
+
+/* Focus management */
+.nav-anchor:focus {
+    outline: var(--border-width-thick) solid var(--primary-blue);
+    outline-offset: var(--border-width-thin);
+}
+
+.cta-button:focus,
+.contact-link:focus {
+    outline: var(--border-width-thick) solid var(--primary-blue);
+    outline-offset: var(--border-width-thick);
+}

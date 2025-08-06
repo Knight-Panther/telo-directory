@@ -17,73 +17,73 @@ const HomePage = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Helper function to parse URL parameters into state
-    const parseUrlParams = () => {
-        const urlParams = new URLSearchParams(location.search);
-        const parsedFilters = {};
-        const parsedSearchTerm = urlParams.get('search') || '';
-
-        // Parse categories
-        const categories = urlParams.get('categories');
-        if (categories) {
-            parsedFilters.categories = categories.split(',');
-        }
-
-        // Parse cities
-        const cities = urlParams.get('cities');
-        if (cities) {
-            parsedFilters.cities = cities.split(',');
-        }
-
-        // Parse business types
-        const businessTypes = urlParams.get('businessTypes');
-        if (businessTypes) {
-            parsedFilters.businessTypes = businessTypes.split(',');
-        }
-
-        // Parse verified filter
-        const verified = urlParams.get('verified');
-        if (verified === 'true') {
-            parsedFilters.verified = true;
-        }
-
-        return { parsedFilters, parsedSearchTerm };
-    };
-
     // Helper function to update URL with current state
     const updateUrl = (newSearchTerm, newFilters) => {
         const urlParams = new URLSearchParams();
 
         // Add search term
         if (newSearchTerm) {
-            urlParams.set('search', newSearchTerm);
+            urlParams.set("search", newSearchTerm);
         }
 
         // Add filters
         if (newFilters.categories?.length) {
-            urlParams.set('categories', newFilters.categories.join(','));
+            urlParams.set("categories", newFilters.categories.join(","));
         }
         if (newFilters.cities?.length) {
-            urlParams.set('cities', newFilters.cities.join(','));
+            urlParams.set("cities", newFilters.cities.join(","));
         }
         if (newFilters.businessTypes?.length) {
-            urlParams.set('businessTypes', newFilters.businessTypes.join(','));
+            urlParams.set("businessTypes", newFilters.businessTypes.join(","));
         }
         if (newFilters.verified) {
-            urlParams.set('verified', 'true');
+            urlParams.set("verified", "true");
         }
 
         // Update URL without triggering a page reload
-        const newUrl = urlParams.toString() ? `/?${urlParams.toString()}` : '/';
+        const newUrl = urlParams.toString() ? `/?${urlParams.toString()}` : "/";
         navigate(newUrl, { replace: true });
     };
 
     // Initialize state from URL parameters on component mount
     useEffect(() => {
+        // Helper function to parse URL parameters into state
+        const parseUrlParams = () => {
+            const urlParams = new URLSearchParams(location.search);
+            const parsedFilters = {};
+            const parsedSearchTerm = urlParams.get("search") || "";
+
+            // Parse categories
+            const categories = urlParams.get("categories");
+            if (categories) {
+                parsedFilters.categories = categories.split(",");
+            }
+
+            // Parse cities
+            const cities = urlParams.get("cities");
+            if (cities) {
+                parsedFilters.cities = cities.split(",");
+            }
+
+            // Parse business types
+            const businessTypes = urlParams.get("businessTypes");
+            if (businessTypes) {
+                parsedFilters.businessTypes = businessTypes.split(",");
+            }
+
+            // Parse verified filter
+            const verified = urlParams.get("verified");
+            if (verified === "true") {
+                parsedFilters.verified = true;
+            }
+
+            return { parsedFilters, parsedSearchTerm };
+        };
+
         const { parsedFilters, parsedSearchTerm } = parseUrlParams();
         setSearchTerm(parsedSearchTerm);
         setFilters(parsedFilters);
-    }, []);
+    }, [location.search]);
 
     // Check screen size
     useEffect(() => {

@@ -69,7 +69,7 @@ const Header = () => {
                             className="nav-link"
                             onClick={closeMenu}
                         >
-                            About Us
+                            About TΣLO
                         </Link>
                         <Link
                             to="/contact"
