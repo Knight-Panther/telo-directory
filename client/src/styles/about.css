@@ -436,13 +436,13 @@
 }
 
 .member-photo {
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
     position: relative;
 }
 
 .photo-placeholder {
-    width: 70px;
-    height: 70px;
+    width: 100px;
+    height: 100px;
     border-radius: var(--radius-full);
     background: var(--gradient-primary);
     color: var(--white);
@@ -466,8 +466,8 @@
 }
 
 .member-image {
-    width: 70px;
-    height: 70px;
+    width: 100px;
+    height: 100px;
     border-radius: var(--radius-full);
     object-fit: cover;
     border: 3px solid var(--white);
@@ -675,8 +675,8 @@
 
     .photo-placeholder,
     .member-image {
-        width: 80px;
-        height: 80px;
+        width: 170px;
+        height: 170px;
     }
 
     .photo-placeholder {
