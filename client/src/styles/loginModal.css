@@ -1,0 +1,512 @@
+/* client/src/styles/loginModal.css - Mobile First Login Modal */
+
+/* ========================================
+   LOGIN MODAL - Mobile First Design
+   ======================================== */
+
+/* Modal Overlay */
+.login-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    animation: modalOverlayIn var(--transition-normal);
+}
+
+@keyframes modalOverlayIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+    }
+}
+
+/* Modal Content Container */
+.login-modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 400px;
+    max-height: calc(100vh - 20px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-modal);
+    animation: modalContentIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+@keyframes modalContentIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Modal Header */
+.login-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+}
+
+.login-modal-title h2 {
+    margin: 0 0 4px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-700);
+}
+
+.login-subtitle {
+    color: var(--gray-500);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.login-modal-close {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: var(--gray-500);
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.login-modal-close:hover {
+    background: var(--gray-200);
+    color: var(--gray-600);
+    transform: scale(1.05);
+}
+
+/* Tab Navigation */
+.login-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-100);
+}
+
+.login-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    position: relative;
+}
+
+.login-tab:first-child {
+    border-right: 1px solid var(--gray-200);
+}
+
+.login-tab.active {
+    color: var(--primary-blue);
+    background: white;
+}
+
+.login-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary-blue);
+}
+
+.login-tab:hover:not(.active) {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+/* Modal Body */
+.login-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Form Styles */
+.login-form {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.85rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    transition: var(--transition-fast);
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--gray-500);
+}
+
+/* Error Message */
+.login-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    color: var(--danger-red);
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.login-error::before {
+    content: "⚠️";
+    margin-right: 8px;
+}
+
+/* Submit Button */
+.login-submit-btn {
+    width: 100%;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    margin-bottom: 20px;
+}
+
+.login-submit-btn:hover:not(:disabled) {
+    background: var(--gradient-primary-hover);
+    transform: var(--hover-lift);
+    box-shadow: var(--shadow-lg);
+}
+
+.login-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Divider */
+.login-divider {
+    position: relative;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.login-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gray-300);
+}
+
+.login-divider span {
+    background: white;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    padding: 0 12px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Social Login Section */
+.social-login-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.social-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 16px;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--gray-700);
+}
+
+.social-login-btn:hover {
+    border-color: var(--gray-400);
+    background: var(--gray-100);
+    transform: var(--hover-lift);
+}
+
+.social-login-btn.google:hover {
+    border-color: #4285f4;
+    background: #f8fbff;
+}
+
+.social-login-btn.facebook:hover {
+    border-color: #1877f2;
+    background: #f0f7ff;
+}
+
+.social-login-btn.phone:hover {
+    border-color: #10b981;
+    background: #f0fdf9;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.social-icon svg {
+    display: block;
+}
+
+/* Footer Links */
+.login-footer-links {
+    text-align: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.forgot-password-link {
+    background: none;
+    border: none;
+    color: var(--primary-blue);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: var(--transition-fast);
+}
+
+.forgot-password-link:hover {
+    color: var(--primary-blue-dark);
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS (Mobile-First)
+   ======================================== */
+
+/* Small Mobile to Large Mobile (480px+) */
+@media (min-width: 480px) {
+    .login-modal-content {
+        max-width: 420px;
+    }
+
+    .login-modal-header {
+        padding: 24px 24px 18px;
+    }
+
+    .login-modal-title h2 {
+        font-size: 1.5rem;
+    }
+
+    .login-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .login-modal-close {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
+
+    .login-tab {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+
+    .login-modal-body {
+        padding: 24px;
+    }
+
+    .form-group input {
+        padding: 14px 16px;
+        font-size: 1rem;
+    }
+
+    .login-submit-btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+
+    .social-login-btn {
+        padding: 13px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+    .login-modal-overlay {
+        padding: 20px;
+    }
+
+    .login-modal-content {
+        max-width: 460px;
+        border-radius: var(--radius-xl);
+    }
+
+    .login-modal-header {
+        padding: 28px 28px 20px;
+    }
+
+    .login-modal-body {
+        padding: 28px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    .login-divider {
+        margin: 24px 0;
+    }
+
+    .social-login-section {
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .login-footer-links {
+        padding-top: 20px;
+    }
+
+    .forgot-password-link {
+        font-size: 0.9rem;
+    }
+}
+
+/* Large Tablet / Small Desktop (1024px+) */
+@media (min-width: 1024px) {
+    .login-modal-content {
+        max-width: 480px;
+    }
+
+    /* Add hover states for desktop */
+    .login-tab:hover:not(.active) {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+}
+
+/* Desktop (1200px+) */
+@media (min-width: 1200px) {
+    .login-modal-overlay {
+        padding: 40px;
+    }
+
+    .login-modal-content {
+        max-width: 500px;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+/* Focus states */
+.login-tab:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: -2px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.social-login-btn:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .login-modal-overlay,
+    .login-modal-content,
+    .login-tab,
+    .form-group input,
+    .login-submit-btn,
+    .social-login-btn {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .login-modal-content {
+        border: 2px solid var(--gray-700);
+    }
+
+    .form-group input {
+        border-width: 2px;
+    }
+
+    .social-login-btn {
+        border-width: 2px;
+    }
+}

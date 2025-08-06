@@ -1,11 +1,13 @@
 // client/src/components/common/Header.js - Enhanced navigation
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import LoginModal from "../modals/LoginModal";
 import "../../styles/components.css";
 
 const Header = () => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -13,6 +15,16 @@ const Header = () => {
 
     const closeMenu = () => {
         setIsMenuOpen(false);
+    };
+
+    const openLoginModal = (e) => {
+        e.preventDefault();
+        setIsLoginModalOpen(true);
+        closeMenu();
+    };
+
+    const closeLoginModal = () => {
+        setIsLoginModalOpen(false);
     };
 
     // Function to navigate home and reset search
@@ -73,6 +85,14 @@ const Header = () => {
                         >
                             Send Listing
                         </Link>
+
+                        <Link
+                            to="/login"
+                            className="nav-link"
+                            onClick={openLoginModal}
+                        >
+                            LogIn
+                        </Link>
                         <Link
                             to="/admin"
                             className="nav-link"
@@ -83,6 +103,8 @@ const Header = () => {
                     </nav>
                 </div>
             </div>
+
+            <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
         </header>
     );
 };
