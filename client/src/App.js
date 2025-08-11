@@ -2,6 +2,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { UserAuthProvider } from "./contexts/UserAuthContext"; // NEW: Import user auth context
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import HomePage from "./pages/HomePage";
@@ -23,23 +24,31 @@ const queryClient = new QueryClient({
 function App() {
     return (
         <QueryClientProvider client={queryClient}>
-            <Router>
-                <div className="App">
-                    <Header />
-                    <main className="main-content">
-                        <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/about" element={<AboutPage />} />
-                            <Route
-                                path="/business/:id"
-                                element={<BusinessDetailPage />}
-                            />
-                            <Route path="/admin/*" element={<AdminPage />} />
-                        </Routes>
-                    </main>
-                    <Footer />
-                </div>
-            </Router>
+            <UserAuthProvider>
+                {" "}
+                {/* NEW: Wrap app with user authentication context */}
+                <Router>
+                    <div className="App">
+                        <Header />
+                        <main className="main-content">
+                            <Routes>
+                                <Route path="/" element={<HomePage />} />
+                                <Route path="/about" element={<AboutPage />} />
+                                <Route
+                                    path="/business/:id"
+                                    element={<BusinessDetailPage />}
+                                />
+                                <Route
+                                    path="/admin/*"
+                                    element={<AdminPage />}
+                                />
+                            </Routes>
+                        </main>
+                        <Footer />
+                    </div>
+                </Router>
+            </UserAuthProvider>{" "}
+            {/* NEW: Close user auth provider */}
         </QueryClientProvider>
     );
 }

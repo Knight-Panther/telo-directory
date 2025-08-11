@@ -248,6 +248,230 @@ const validateRateLimit = async (req, res, next) => {
     }
 };
 
+// ===== NEW USER VALIDATION FUNCTIONS (ADD THESE) =====
+
+/**
+ * User Registration Validation Middleware
+ *
+ * This validation follows your established patterns from validateBusiness and validateReport:
+ * - Input sanitization to prevent XSS attacks
+ * - Comprehensive field validation with clear error messages
+ * - Password strength requirements for security
+ * - Consistent error response format matching your existing API
+ */
+const validateUserRegistration = (req, res, next) => {
+    const { email, password, name, phone } = req.body;
+    const errors = [];
+
+    // Email validation
+    if (!email?.trim()) {
+        errors.push("Email address is required");
+    } else {
+        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+        if (!emailRegex.test(email.trim())) {
+            errors.push("Please enter a valid email address");
+        }
+    }
+
+    // Password strength validation
+    if (!password) {
+        errors.push("Password is required");
+    } else {
+        // Minimum length check
+        if (password.length < 8) {
+            errors.push("Password must be at least 8 characters long");
+        }
+
+        // Character variety requirements
+        const hasLowercase = /(?=.*[a-z])/.test(password);
+        const hasUppercase = /(?=.*[A-Z])/.test(password);
+        const hasNumber = /(?=.*\d)/.test(password);
+        const hasSpecialChar = /(?=.*[!@#$%^&*(),.?":{}|<>])/.test(password);
+
+        if (!hasLowercase) {
+            errors.push("Password must contain at least one lowercase letter");
+        }
+        if (!hasUppercase) {
+            errors.push("Password must contain at least one uppercase letter");
+        }
+        if (!hasNumber) {
+            errors.push("Password must contain at least one number");
+        }
+        if (!hasSpecialChar) {
+            errors.push(
+                "Password must contain at least one special character (!@#$%^&*...)"
+            );
+        }
+
+        // Check for common weak passwords
+        const commonPasswords = [
+            "password",
+            "password123",
+            "123456789",
+            "qwerty123",
+            "admin123",
+            "welcome123",
+            "letmein123",
+        ];
+        if (commonPasswords.includes(password.toLowerCase())) {
+            errors.push(
+                "Password is too common. Please choose a more unique password"
+            );
+        }
+    }
+
+    // Name validation
+    if (!name?.trim()) {
+        errors.push("Full name is required");
+    } else {
+        const trimmedName = name.trim();
+        if (trimmedName.length < 2) {
+            errors.push("Name must be at least 2 characters long");
+        }
+        if (trimmedName.length > 50) {
+            errors.push("Name cannot exceed 50 characters");
+        }
+
+        // Check for potentially malicious content
+        if (/<[^>]*>/.test(trimmedName)) {
+            errors.push("Name cannot contain HTML tags");
+        }
+    }
+
+    // Phone validation (optional field)
+    if (phone && phone.trim()) {
+        const phoneRegex = /^[+]?[0-9\s\-()]{9,15}$/;
+        if (!phoneRegex.test(phone.trim())) {
+            errors.push(
+                "Please enter a valid phone number (9-15 digits, may include +, spaces, dashes, parentheses)"
+            );
+        }
+    }
+
+    // Return validation errors if any exist
+    if (errors.length > 0) {
+        return res.status(400).json({
+            error: "Registration validation failed",
+            code: "VALIDATION_ERROR",
+            details: errors,
+        });
+    }
+
+    // Sanitize inputs before proceeding
+    req.body.email = email.trim().toLowerCase();
+    req.body.name = name.trim();
+    req.body.phone = phone ? phone.trim() : undefined;
+
+    next();
+};
+
+/**
+ * User Login Validation Middleware
+ *
+ * Simpler validation for login since we only need email and password.
+ * Follows the same error response format as registration validation.
+ */
+const validateUserLogin = (req, res, next) => {
+    const { email, password } = req.body;
+    const errors = [];
+
+    // Email validation (basic check - detailed validation was done at registration)
+    if (!email?.trim()) {
+        errors.push("Email address is required");
+    } else {
+        // Basic format check
+        if (!email.includes("@") || !email.includes(".")) {
+            errors.push("Please enter a valid email address");
+        }
+    }
+
+    // Password validation (just check presence - strength was validated at registration)
+    if (!password) {
+        errors.push("Password is required");
+    }
+
+    // Return validation errors if any exist
+    if (errors.length > 0) {
+        return res.status(400).json({
+            error: "Login validation failed",
+            code: "VALIDATION_ERROR",
+            details: errors,
+        });
+    }
+
+    // Sanitize email input
+    req.body.email = email.trim().toLowerCase();
+
+    next();
+};
+
+/**
+ * Password Change Validation Middleware
+ *
+ * For future password change functionality.
+ * Validates both current password and new password requirements.
+ */
+const validatePasswordChange = (req, res, next) => {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const errors = [];
+
+    // Current password validation
+    if (!currentPassword) {
+        errors.push("Current password is required");
+    }
+
+    // New password validation (same rules as registration)
+    if (!newPassword) {
+        errors.push("New password is required");
+    } else {
+        if (newPassword.length < 8) {
+            errors.push("New password must be at least 8 characters long");
+        }
+
+        const hasLowercase = /(?=.*[a-z])/.test(newPassword);
+        const hasUppercase = /(?=.*[A-Z])/.test(newPassword);
+        const hasNumber = /(?=.*\d)/.test(newPassword);
+        const hasSpecialChar = /(?=.*[!@#$%^&*(),.?":{}|<>])/.test(newPassword);
+
+        if (!hasLowercase)
+            errors.push(
+                "New password must contain at least one lowercase letter"
+            );
+        if (!hasUppercase)
+            errors.push(
+                "New password must contain at least one uppercase letter"
+            );
+        if (!hasNumber)
+            errors.push("New password must contain at least one number");
+        if (!hasSpecialChar)
+            errors.push(
+                "New password must contain at least one special character"
+            );
+
+        // Ensure new password is different from current
+        if (currentPassword === newPassword) {
+            errors.push("New password must be different from current password");
+        }
+    }
+
+    // Confirm password validation
+    if (!confirmPassword) {
+        errors.push("Password confirmation is required");
+    } else if (newPassword !== confirmPassword) {
+        errors.push("New password and confirmation do not match");
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            error: "Password change validation failed",
+            code: "VALIDATION_ERROR",
+            details: errors,
+        });
+    }
+
+    next();
+};
+
 // Update the existing module.exports to include new validation functions
 module.exports = {
     validateBusiness,
@@ -255,4 +479,8 @@ module.exports = {
     validateReport,
     validateReportStatusUpdate,
     validateRateLimit,
+    // NEW USER VALIDATION FUNCTIONS
+    validateUserRegistration,
+    validateUserLogin,
+    validatePasswordChange,
 };
