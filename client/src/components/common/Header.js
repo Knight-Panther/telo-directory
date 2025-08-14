@@ -161,30 +161,31 @@ const Header = () => {
                                 {isUserDropdownOpen && (
                                     <div className="user-dropdown">
                                         <Link
-                                            to="/profile"
+                                            to="/dashboard"
                                             className="dropdown-link"
                                             onClick={closeMenu}
                                         >
                                             <span className="dropdown-icon">
-                                                👤
+                                                💻
                                             </span>
-                                            Profile
-                                        </Link>
-                                        <Link
-                                            to="/favorites"
-                                            className="dropdown-link"
-                                            onClick={closeMenu}
-                                        >
-                                            <span className="dropdown-icon">
-                                                ❤️
-                                            </span>
-                                            Favorites
+                                            Dashboard
                                             {user?.favoritesCount > 0 && (
                                                 <span className="favorites-count">
                                                     {user.favoritesCount}
                                                 </span>
                                             )}
                                         </Link>
+                                        <Link
+                                            to="/settings"
+                                            className="dropdown-link"
+                                            onClick={closeMenu}
+                                        >
+                                            <span className="dropdown-icon">
+                                                👤
+                                            </span>
+                                            Settings
+                                        </Link>
+
                                         <div className="dropdown-divider"></div>
                                         <button
                                             className="dropdown-link logout-btn"
