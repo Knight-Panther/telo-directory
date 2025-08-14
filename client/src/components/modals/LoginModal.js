@@ -1,6 +1,6 @@
-// client/src/components/modals/LoginModal.js - Enhanced with Real Authentication
+// client/src/components/modals/LoginModal.js
 import React, { useState } from "react";
-import { useUserAuth } from "../../contexts/UserAuthContext"; // ✅ NEW: Import auth context
+import { useUserAuth } from "../../contexts/UserAuthContext";
 import "./../../styles/loginModal.css";
 
 const LoginModal = ({ isOpen, onClose }) => {
@@ -14,9 +14,8 @@ const LoginModal = ({ isOpen, onClose }) => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
-    const [rememberMe, setRememberMe] = useState(true); // ✅ NEW: Remember Me state
+    const [rememberMe, setRememberMe] = useState(true);
 
-    // ✅ NEW: Get authentication functions from context
     const { login, register } = useUserAuth();
 
     const handleInputChange = (e) => {
@@ -25,15 +24,15 @@ const LoginModal = ({ isOpen, onClose }) => {
             ...prev,
             [name]: value,
         }));
-        setError("");
+        // ✅ ENHANCEMENT: Clear error when user starts typing (was just setError(""))
+        if (error) setError("");
     };
 
-    // ✅ NEW: Handle Remember Me checkbox
     const handleRememberMeChange = (e) => {
         setRememberMe(e.target.checked);
     };
 
-    // ✅ ENHANCED: Real authentication instead of mock
+    // ✅ ENHANCEMENT: Only the error handling part is enhanced
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -41,12 +40,10 @@ const LoginModal = ({ isOpen, onClose }) => {
 
         try {
             if (activeTab === "login") {
-                // ✅ Login validation
                 if (!formData.email || !formData.password) {
                     throw new Error("Please fill in all fields");
                 }
 
-                // ✅ REAL: Call actual login API through context
                 await login(
                     {
                         email: formData.email,
@@ -55,10 +52,8 @@ const LoginModal = ({ isOpen, onClose }) => {
                     rememberMe
                 );
 
-                // ✅ Success: Close modal and reset form
                 handleClose();
             } else {
-                // ✅ Registration validation
                 if (
                     !formData.name ||
                     !formData.email ||
@@ -71,7 +66,6 @@ const LoginModal = ({ isOpen, onClose }) => {
                     throw new Error("Passwords don't match");
                 }
 
-                // ✅ REAL: Call actual registration API through context
                 await register({
                     name: formData.name,
                     email: formData.email,
@@ -79,36 +73,51 @@ const LoginModal = ({ isOpen, onClose }) => {
                     phone: formData.phone || undefined,
                 });
 
-                // ✅ Success: Close modal and reset form (user is now logged in)
                 handleClose();
             }
         } catch (err) {
-            // ✅ ENHANCED: Better error handling for different error types
             console.error("Authentication error:", err);
 
-            // Handle different error formats from the API
-            if (err.details && Array.isArray(err.details)) {
-                // Validation errors with details array
-                setError(err.details.join(", "));
+            // ✅ ENHANCEMENT: Better error handling with specific messages (ONLY THIS PART CHANGED)
+            let errorMessage = "";
+
+            // Handle specific error codes from backend
+            if (err.code === "INVALID_CREDENTIALS") {
+                errorMessage =
+                    "❌ Invalid email or password. Please check your credentials and try again.";
+            } else if (err.code === "EMAIL_ALREADY_EXISTS") {
+                errorMessage =
+                    "📧 An account with this email already exists. Please try logging in instead.";
+            } else if (err.code === "ACCOUNT_LOCKED") {
+                errorMessage =
+                    "🔒 Account temporarily locked due to too many failed attempts. Please try again later.";
+            } else if (
+                err.code === "VALIDATION_ERROR" &&
+                err.details &&
+                Array.isArray(err.details)
+            ) {
+                errorMessage = `⚠️ ${err.details.join(", ")}`;
+            } else if (err.details && Array.isArray(err.details)) {
+                // Fallback for validation errors with details array
+                errorMessage = err.details.join(", ");
             } else if (err.message) {
                 // Simple error message
-                setError(err.message);
+                errorMessage = err.message;
             } else {
-                // Fallback error message
-                setError(
+                // Final fallback
+                errorMessage =
                     activeTab === "login"
                         ? "Login failed. Please try again."
-                        : "Registration failed. Please try again."
-                );
+                        : "Registration failed. Please try again.";
             }
 
+            setError(errorMessage);
             setIsSubmitting(false);
         }
     };
 
     const handleSocialLogin = (provider) => {
         console.log(`${provider} login clicked`);
-        // TODO: Implement social login in future phases
         setError(`${provider} login coming soon!`);
     };
 
@@ -123,7 +132,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         setActiveTab("login");
         setError("");
         setIsSubmitting(false);
-        setRememberMe(true); // ✅ Reset remember me to default
+        setRememberMe(true);
         onClose();
     };
 
@@ -186,7 +195,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="login-modal-body">
-                    {/* ✅ ENHANCED: Social Login Section (existing but improved) */}
+                    {/* Your existing social login section - NO CHANGES */}
                     <div className="social-login-section">
                         <button
                             type="button"
@@ -328,7 +337,6 @@ const LoginModal = ({ isOpen, onClose }) => {
                             </div>
                         )}
 
-                        {/* ✅ NEW: Remember Me checkbox (only show on login) */}
                         {activeTab === "login" && (
                             <div className="form-group remember-me-group">
                                 <label className="remember-me-label">
@@ -339,16 +347,16 @@ const LoginModal = ({ isOpen, onClose }) => {
                                         className="remember-me-checkbox"
                                     />
                                     <span className="remember-me-text">
-                                        Remember me for 7 days
+                                        Remember Me!
                                     </span>
                                 </label>
                             </div>
                         )}
 
-                        {/* ✅ ENHANCED: Better error display */}
+                        {/* ✅ ENHANCEMENT: Enhanced error display with better formatting */}
                         {error && (
-                            <div className="login-error">
-                                <strong>Error:</strong> {error}
+                            <div className="login-error enhanced-error">
+                                {error}
                             </div>
                         )}
 

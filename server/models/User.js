@@ -2,6 +2,63 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+// ✅ NEW ADDITION: Environment Variable Configuration
+/**
+ * Security Configuration from Environment Variables
+ *
+ * These settings control account locking behavior for brute force protection.
+ * Values can be configured via environment variables or use secure defaults.
+ */
+
+// Parse MAX_LOGIN_ATTEMPTS from environment (default: 5)
+const MAX_LOGIN_ATTEMPTS = parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5;
+
+// Parse ACCOUNT_LOCK_TIME from environment (default: 2 hours)
+const parseAccountLockTime = () => {
+    const lockTimeEnv = process.env.ACCOUNT_LOCK_TIME || "2h";
+
+    // Parse time format: "2h", "30m", "1d", etc.
+    const timeMatch = lockTimeEnv.match(/^(\d+)([hmsd])$/);
+    if (!timeMatch) {
+        console.warn(
+            `Invalid ACCOUNT_LOCK_TIME format: ${lockTimeEnv}. Using default 2h.`
+        );
+        return 2 * 60 * 60 * 1000; // 2 hours default
+    }
+
+    const [, value, unit] = timeMatch;
+    const numValue = parseInt(value);
+
+    switch (unit) {
+        case "s":
+            return numValue * 1000; // seconds
+        case "m":
+            return numValue * 60 * 1000; // minutes
+        case "h":
+            return numValue * 60 * 60 * 1000; // hours
+        case "d":
+            return numValue * 24 * 60 * 60 * 1000; // days
+        default:
+            console.warn(`Unknown time unit: ${unit}. Using default 2h.`);
+            return 2 * 60 * 60 * 1000; // 2 hours default
+    }
+};
+
+const ACCOUNT_LOCK_TIME = parseAccountLockTime();
+
+// Parse BCRYPT_ROUNDS from environment (default: 12)
+const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS) || 12;
+
+// Log configuration for debugging (only in development)
+if (process.env.NODE_ENV === "development") {
+    console.log(
+        `🔒 Security Config: MAX_LOGIN_ATTEMPTS=${MAX_LOGIN_ATTEMPTS}, ACCOUNT_LOCK_TIME=${
+            process.env.ACCOUNT_LOCK_TIME || "2h"
+        }, BCRYPT_ROUNDS=${BCRYPT_ROUNDS}`
+    );
+}
+// ✅ END NEW ADDITION
+
 /**
  * User Schema for Authentication and Favorites System
  *
@@ -158,11 +215,12 @@ userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
 
     try {
-        // Generate a salt with cost factor 12
+        // ✅ CHANGED: Use environment variable instead of hardcoded 12
+        // Generate a salt with cost factor from BCRYPT_ROUNDS (default: 12)
         // Cost factor 12 means 2^12 = 4,096 iterations
         // This is the current security standard (2024) - secure but not too slow
         // Higher numbers = more secure but slower login/registration
-        const salt = await bcrypt.genSalt(12);
+        const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
 
         // Hash the password with the generated salt
         // The salt is automatically included in the final hash
@@ -214,9 +272,13 @@ userSchema.virtual("isLocked").get(function () {
 /**
  * Handle failed login attempts and implement account locking
  *
+ * ✅ UPDATED: Now uses environment variables for configuration:
+ * - MAX_LOGIN_ATTEMPTS: How many failures before locking (default: 5)
+ * - ACCOUNT_LOCK_TIME: How long to lock account (default: 2h)
+ *
  * This method provides graduated security responses:
  * - First few failures: just increment counter
- * - After 5 failures: lock account for 2 hours
+ * - After max failures: lock account for configured time
  * - If previous lock expired: restart counting at 1
  *
  * This balance prevents brute force attacks while not permanently
@@ -235,14 +297,21 @@ userSchema.methods.incLoginAttempts = async function () {
     // Prepare to increment the login attempts counter
     const updates = { $inc: { loginAttempts: 1 } };
 
-    // If we've reached the max attempts (5) and account isn't already locked
-    const maxAttempts = 5;
-    const lockTime = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
-
-    if (this.loginAttempts + 1 >= maxAttempts && !this.isLocked) {
+    // ✅ CHANGED: Use environment variables instead of hardcoded values
+    // If we've reached the max attempts and account isn't already locked
+    if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
         updates.$set = {
-            lockUntil: Date.now() + lockTime,
+            lockUntil: Date.now() + ACCOUNT_LOCK_TIME,
         };
+
+        // ✅ NEW: Log account locking for security monitoring
+        if (process.env.NODE_ENV === "development") {
+            console.log(
+                `🔒 Account locked: ${this.email} for ${
+                    process.env.ACCOUNT_LOCK_TIME || "2h"
+                } after ${MAX_LOGIN_ATTEMPTS} failed attempts`
+            );
+        }
     }
 
     return this.updateOne(updates);
@@ -315,6 +384,20 @@ userSchema.statics.findByResetToken = function (token) {
         resetPasswordToken: token,
         resetPasswordExpires: { $gt: Date.now() }, // Token must not be expired
     });
+};
+
+// ✅ NEW ADDITION: Get current security configuration
+/**
+ * Get current security configuration
+ * Useful for admin dashboards and debugging
+ */
+userSchema.statics.getSecurityConfig = function () {
+    return {
+        maxLoginAttempts: MAX_LOGIN_ATTEMPTS,
+        accountLockTime: process.env.ACCOUNT_LOCK_TIME || "2h",
+        accountLockTimeMs: ACCOUNT_LOCK_TIME,
+        bcryptRounds: BCRYPT_ROUNDS,
+    };
 };
 
 // === EXPORT THE MODEL ===
