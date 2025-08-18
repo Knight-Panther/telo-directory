@@ -8,6 +8,8 @@ import Footer from "./components/common/Footer";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import BusinessDetailPage from "./pages/BusinessDetailPage";
+import DashboardPage from "./pages/DashboardPage"; // NEW: Import DashboardPage
+import SettingsPage from "./pages/SettingsPage"; // NEW: Import SettingsPage
 import AdminPage from "./pages/AdminPage";
 import "./App.css";
 
@@ -37,6 +39,16 @@ function App() {
                                 <Route
                                     path="/business/:id"
                                     element={<BusinessDetailPage />}
+                                />
+                                {/* NEW: Add dashboard route */}
+                                <Route
+                                    path="/dashboard"
+                                    element={<DashboardPage />}
+                                />
+                                {/* NEW: Add settings route */}
+                                <Route
+                                    path="/settings"
+                                    element={<SettingsPage />}
                                 />
                                 <Route
                                     path="/admin/*"
