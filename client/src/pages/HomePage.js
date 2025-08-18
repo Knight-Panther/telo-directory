@@ -7,6 +7,7 @@ import FullScreenFilterModal from "../components/business/FullScreenFilterModal"
 import FilterPanel from "../components/business/FilterPanel";
 import BusinessList from "../components/business/BusinessList";
 import "../styles/pages.css";
+import HeroSection from "../components/common/HeroSection";
 
 const HomePage = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -198,15 +199,18 @@ const HomePage = () => {
             />
 
             <div className="container">
-                <div className="hero-section">
-                    <h1>Your Business Directory</h1>
-                    <p>Find renovation businesses in your area</p>
+                <HeroSection
+                    title="Your Business Directory"
+                    description="Find renovation businesses in your area"
+                    backgroundType="construction"
+                    overlayType="dark"
+                >
                     <SearchBar
                         onSearch={handleSearchChange}
                         searchTerm={searchTerm}
                         onReset={resetToMainPage}
                     />
-                </div>
+                </HeroSection>
 
                 <div className="content-section">
                     {/* Desktop Sidebar Filter */}

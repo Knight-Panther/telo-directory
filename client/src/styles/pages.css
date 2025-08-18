@@ -11,28 +11,28 @@
    HOME PAGE - Mobile First
    ======================================== */
 /* Hero section - Base Mobile */
-.hero-section {
+/* .hero-section {
     text-align: center;
     padding: var(--grid-gap-medium) var(--spacing-sm);
     background: var(--gradient-hero);
     margin-bottom: var(--spacing-2xl);
     position: relative;
     transition: opacity var(--transition-slow), transform var(--transition-slow);
-}
+} */
 
-.hero-section.fade-out {
+/* .hero-section.fade-out {
     opacity: var(--opacity-30);
     transform: translateY(-20px);
-}
+} */
 
-.hero-section h1 {
+/* .hero-section h1 {
     font-size: var(--font-size-6xl);
     margin-bottom: var(--spacing-sm);
     color: var(--gray-700);
     font-weight: var(--font-weight-bold);
-}
+} */
 
-.hero-section p {
+/* .hero-section p {
     font-size: var(--font-size-lg);
     color: var(--medium-gray);
     margin-bottom: var(--spacing-2xl);
@@ -41,7 +41,7 @@
     margin-right: auto;
     line-height: var(--line-height-normal);
     padding: 0 var(--spacing-lg);
-}
+} */
 
 /* Content section - Mobile First */
 .content-section {
@@ -602,7 +602,7 @@
 
 /* Small Mobile to Large Mobile (480px+) */
 @media (min-width: 480px) {
-    .hero-section {
+    /* .hero-section {
         padding: var(--spacing-2xl) var(--spacing-lg);
     }
 
@@ -613,7 +613,7 @@
     .hero-section p {
         font-size: var(--font-size-xl);
         margin-bottom: var(--spacing-2xl);
-    }
+    } */
 
     .business-detail-page {
         padding: var(--spacing-lg) 0;
@@ -641,7 +641,7 @@
 
 /* Tablet Portrait (768px+) */
 @media (min-width: 768px) {
-    .hero-section {
+    /* .hero-section {
         padding: var(--spacing-4xl) 0;
     }
 
@@ -653,7 +653,7 @@
         font-size: var(--font-size-2xl);
         margin-bottom: var(--spacing-3xl);
         padding: 0;
-    }
+    } */
 
     .content-section {
         padding-top: var(--spacing-lg);
@@ -802,7 +802,7 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-    .hero-section,
+    /* .hero-section, */
     .back-link a,
     .social-links-large a,
     .verified-badge-large {
@@ -817,10 +817,10 @@
 
 /* High contrast mode */
 @media (prefers-contrast: high) {
-    .hero-section {
+    /* .hero-section {
         background: var(--white);
         border: var(--border-width-thick) solid var(--black);
-    }
+    } */
 
     .business-detail {
         border: var(--border-width-thick) solid var(--black);
