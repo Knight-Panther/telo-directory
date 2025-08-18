@@ -1,0 +1,388 @@
+/* client/src/styles/contact.css */
+/* ========================================
+   CONTACT PAGE - Mobile First Responsive Design
+   Base style up to 480px;
+   Small Mobile to Large Mobile (480px+);
+   Tablet Portrait (768px+);
+   Large Tablet / Small Desktop (1024px+);
+   Desktop (1200px+);
+   ======================================== */
+
+/* ========================================
+   CONTACT PAGE LAYOUT - Mobile First
+   ======================================== */
+.contact-page {
+    min-height: var(--min-page-height);
+    background: var(--gray-100);
+}
+
+.contact-hero {
+    margin-bottom: 0;
+}
+
+.contact-content {
+    padding: var(--spacing-2xl) var(--spacing-sm);
+}
+
+.contact-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ========================================
+   CONTACT INFO GRID - Mobile First
+   ======================================== */
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-3xl);
+}
+
+/* ========================================
+   CONTACT CARDS - Mobile First
+   ======================================== */
+.contact-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    transition: var(--transition-normal);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.contact-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: var(--hover-lift);
+}
+
+.contact-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    background: var(--gradient-hero);
+    border-bottom: var(--border-width-thin) solid var(--gray-200);
+}
+
+.contact-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+.contact-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.phone-icon {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: var(--white);
+}
+
+.email-icon {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #6f42c1 100%);
+    color: var(--white);
+}
+
+.location-icon {
+    background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
+    color: var(--white);
+}
+
+.time-icon {
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    color: var(--white);
+}
+
+.contact-card-header h3 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.contact-card-content {
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.contact-card-content p {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+}
+
+.contact-link {
+    display: inline-block;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-lg);
+    transition: var(--transition-fast);
+    padding: var(--spacing-sm) 0;
+}
+
+.contact-link:hover {
+    color: var(--primary-blue-dark);
+    text-decoration: underline;
+}
+
+.contact-address {
+    font-style: normal;
+    color: var(--gray-700);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-relaxed);
+}
+
+/* ========================================
+   BUSINESS HOURS SECTION - Mobile First
+   ======================================== */
+.business-hours-section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+.business-hours-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.business-hours-content {
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.hours-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.hours-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+    border-bottom: var(--border-width-thin) solid var(--gray-150);
+}
+
+.hours-row:last-child {
+    border-bottom: none;
+}
+
+.day {
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-700);
+    font-size: var(--font-size-base);
+}
+
+.time {
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+   SOCIAL MEDIA SECTION - Mobile First
+   ======================================== */
+.contact-social-section {
+    text-align: center;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    box-shadow: var(--shadow-card);
+    border: var(--border-width-thin) solid var(--gray-200);
+}
+
+.contact-social-section h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-3xl);
+    color: var(--dark-blue);
+    font-weight: var(--font-weight-bold);
+}
+
+.contact-social-section p {
+    margin: 0 0 var(--spacing-2xl) 0;
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-social-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.contact-social-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+    border: var(--border-width-thin) solid transparent;
+}
+
+.contact-social-link svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.contact-social-link:hover {
+    transform: var(--hover-lift);
+    box-shadow: var(--shadow-md);
+}
+
+/* Social Media Brand Colors */
+.contact-social-link.facebook {
+    background: var(--gradient-facebook);
+    color: var(--white);
+}
+
+.contact-social-link.facebook:hover {
+    box-shadow: 0 4px 15px rgba(66, 103, 178, 0.4);
+}
+
+.contact-social-link.instagram {
+    background: var(--gradient-instagram);
+    color: var(--white);
+}
+
+.contact-social-link.instagram:hover {
+    box-shadow: 0 4px 15px rgba(228, 64, 95, 0.4);
+}
+
+.contact-social-link.tiktok {
+    background: linear-gradient(
+        135deg,
+        var(--tiktok-black) 0%,
+        var(--tiktok-gray) 100%
+    );
+    color: var(--white);
+}
+
+.contact-social-link.tiktok:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.contact-social-link.youtube {
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    color: var(--white);
+}
+
+.contact-social-link.youtube:hover {
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+}
+
+.contact-social-link.email {
+    background: linear-gradient(
+        135deg,
+        var(--gray-700) 0%,
+        var(--gray-800) 100%
+    );
+    color: var(--white);
+}
+
+.contact-social-link.email:hover {
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS (Mobile-First)
+   ======================================== */
+
+/* Small Mobile to Large Mobile (480px+) */
+@media (min-width: 480px) {
+    .contact-content {
+        padding: var(--spacing-3xl) var(--spacing-md);
+    }
+
+    .contact-social-links {
+        grid-template-columns: 1fr 1fr;
+        max-width: 500px;
+    }
+}
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+    .contact-content {
+        padding: var(--spacing-3xl) var(--spacing-lg);
+    }
+
+    .contact-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-xl);
+    }
+
+    .contact-social-links {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 600px;
+    }
+
+    .hours-grid {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+/* Large Tablet / Small Desktop (1024px+) */
+@media (min-width: 1024px) {
+    .contact-content {
+        padding: var(--spacing-4xl) var(--spacing-xl);
+    }
+
+    .contact-info-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .contact-social-links {
+        grid-template-columns: repeat(5, 1fr);
+        max-width: 700px;
+    }
+}
+
+/* Desktop (1200px+) */
+@media (min-width: 1200px) {
+    .contact-content {
+        padding: var(--spacing-5xl) var(--spacing-2xl);
+    }
+
+    .contact-info-grid {
+        gap: var(--spacing-2xl);
+    }
+
+    .contact-card-header {
+        padding: var(--spacing-2xl) var(--spacing-xl);
+    }
+
+    .contact-card-content {
+        padding: var(--spacing-2xl) var(--spacing-xl);
+    }
+
+    .business-hours-content {
+        padding: var(--spacing-2xl) var(--spacing-xl);
+    }
+
+    .contact-social-section {
+        padding: var(--spacing-3xl) var(--spacing-2xl);
+    }
+}

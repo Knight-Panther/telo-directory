@@ -1,5 +1,6 @@
 // client/src/pages/AboutPage.js
 import React, { useState, useEffect, useCallback } from "react";
+import HeroSection from "../components/common/HeroSection"; //hero section improted
 import "../styles/about.css";
 
 const AboutPage = () => {
@@ -199,15 +200,14 @@ const AboutPage = () => {
             </nav>
 
             <div className="container">
-                {/* Page Header */}
-                <header className="about-header">
-                    <h1>About TΣLO</h1>
-                    <p className="about-subtitle">
-                        Your trusted renovation business directory connecting
-                        homeowners with quality contractors
-                    </p>
-                </header>
-
+                {/* Hero section imported */}
+                <HeroSection
+                    title="About Us"
+                    description=""
+                    backgroundType="construction"
+                    overlayType="dark"
+                    className="contact-hero"
+                />
                 {/* Team Section */}
                 <section id="team" className="about-section team-section">
                     <div className="section-header">
