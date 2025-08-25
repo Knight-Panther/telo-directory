@@ -1,9 +1,11 @@
 // client/src/components/modals/LoginModal.js
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // NEW: Added useNavigate import
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import "./../../styles/loginModal.css";
 
 const LoginModal = ({ isOpen, onClose }) => {
+    const navigate = useNavigate(); // NEW: For post-login navigation
     const [activeTab, setActiveTab] = useState("login");
     const [formData, setFormData] = useState({
         email: "",
@@ -32,6 +34,25 @@ const LoginModal = ({ isOpen, onClose }) => {
         setRememberMe(e.target.checked);
     };
 
+    // NEW: Handle post-login navigation with return URL support
+    const handleLoginSuccess = () => {
+        // Check if there's a return URL stored from ProtectedRoute
+        const returnUrl = sessionStorage.getItem("returnUrl");
+
+        if (returnUrl) {
+            // Clear the stored return URL
+            sessionStorage.removeItem("returnUrl");
+            // Navigate to the original destination
+            navigate(returnUrl);
+        } else {
+            // Default behavior: go to dashboard or stay on current page
+            navigate("/dashboard");
+        }
+
+        // Close the modal
+        onClose();
+    };
+
     // ✅ ENHANCEMENT: Only the error handling part is enhanced
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -52,7 +73,8 @@ const LoginModal = ({ isOpen, onClose }) => {
                     rememberMe
                 );
 
-                handleClose();
+                // NEW: Handle post-login navigation instead of just handleClose()
+                handleLoginSuccess();
             } else {
                 if (
                     !formData.name ||
@@ -73,7 +95,8 @@ const LoginModal = ({ isOpen, onClose }) => {
                     phone: formData.phone || undefined,
                 });
 
-                handleClose();
+                // NEW: Handle post-registration navigation instead of just handleClose()
+                handleLoginSuccess();
             }
         } catch (err) {
             console.error("Authentication error:", err);

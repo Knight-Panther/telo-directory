@@ -1,12 +1,13 @@
 // client/src/components/common/Header.js - Enhanced navigation
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useUserAuth } from "../../contexts/UserAuthContext"; // ✅ NEW: Only addition needed
+import React, { useState, useEffect } from "react"; // UPDATED: Added useEffect import
+import { Link, useNavigate, useSearchParams } from "react-router-dom"; // UPDATED: Added useSearchParams import
+import { useUserAuth } from "../../contexts/UserAuthContext";
 import LoginModal from "../modals/LoginModal";
 import "../../styles/components.css";
 
 const Header = () => {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams(); // NEW: For URL parameter detection
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -15,6 +16,19 @@ const Header = () => {
 
     // ✅ NEW: Get authentication state (only addition)
     const { isAuthenticated, user, logout, isLoading } = useUserAuth();
+
+    // NEW: Auto-trigger login modal if redirected from protected route
+    useEffect(() => {
+        const shouldShowLogin = searchParams.get("showLogin");
+        if (shouldShowLogin === "true") {
+            setIsLoginModalOpen(true);
+            // Clean up URL parameter after triggering modal
+            setSearchParams((params) => {
+                params.delete("showLogin");
+                return params;
+            });
+        }
+    }, [searchParams, setSearchParams]);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);

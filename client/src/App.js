@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserAuthProvider } from "./contexts/UserAuthContext";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import HomePage from "./pages/HomePage";
@@ -45,15 +46,23 @@ function App() {
                                     path="/business/:id"
                                     element={<BusinessDetailPage />}
                                 />
-                                {/* NEW: Add dashboard route */}
+                                {/* PROTECTED: Dashboard route now requires authentication */}
                                 <Route
                                     path="/dashboard"
-                                    element={<DashboardPage />}
+                                    element={
+                                        <ProtectedRoute>
+                                            <DashboardPage />
+                                        </ProtectedRoute>
+                                    }
                                 />
-                                {/* NEW: Add settings route */}
+                                {/* PROTECTED: Settings route now requires authentication */}
                                 <Route
                                     path="/settings"
-                                    element={<SettingsPage />}
+                                    element={
+                                        <ProtectedRoute>
+                                            <SettingsPage />
+                                        </ProtectedRoute>
+                                    }
                                 />
                                 <Route
                                     path="/admin/*"
