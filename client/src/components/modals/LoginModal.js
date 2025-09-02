@@ -1,11 +1,11 @@
 // client/src/components/modals/LoginModal.js
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // NEW: Added useNavigate import
+import React, { useState, useEffect } from "react"; // ADDED: useEffect import
+import { useNavigate } from "react-router-dom";
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import "./../../styles/loginModal.css";
 
 const LoginModal = ({ isOpen, onClose }) => {
-    const navigate = useNavigate(); // NEW: For post-login navigation
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("login");
     const [formData, setFormData] = useState({
         email: "",
@@ -20,13 +20,21 @@ const LoginModal = ({ isOpen, onClose }) => {
 
     const { login, register } = useUserAuth();
 
+    // 🔧 FIX: Reset isSubmitting when modal closes/opens
+    useEffect(() => {
+        if (!isOpen) {
+            // Reset all states when modal is closed
+            setIsSubmitting(false);
+            setError("");
+        }
+    }, [isOpen]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
-        // ✅ ENHANCEMENT: Clear error when user starts typing (was just setError(""))
         if (error) setError("");
     };
 
@@ -34,26 +42,20 @@ const LoginModal = ({ isOpen, onClose }) => {
         setRememberMe(e.target.checked);
     };
 
-    // NEW: Handle post-login navigation with return URL support
     const handleLoginSuccess = () => {
-        // Check if there's a return URL stored from ProtectedRoute
         const returnUrl = sessionStorage.getItem("returnUrl");
 
         if (returnUrl) {
-            // Clear the stored return URL
             sessionStorage.removeItem("returnUrl");
-            // Navigate to the original destination
             navigate(returnUrl);
         } else {
-            // Default behavior: go to dashboard or stay on current page
             navigate("/dashboard");
         }
 
-        // Close the modal
         onClose();
     };
 
-    // ✅ ENHANCEMENT: Only the error handling part is enhanced
+    // 🔧 FIX: Properly handle isSubmitting state in all code paths
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -75,11 +77,13 @@ const LoginModal = ({ isOpen, onClose }) => {
 
                 // Handle email verification requirement for login
                 if (result.requiresVerification) {
-                    // Redirect to email verification page
                     onClose();
-                    navigate(`/verify-email?email=${encodeURIComponent(result.email)}`);
+                    navigate(
+                        `/verify-email?email=${encodeURIComponent(
+                            result.email
+                        )}`
+                    );
                 } else {
-                    // Normal login success - redirect to dashboard
                     handleLoginSuccess();
                 }
             } else {
@@ -104,18 +108,19 @@ const LoginModal = ({ isOpen, onClose }) => {
 
                 // Handle email verification requirement for registration
                 if (result.requiresVerification) {
-                    // Registration successful but needs email verification
                     onClose();
-                    navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+                    navigate(
+                        `/verify-email?email=${encodeURIComponent(
+                            formData.email
+                        )}`
+                    );
                 } else {
-                    // Legacy path: immediate login (shouldn't happen with new backend)
                     handleLoginSuccess();
                 }
             }
         } catch (err) {
             console.error("Authentication error:", err);
 
-            // ✅ ENHANCEMENT: Better error handling with specific messages (ONLY THIS PART CHANGED)
             let errorMessage = "";
 
             // Handle specific error codes from backend
@@ -135,13 +140,10 @@ const LoginModal = ({ isOpen, onClose }) => {
             ) {
                 errorMessage = `⚠️ ${err.details.join(", ")}`;
             } else if (err.details && Array.isArray(err.details)) {
-                // Fallback for validation errors with details array
                 errorMessage = err.details.join(", ");
             } else if (err.message) {
-                // Simple error message
                 errorMessage = err.message;
             } else {
-                // Final fallback
                 errorMessage =
                     activeTab === "login"
                         ? "Login failed. Please try again."
@@ -149,6 +151,8 @@ const LoginModal = ({ isOpen, onClose }) => {
             }
 
             setError(errorMessage);
+        } finally {
+            // 🔧 FIX: Always reset isSubmitting in finally block
             setIsSubmitting(false);
         }
     };
@@ -168,7 +172,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         });
         setActiveTab("login");
         setError("");
-        setIsSubmitting(false);
+        setIsSubmitting(false); // 🔧 FIX: Explicitly reset isSubmitting
         setRememberMe(true);
         onClose();
     };
@@ -176,6 +180,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     const switchTab = (tab) => {
         setActiveTab(tab);
         setError("");
+        setIsSubmitting(false); // 🔧 FIX: Reset isSubmitting when switching tabs
         setFormData({
             email: "",
             password: "",
@@ -232,7 +237,6 @@ const LoginModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="login-modal-body">
-                    {/* Your existing social login section - NO CHANGES */}
                     <div className="social-login-section">
                         <button
                             type="button"
@@ -390,7 +394,6 @@ const LoginModal = ({ isOpen, onClose }) => {
                             </div>
                         )}
 
-                        {/* ✅ ENHANCEMENT: Enhanced error display with better formatting */}
                         {error && (
                             <div className="login-error enhanced-error">
                                 {error}
