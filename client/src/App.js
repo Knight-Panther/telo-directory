@@ -13,6 +13,8 @@ import BusinessDetailPage from "./pages/BusinessDetailPage";
 import DashboardPage from "./pages/DashboardPage";
 import SettingsPage from "./pages/SettingsPage";
 import AdminPage from "./pages/AdminPage";
+// NEW: Import email verification page
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import "./App.css";
 
 // Create a client for React Query
@@ -46,7 +48,18 @@ function App() {
                                     path="/business/:id"
                                     element={<BusinessDetailPage />}
                                 />
-                                {/* PROTECTED: Dashboard route now requires authentication */}
+
+                                {/* NEW: Email Verification Routes */}
+                                <Route
+                                    path="/verify-email"
+                                    element={<VerifyEmailPage />}
+                                />
+                                <Route
+                                    path="/verify-email/confirm/:token"
+                                    element={<VerifyEmailPage />}
+                                />
+
+                                {/* PROTECTED: Dashboard route now requires authentication AND email verification */}
                                 <Route
                                     path="/dashboard"
                                     element={
@@ -55,7 +68,7 @@ function App() {
                                         </ProtectedRoute>
                                     }
                                 />
-                                {/* PROTECTED: Settings route now requires authentication */}
+                                {/* PROTECTED: Settings route now requires authentication AND email verification */}
                                 <Route
                                     path="/settings"
                                     element={

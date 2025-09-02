@@ -10,6 +10,12 @@ const {
     validateUserRegistration,
     validateUserLogin,
 } = require("../middleware/validation");
+// NEW: Email verification service
+const {
+    sendVerificationEmail,
+    generateVerificationToken,
+    getTokenExpiration,
+} = require("../services/emailService");
 const router = express.Router();
 
 /**
@@ -21,18 +27,20 @@ const router = express.Router();
  * - Security-first approach with proper rate limiting
  * - Consistent response formatting across all endpoints
  * - Integration with your existing User model and middleware
+ *
+ * UPDATED: Now includes email verification workflow
  */
 
 /**
  * POST /api/auth/register
  * Register a new user account
  *
- * This endpoint handles the complete user registration process including:
+ * UPDATED: This endpoint now requires email verification before login:
  * - Input validation and sanitization
  * - Duplicate email checking
  * - Automatic password hashing (via User model middleware)
- * - Immediate token generation for seamless login
- * - TODO: Email verification (Phase 3)
+ * - Email verification token generation and email sending
+ * - NO immediate token generation (requires email verification first)
  */
 router.post("/register", validateUserRegistration, async (req, res) => {
     try {
@@ -50,42 +58,81 @@ router.post("/register", validateUserRegistration, async (req, res) => {
             });
         }
 
+        // Generate email verification token
+        const verificationToken = generateVerificationToken();
+        const tokenExpiration = getTokenExpiration();
+
         // Create new user (password automatically hashed by User model middleware)
         const user = new User({
             email: email.toLowerCase().trim(),
             password,
             name: name.trim(),
             phone: phone ? phone.trim() : undefined,
+            // NEW: Email verification fields
+            isEmailVerified: false,
+            emailVerificationToken: verificationToken,
+            emailVerificationExpires: tokenExpiration,
         });
 
         await user.save();
 
-        // Generate tokens for immediate login after registration
-        const tokens = generateTokenPair(user._id);
+        // Send verification email
+        try {
+            await sendVerificationEmail(
+                user.email,
+                user.name,
+                verificationToken
+            );
 
-        // Log successful registration for monitoring
-        console.log(
-            `New user registered: ${user.email} at ${new Date().toISOString()}`
-        );
+            // Log successful registration for monitoring
+            console.log(
+                `New user registered: ${
+                    user.email
+                } at ${new Date().toISOString()}`
+            );
 
-        // Return success response with user data (excluding sensitive fields)
-        res.status(201).json({
-            success: true,
-            message: "Account created successfully! You are now logged in.",
-            user: {
-                id: user._id,
-                email: user.email,
-                name: user.name,
-                phone: user.phone,
-                isEmailVerified: user.isEmailVerified,
-                createdAt: user.createdAt,
-            },
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-        });
+            // UPDATED: Return success WITHOUT JWT tokens (requires email verification)
+            res.status(201).json({
+                success: true,
+                message:
+                    "Account created successfully! Please check your email to verify your account before logging in.",
+                requiresVerification: true,
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    name: user.name,
+                    phone: user.phone,
+                    isEmailVerified: false,
+                    createdAt: user.createdAt,
+                },
+                // NEW: No tokens provided - user must verify email first
+            });
+        } catch (emailError) {
+            console.error("Failed to send verification email:", emailError);
 
-        // TODO Phase 3: Send verification email
-        // await sendVerificationEmail(user);
+            // If email sending fails, we have two options:
+            // 1. Delete the user and return error (strict)
+            // 2. Keep user but inform about email issue (graceful)
+            // We'll go with graceful approach with retry option
+
+            res.status(201).json({
+                success: true,
+                message:
+                    "Account created, but we couldn't send the verification email. Please try resending it.",
+                requiresVerification: true,
+                emailSendFailed: true,
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    name: user.name,
+                    phone: user.phone,
+                    isEmailVerified: false,
+                    createdAt: user.createdAt,
+                },
+                suggestion:
+                    "Click 'Resend Verification Email' on the verification page.",
+            });
+        }
     } catch (error) {
         // Handle Mongoose validation errors specifically
         if (error.name === "ValidationError") {
@@ -121,11 +168,12 @@ router.post("/register", validateUserRegistration, async (req, res) => {
  * POST /api/auth/login
  * Authenticate user and return tokens
  *
- * This endpoint handles user login with:
+ * UPDATED: This endpoint now checks email verification status:
  * - Account locking protection against brute force attacks
  * - Failed attempt tracking and progressive penalties
  * - Secure password comparison using bcrypt
- * - JWT token generation for session management
+ * - EMAIL VERIFICATION CHECK (new requirement)
+ * - JWT token generation for session management (only if verified)
  */
 router.post("/login", validateUserLogin, async (req, res) => {
     try {
@@ -163,6 +211,22 @@ router.post("/login", validateUserLogin, async (req, res) => {
             return res.status(401).json({
                 error: "Invalid email or password",
                 code: "INVALID_CREDENTIALS",
+            });
+        }
+
+        // NEW: Check if email is verified before allowing login
+        if (!user.isEmailVerified) {
+            // Password is correct, but email not verified
+            // Reset login attempts since credentials are valid
+            await user.resetLoginAttempts();
+
+            return res.status(403).json({
+                error: "Please verify your email address before logging in",
+                code: "EMAIL_NOT_VERIFIED",
+                message:
+                    "We've sent a verification email to your address. Please check your inbox and click the verification link.",
+                requiresVerification: true,
+                email: user.email,
             });
         }
 

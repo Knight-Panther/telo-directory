@@ -13,6 +13,8 @@ import axios from "axios";
  * - "Remember Me" functionality
  * - Profile management
  * - Secure token storage
+ *
+ * UPDATED: Now includes email verification workflow support
  */
 
 // Token storage keys
@@ -113,11 +115,29 @@ const createUserAPI = () => {
         (error) => Promise.reject(error)
     );
 
-    // Response interceptor - handle automatic token refresh
+    // Response interceptor - handle automatic token refresh and email verification
     userAPI.interceptors.response.use(
         (response) => response,
         async (error) => {
             const originalRequest = error.config;
+
+            // NEW: Handle email verification errors
+            if (
+                error.response?.status === 403 &&
+                error.response?.data?.code === "EMAIL_NOT_VERIFIED"
+            ) {
+                // User needs to verify email - clear tokens and emit event
+                tokenManager.clearTokens();
+                window.dispatchEvent(
+                    new CustomEvent("auth:email-not-verified", {
+                        detail: error.response.data,
+                    })
+                );
+                return Promise.reject({
+                    ...error.response.data,
+                    requiresVerification: true,
+                });
+            }
 
             // If access token expired and we haven't already tried to refresh
             if (
@@ -182,22 +202,38 @@ const userAPI = createUserAPI();
 const userAuthService = {
     /**
      * Register new user account
+     * UPDATED: Now handles email verification requirement
      */
     register: async (userData) => {
         try {
             const response = await userAPI.post("/auth/register", userData);
+            const data = response.data;
 
-            const { user, accessToken, refreshToken } = response.data;
+            // NEW: Check if registration requires email verification
+            if (data.requiresVerification) {
+                // Registration successful but requires email verification
+                // Do NOT store tokens yet
+                return {
+                    success: true,
+                    user: data.user,
+                    message: data.message,
+                    requiresVerification: true,
+                    emailSendFailed: data.emailSendFailed || false,
+                };
+            } else {
+                // Legacy path: immediate login (shouldn't happen with new backend)
+                const { user, accessToken, refreshToken } = data;
 
-            // Store tokens and user data (default to remember me for registration)
-            tokenManager.setTokens(accessToken, refreshToken, true);
-            tokenManager.setUserData(user);
+                tokenManager.setTokens(accessToken, refreshToken, true);
+                tokenManager.setUserData(user);
 
-            return {
-                success: true,
-                user,
-                message: response.data.message,
-            };
+                return {
+                    success: true,
+                    user,
+                    message: data.message,
+                    requiresVerification: false,
+                };
+            }
         } catch (error) {
             throw {
                 message: error.response?.data?.error || "Registration failed",
@@ -209,23 +245,53 @@ const userAuthService = {
 
     /**
      * Login existing user
+     * UPDATED: Now handles email verification requirement
      */
     login: async (credentials, rememberMe = true) => {
         try {
             const response = await userAPI.post("/auth/login", credentials);
+            const data = response.data;
 
-            const { user, accessToken, refreshToken } = response.data;
+            // NEW: Check if login requires email verification
+            if (data.requiresVerification) {
+                // Credentials valid but email not verified
+                return {
+                    success: false,
+                    message: data.error || "Please verify your email address",
+                    requiresVerification: true,
+                    email: data.email,
+                    code: data.code,
+                };
+            } else {
+                // Normal login flow
+                const { user, accessToken, refreshToken } = data;
 
-            // Store tokens and user data with remember me preference
-            tokenManager.setTokens(accessToken, refreshToken, rememberMe);
-            tokenManager.setUserData(user);
+                // Store tokens and user data with remember me preference
+                tokenManager.setTokens(accessToken, refreshToken, rememberMe);
+                tokenManager.setUserData(user);
 
-            return {
-                success: true,
-                user,
-                message: response.data.message,
-            };
+                return {
+                    success: true,
+                    user,
+                    message: data.message,
+                    requiresVerification: false,
+                };
+            }
         } catch (error) {
+            // Handle email verification errors from backend
+            if (
+                error.response?.status === 403 &&
+                error.response?.data?.code === "EMAIL_NOT_VERIFIED"
+            ) {
+                return {
+                    success: false,
+                    message: error.response.data.error,
+                    requiresVerification: true,
+                    email: error.response.data.email,
+                    code: error.response.data.code,
+                };
+            }
+
             throw {
                 message: error.response?.data?.error || "Login failed",
                 details: error.response?.data?.details || [],
@@ -252,6 +318,7 @@ const userAuthService = {
 
     /**
      * Get current user profile
+     * UPDATED: Now handles email verification errors
      */
     getCurrentUser: async () => {
         try {
@@ -263,6 +330,18 @@ const userAuthService = {
 
             return user;
         } catch (error) {
+            // Handle email verification errors
+            if (
+                error.response?.status === 403 &&
+                error.response?.data?.code === "EMAIL_NOT_VERIFIED"
+            ) {
+                throw {
+                    message: error.response.data.error,
+                    code: "EMAIL_NOT_VERIFIED",
+                    requiresVerification: true,
+                };
+            }
+
             throw {
                 message:
                     error.response?.data?.error || "Failed to get user profile",
@@ -298,6 +377,7 @@ const userAuthService = {
 
     /**
      * Refresh access token
+     * UPDATED: Now handles email verification during refresh
      */
     refreshToken: async () => {
         try {
@@ -333,6 +413,19 @@ const userAuthService = {
 
             return { accessToken, refreshToken: newRefreshToken, user };
         } catch (error) {
+            // Handle email verification errors during refresh
+            if (
+                error.response?.status === 403 &&
+                error.response?.data?.code === "EMAIL_NOT_VERIFIED"
+            ) {
+                tokenManager.clearTokens();
+                throw {
+                    message: "Email verification required",
+                    code: "EMAIL_NOT_VERIFIED",
+                    requiresVerification: true,
+                };
+            }
+
             tokenManager.clearTokens();
             throw {
                 message: "Session expired. Please login again.",
@@ -343,11 +436,24 @@ const userAuthService = {
 
     /**
      * Check if user is currently authenticated
+     * UPDATED: Now checks email verification status too
      */
     isAuthenticated: () => {
         const token = tokenManager.getAccessToken();
         const userData = tokenManager.getUserData();
-        return !!(token && userData);
+
+        // NEW: Only consider authenticated if user has token, data, AND is email verified
+        return !!(token && userData && userData.isEmailVerified);
+    },
+
+    /**
+     * NEW: Check if user has tokens but needs email verification
+     */
+    hasTokensButUnverified: () => {
+        const token = tokenManager.getAccessToken();
+        const userData = tokenManager.getUserData();
+
+        return !!(token && userData && !userData.isEmailVerified);
     },
 
     /**
@@ -365,9 +471,63 @@ const userAuthService = {
     },
 
     /**
+     * NEW: Handle successful email verification
+     * Called when user completes email verification
+     */
+    handleEmailVerification: (user, tokens) => {
+        const rememberMe = tokenManager.shouldRemember();
+
+        // Store new tokens and updated user data
+        if (tokens && tokens.accessToken && tokens.refreshToken) {
+            tokenManager.setTokens(
+                tokens.accessToken,
+                tokens.refreshToken,
+                rememberMe
+            );
+        }
+
+        tokenManager.setUserData(user);
+
+        return {
+            success: true,
+            user,
+            message: "Email verified successfully",
+        };
+    },
+
+    /**
+     * NEW: Get user's email for verification purposes
+     */
+    getUserEmail: () => {
+        const userData = tokenManager.getUserData();
+        return userData?.email || null;
+    },
+
+    /**
+     * NEW: Check if user needs email verification
+     */
+    needsEmailVerification: () => {
+        const userData = tokenManager.getUserData();
+        return userData && !userData.isEmailVerified;
+    },
+
+    /**
+     * NEW: Validate email format
+     */
+    isValidEmail: (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email?.trim());
+    },
+
+    /**
      * Token management utilities (exported for context use)
      */
     tokenManager,
+
+    // NEW: Export token management functions for external use
+    setTokens: tokenManager.setTokens,
+    setUserData: tokenManager.setUserData,
+    clearTokens: tokenManager.clearTokens,
 };
 
 export default userAuthService;

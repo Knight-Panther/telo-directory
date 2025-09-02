@@ -1,0 +1,510 @@
+/* client/src/styles/verify-email.css */
+
+/* ========================================
+   VERIFY EMAIL PAGE STYLES - Mobile First
+   ======================================== */
+
+.verify-email-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        sans-serif;
+}
+
+.verify-email-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.verify-email-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    text-align: center;
+    animation: slideIn 0.5s ease-out;
+}
+
+.verify-email-card.success {
+    border-top: 4px solid #10b981;
+}
+
+.verify-email-card.error {
+    border-top: 4px solid #ef4444;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   HEADER SECTION
+   ======================================== */
+
+.verify-email-icon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.verify-email-icon.success {
+    color: #10b981;
+    animation: checkmark 0.6s ease-in-out;
+}
+
+.verify-email-icon.processing {
+    color: #3b82f6;
+}
+
+@keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.verify-email-card h1 {
+    color: #1f2937;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.2;
+}
+
+.verify-email-subtitle {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin-bottom: 32px;
+    line-height: 1.5;
+}
+
+/* ========================================
+   EMAIL DISPLAY SECTION
+   ======================================== */
+
+.email-display {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 24px 0;
+    font-size: 1.1rem;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+/* ========================================
+   INSTRUCTIONS SECTION
+   ======================================== */
+
+.verification-instructions {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 24px 0;
+    text-align: left;
+}
+
+.verification-instructions h3 {
+    color: #92400e;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.verification-instructions ol {
+    color: #78350f;
+    padding-left: 20px;
+    line-height: 1.6;
+}
+
+.verification-instructions ol li {
+    margin-bottom: 8px;
+}
+
+/* ========================================
+   MESSAGE SECTIONS
+   ======================================== */
+
+.error-message,
+.success-message {
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+.success-message {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #16a34a;
+}
+
+.error-icon,
+.success-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   RESEND SECTION
+   ======================================== */
+
+.resend-section {
+    margin: 32px 0;
+    padding: 24px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.resend-text {
+    color: #4b5563;
+    margin-bottom: 16px;
+    font-size: 1rem;
+}
+
+.resend-button {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    min-width: 200px;
+    justify-content: center;
+}
+
+.resend-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.resend-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.resend-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.resend-button.loading {
+    background: #6b7280;
+}
+
+.email-sent-note {
+    color: #16a34a;
+    font-size: 0.9rem;
+    margin-top: 12px;
+    font-weight: 500;
+}
+
+/* ========================================
+   HELP SECTION
+   ======================================== */
+
+.help-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.help-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.help-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 4px;
+}
+
+.help-link:hover {
+    text-decoration: underline;
+}
+
+.help-tips {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: left;
+}
+
+.help-tips h4 {
+    color: #374151;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.help-tips ul {
+    color: #6b7280;
+    font-size: 0.9rem;
+    padding-left: 20px;
+    line-height: 1.5;
+}
+
+.help-tips ul li {
+    margin-bottom: 6px;
+}
+
+/* ========================================
+   BACK SECTION
+   ======================================== */
+
+.back-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.back-button {
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    background: #f9fafb;
+    color: #374151;
+    border-color: #9ca3af;
+}
+
+/* ========================================
+   REDIRECT MESSAGE
+   ======================================== */
+
+.redirect-message {
+    color: #059669;
+    font-size: 1.1rem;
+    margin: 20px 0;
+    font-weight: 500;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 640px) {
+    .verify-email-page {
+        padding: 16px;
+    }
+
+    .verify-email-card {
+        padding: 32px 24px;
+    }
+
+    .verify-email-card h1 {
+        font-size: 1.75rem;
+    }
+
+    .verify-email-icon {
+        font-size: 3rem;
+    }
+
+    .verification-instructions {
+        padding: 16px;
+    }
+
+    .resend-section {
+        padding: 20px;
+        margin: 24px 0;
+    }
+
+    .resend-button {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .verify-email-card {
+        padding: 24px 20px;
+    }
+
+    .verify-email-card h1 {
+        font-size: 1.5rem;
+    }
+
+    .verify-email-subtitle {
+        font-size: 1rem;
+    }
+
+    .email-display {
+        font-size: 1rem;
+        padding: 14px;
+    }
+}
+
+/* ========================================
+   LOADING SPINNER INTEGRATION
+   ======================================== */
+
+.verify-email-card .loading-spinner {
+    margin: 20px 0;
+}
+
+.resend-button .loading-spinner {
+    margin: 0;
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .verify-email-card {
+        animation: none;
+    }
+
+    .verify-email-icon {
+        animation: none;
+    }
+
+    .error-message,
+    .success-message {
+        animation: none;
+    }
+
+    .resend-button:hover:not(:disabled) {
+        transform: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .verify-email-card {
+        border: 2px solid #000;
+    }
+
+    .email-display {
+        border-color: #000;
+    }
+
+    .resend-button {
+        border: 2px solid #000;
+    }
+}
+
+/* Dark mode support (optional - activate if your app supports dark mode) */
+@media (prefers-color-scheme: dark) {
+    .verify-email-page {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+
+    .verify-email-card {
+        background: #374151;
+        color: #f9fafb;
+    }
+
+    .verify-email-card h1 {
+        color: #f9fafb;
+    }
+
+    .verify-email-subtitle {
+        color: #d1d5db;
+    }
+
+    .email-display {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #60a5fa;
+    }
+
+    .verification-instructions {
+        background: #451a03;
+        border-color: #f59e0b;
+    }
+
+    .help-tips {
+        background: #4b5563;
+        border-color: #6b7280;
+    }
+
+    .resend-section {
+        background: #4b5563;
+        border-color: #6b7280;
+    }
+
+    .back-button {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #d1d5db;
+    }
+
+    .back-button:hover {
+        background: #6b7280;
+        color: #f9fafb;
+    }
+}

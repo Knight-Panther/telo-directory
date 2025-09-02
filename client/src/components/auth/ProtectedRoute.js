@@ -12,15 +12,25 @@ import LoadingSpinner from "../common/LoadingSpinner";
  *
  * Features:
  * - Quick context-based authentication check (fast UX)
- * - Return URL memory (user goes back where they wanted after login)
+ * - Email verification requirement enforcement
+ * - Return URL memory (user goes back where they wanted after verification)
  * - Loading state management
  * - Conservative error handling (graceful degradation)
- * - Triggers login modal on home page redirect
+ * - Smart redirection based on user state
+ *
+ * UPDATED: Now enforces email verification for protected routes
  *
  * Usage: <ProtectedRoute><DashboardPage /></ProtectedRoute>
  */
 const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, isLoading, error } = useUserAuth();
+    const {
+        isAuthenticated,
+        isLoading,
+        error,
+        user,
+        isEmailVerified,
+        getUserEmail,
+    } = useUserAuth();
     const location = useLocation();
 
     /**
@@ -28,14 +38,14 @@ const ProtectedRoute = ({ children }) => {
      * This runs whenever someone tries to access a protected route
      */
     useEffect(() => {
-        if (!isAuthenticated && !isLoading) {
-            // Store where user wanted to go for post-login redirect
+        if ((!isAuthenticated || !isEmailVerified()) && !isLoading) {
+            // Store where user wanted to go for post-verification redirect
             sessionStorage.setItem(
                 "returnUrl",
                 location.pathname + location.search
             );
         }
-    }, [isAuthenticated, isLoading, location]);
+    }, [isAuthenticated, isEmailVerified, isLoading, location]);
 
     // Show loading spinner while authentication is being determined
     if (isLoading) {
@@ -65,14 +75,31 @@ const ProtectedRoute = ({ children }) => {
         sessionStorage.removeItem("returnUrl");
     }
 
-    // If user is not authenticated (or has auth errors), redirect to home with login trigger
-    if (!isAuthenticated) {
+    // NEW: Check authentication and email verification status
+    const userEmail = getUserEmail() || user?.email;
+
+    // If user is not authenticated at all, redirect to login
+    if (!isAuthenticated && !user) {
         // Add query parameter to trigger login modal on home page
-        // Your Header component can watch for this parameter
         return <Navigate to="/?showLogin=true" replace />;
     }
 
-    // User is authenticated - render the protected component
+    // NEW: If user is authenticated but email is not verified, redirect to verification page
+    if (user && !isEmailVerified()) {
+        const verifyEmailUrl = userEmail
+            ? `/verify-email?email=${encodeURIComponent(userEmail)}`
+            : "/verify-email";
+
+        return <Navigate to={verifyEmailUrl} replace />;
+    }
+
+    // NEW: If user has some auth state but isn't fully authenticated, handle appropriately
+    if (!isAuthenticated) {
+        // This handles edge cases where user exists but tokens are invalid
+        return <Navigate to="/?showLogin=true" replace />;
+    }
+
+    // User is fully authenticated AND email verified - render the protected component
     return children;
 };
 

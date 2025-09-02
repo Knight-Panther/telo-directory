@@ -11,6 +11,8 @@ const User = require("../models/User");
  * - Enhanced security with separate token secrets
  * - Comprehensive error handling with specific error codes
  * - Integration with the User model's security features
+ *
+ * UPDATED: Now includes email verification enforcement
  */
 
 // JWT secrets from environment variables
@@ -59,9 +61,9 @@ const generateTokenPair = (userId) => {
 /**
  * Verify access token middleware
  *
- * This middleware protects routes that require user authentication.
+ * UPDATED: This middleware now enforces email verification for protected routes.
  * It follows your established error handling patterns from admin middleware
- * but adds user-specific features like account locking checks.
+ * but adds user-specific features like account locking checks and email verification.
  *
  * Usage: router.get('/protected-route', verifyAccessToken, (req, res) => {...})
  */
@@ -108,6 +110,18 @@ const verifyAccessToken = async (req, res, next) => {
             });
         }
 
+        // NEW: Check if email is verified
+        // This ensures only verified users can access protected routes
+        if (!user.isEmailVerified) {
+            return res.status(403).json({
+                error: "Please verify your email address to access this resource.",
+                code: "EMAIL_NOT_VERIFIED",
+                message:
+                    "Check your email inbox and click the verification link to activate your account.",
+                requiresVerification: true,
+            });
+        }
+
         // Attach user object to request for use in route handlers
         req.user = user;
         next();
@@ -147,7 +161,8 @@ const verifyAccessToken = async (req, res, next) => {
  * Useful for routes that should work for both logged-in and anonymous users
  * but provide different data based on authentication status.
  *
- * Example: Business listings that show favorite status if user is logged in
+ * UPDATED: Now includes email verification awareness for optional routes
+ * Example: Business listings that show favorite status if user is logged in AND verified
  */
 const optionalAuth = async (req, res, next) => {
     try {
@@ -166,7 +181,10 @@ const optionalAuth = async (req, res, next) => {
             const user = await User.findById(decoded.userId).select(
                 "-password"
             );
-            req.user = user || null;
+
+            // NEW: Only set req.user if the user exists AND is email verified
+            // This ensures optional auth features only work for verified users
+            req.user = user && user.isEmailVerified ? user : null;
         } else {
             req.user = null;
         }
@@ -183,9 +201,9 @@ const optionalAuth = async (req, res, next) => {
 /**
  * Refresh token endpoint logic
  *
- * This function handles the token refresh process, allowing users
- * to get new access tokens without logging in again. This creates
- * a seamless user experience while maintaining security.
+ * UPDATED: This function now checks email verification status during refresh.
+ * This ensures that if a user becomes unverified somehow, their session
+ * will be invalidated on the next token refresh.
  */
 const refreshAccessToken = async (req, res) => {
     try {
@@ -222,6 +240,18 @@ const refreshAccessToken = async (req, res) => {
             return res.status(423).json({
                 error: "Account temporarily locked. Cannot refresh tokens.",
                 code: "ACCOUNT_LOCKED",
+            });
+        }
+
+        // NEW: Check if email is verified
+        // If user becomes unverified, invalidate their refresh token
+        if (!user.isEmailVerified) {
+            return res.status(403).json({
+                error: "Email verification required. Please verify your email address.",
+                code: "EMAIL_NOT_VERIFIED",
+                message:
+                    "Your account requires email verification. Please check your email and click the verification link.",
+                requiresVerification: true,
             });
         }
 

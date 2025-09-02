@@ -140,6 +140,42 @@ const userSchema = new mongoose.Schema(
             // Prevents old verification emails from being used maliciously
         },
 
+        emailVerifiedAt: {
+            type: Date,
+            // NEW: Track when email was verified for analytics and security
+            // Useful for understanding user engagement and verification patterns
+        },
+
+        // === EMAIL CHANGE FUNCTIONALITY (NEW) ===
+
+        pendingEmailChange: {
+            type: String,
+            sparse: true,
+            lowercase: true,
+            trim: true,
+            // NEW: Stores the new email address while waiting for verification
+            // Only gets applied to main email field after verification
+        },
+
+        emailChangeToken: {
+            type: String,
+            sparse: true,
+            // NEW: Token for verifying email changes (separate from registration verification)
+            // Prevents unauthorized email changes even if someone gains account access
+        },
+
+        emailChangeTokenExpires: {
+            type: Date,
+            // NEW: Expiration for email change tokens (typically 24 hours)
+            // Security measure to prevent old change requests from being abused
+        },
+
+        emailChangedAt: {
+            type: Date,
+            // NEW: Track when email was last changed for security monitoring
+            // Helps detect suspicious account activity
+        },
+
         // === PASSWORD RESET FUNCTIONALITY ===
 
         resetPasswordToken: {
@@ -195,6 +231,8 @@ const userSchema = new mongoose.Schema(
             { email: 1 }, // Fast email lookups for login
             { emailVerificationToken: 1 }, // Fast verification token lookups
             { resetPasswordToken: 1 }, // Fast password reset token lookups
+            { emailChangeToken: 1 }, // NEW: Fast email change token lookups
+            { pendingEmailChange: 1 }, // NEW: Fast pending email lookups
             { favorites: 1 }, // Fast queries for user's favorited businesses
         ],
     }
@@ -386,6 +424,22 @@ userSchema.statics.findByResetToken = function (token) {
     });
 };
 
+/**
+ * NEW: Find user by email change token
+ *
+ * This method handles email change verification by finding users with
+ * matching email change tokens that haven't expired yet.
+ *
+ * @param {string} token - Email change token from email link
+ * @returns {Object|null} - User document or null if token invalid/expired
+ */
+userSchema.statics.findByEmailChangeToken = function (token) {
+    return this.findOne({
+        emailChangeToken: token,
+        emailChangeTokenExpires: { $gt: Date.now() }, // Token must not be expired
+    });
+};
+
 // ✅ NEW ADDITION: Get current security configuration
 /**
  * Get current security configuration
@@ -413,5 +467,6 @@ userSchema.statics.getSecurityConfig = function () {
  * - Authenticate users during login
  * - Manage user profiles and favorites
  * - Handle email verification and password resets
+ * - Handle email changes with verification
  */
 module.exports = mongoose.model("User", userSchema);

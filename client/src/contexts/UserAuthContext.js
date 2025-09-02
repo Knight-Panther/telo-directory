@@ -14,6 +14,8 @@ import userAuthService from "../services/userAuthService";
  * - Persistent authentication across browser sessions
  * - Loading states for better UX
  * - Error handling
+ *
+ * UPDATED: Now includes email verification workflow
  */
 
 // Initial authentication state
@@ -32,6 +34,8 @@ const AUTH_ACTIONS = {
     UPDATE_USER: "UPDATE_USER",
     SET_ERROR: "SET_ERROR",
     CLEAR_ERROR: "CLEAR_ERROR",
+    // NEW: Registration success without immediate login
+    REGISTRATION_SUCCESS: "REGISTRATION_SUCCESS",
 };
 
 // Reducer function to handle state updates
@@ -82,6 +86,16 @@ const authReducer = (state, action) => {
                 error: null,
             };
 
+        // NEW: Handle successful registration without login
+        case AUTH_ACTIONS.REGISTRATION_SUCCESS:
+            return {
+                ...state,
+                user: null, // No user login until email verified
+                isAuthenticated: false,
+                isLoading: false,
+                error: null,
+            };
+
         default:
             return state;
     }
@@ -111,7 +125,7 @@ export const UserAuthProvider = ({ children }) => {
 
     /**
      * Initialize authentication state on app startup
-     * Checks for stored tokens and validates them
+     * UPDATED: Now checks for email verification
      */
     useEffect(() => {
         const initializeAuth = async () => {
@@ -123,27 +137,51 @@ export const UserAuthProvider = ({ children }) => {
                     // Get cached user data first for immediate UI update
                     const cachedUser =
                         userAuthService.getCurrentUserFromStorage();
-                    if (cachedUser) {
+
+                    // NEW: Only consider authenticated if email is verified
+                    if (cachedUser && cachedUser.isEmailVerified) {
                         dispatch({
                             type: AUTH_ACTIONS.LOGIN_SUCCESS,
                             payload: cachedUser,
                         });
-                    }
 
-                    // Then fetch fresh user data in the background
-                    try {
-                        const freshUser =
-                            await userAuthService.getCurrentUser();
+                        // Then fetch fresh user data in the background
+                        try {
+                            const freshUser =
+                                await userAuthService.getCurrentUser();
+
+                            // Double-check verification status with fresh data
+                            if (freshUser.isEmailVerified) {
+                                dispatch({
+                                    type: AUTH_ACTIONS.UPDATE_USER,
+                                    payload: freshUser,
+                                });
+                            } else {
+                                // User became unverified somehow, log them out
+                                userAuthService.clearSession();
+                                dispatch({ type: AUTH_ACTIONS.LOGOUT });
+                            }
+                        } catch (error) {
+                            // If fetching fresh data fails, handle based on error type
+                            if (error.code === "EMAIL_NOT_VERIFIED") {
+                                // User needs to verify email
+                                userAuthService.clearSession();
+                                dispatch({ type: AUTH_ACTIONS.LOGOUT });
+                            } else {
+                                // Network error - keep cached data but log the error
+                                console.warn(
+                                    "Failed to fetch fresh user data:",
+                                    error.message
+                                );
+                            }
+                        }
+                    } else {
+                        // User not verified or no cached user - clear any invalid tokens
+                        userAuthService.clearSession();
                         dispatch({
-                            type: AUTH_ACTIONS.UPDATE_USER,
-                            payload: freshUser,
+                            type: AUTH_ACTIONS.SET_LOADING,
+                            payload: false,
                         });
-                    } catch (error) {
-                        // If fetching fresh data fails, keep cached data but log the error
-                        console.warn(
-                            "Failed to fetch fresh user data:",
-                            error.message
-                        );
                     }
                 } else {
                     // No stored authentication
@@ -182,6 +220,7 @@ export const UserAuthProvider = ({ children }) => {
 
     /**
      * User registration function
+     * UPDATED: Now handles email verification requirement
      */
     const register = async (userData) => {
         dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
@@ -189,11 +228,24 @@ export const UserAuthProvider = ({ children }) => {
 
         try {
             const result = await userAuthService.register(userData);
-            dispatch({
-                type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                payload: result.user,
-            });
-            return result;
+
+            // NEW: Check if registration requires email verification
+            if (result.requiresVerification) {
+                // Registration successful but requires email verification
+                dispatch({ type: AUTH_ACTIONS.REGISTRATION_SUCCESS });
+                return {
+                    ...result,
+                    requiresVerification: true,
+                    registrationComplete: true,
+                };
+            } else {
+                // Legacy path: immediate login (shouldn't happen with new backend)
+                dispatch({
+                    type: AUTH_ACTIONS.LOGIN_SUCCESS,
+                    payload: result.user,
+                });
+                return result;
+            }
         } catch (error) {
             dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: error.message });
             throw error;
@@ -202,6 +254,7 @@ export const UserAuthProvider = ({ children }) => {
 
     /**
      * User login function
+     * UPDATED: Now handles email verification requirement
      */
     const login = async (credentials, rememberMe = true) => {
         dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
@@ -209,15 +262,51 @@ export const UserAuthProvider = ({ children }) => {
 
         try {
             const result = await userAuthService.login(credentials, rememberMe);
-            dispatch({
-                type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                payload: result.user,
-            });
-            return result;
+
+            // NEW: Check if login requires email verification
+            if (result.requiresVerification) {
+                // Credentials valid but email not verified
+                dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+                return {
+                    ...result,
+                    requiresVerification: true,
+                    credentialsValid: true,
+                };
+            } else {
+                // Normal login flow
+                dispatch({
+                    type: AUTH_ACTIONS.LOGIN_SUCCESS,
+                    payload: result.user,
+                });
+                return result;
+            }
         } catch (error) {
             dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: error.message });
             throw error;
         }
+    };
+
+    /**
+     * NEW: Handle successful email verification
+     * Called when user successfully verifies their email
+     */
+    const handleEmailVerified = (user, tokens) => {
+        // Store tokens if provided (from email verification)
+        if (tokens && tokens.accessToken && tokens.refreshToken) {
+            const rememberMe =
+                localStorage.getItem("telo_remember_me") !== "false";
+            userAuthService.setTokens(
+                tokens.accessToken,
+                tokens.refreshToken,
+                rememberMe
+            );
+            userAuthService.setUserData(user);
+        }
+
+        dispatch({
+            type: AUTH_ACTIONS.LOGIN_SUCCESS,
+            payload: user,
+        });
     };
 
     /**
@@ -261,10 +350,28 @@ export const UserAuthProvider = ({ children }) => {
 
         try {
             const freshUser = await userAuthService.getCurrentUser();
-            dispatch({ type: AUTH_ACTIONS.UPDATE_USER, payload: freshUser });
-            return freshUser;
+
+            // NEW: Check if user is still verified
+            if (freshUser.isEmailVerified) {
+                dispatch({
+                    type: AUTH_ACTIONS.UPDATE_USER,
+                    payload: freshUser,
+                });
+                return freshUser;
+            } else {
+                // User became unverified, log them out
+                userAuthService.clearSession();
+                dispatch({ type: AUTH_ACTIONS.LOGOUT });
+                return null;
+            }
         } catch (error) {
             console.error("Failed to refresh user data:", error);
+
+            // Handle email verification errors
+            if (error.code === "EMAIL_NOT_VERIFIED") {
+                userAuthService.clearSession();
+                dispatch({ type: AUTH_ACTIONS.LOGOUT });
+            }
             // Don't throw error here as this is often called in background
         }
     };
@@ -279,10 +386,18 @@ export const UserAuthProvider = ({ children }) => {
 
     /**
      * Check if user has specific verification status
-     * Useful for conditional rendering based on verification
+     * UPDATED: More robust email verification check
      */
     const isEmailVerified = () => {
-        return state.user?.isEmailVerified || false;
+        return state.user?.isEmailVerified === true;
+    };
+
+    /**
+     * NEW: Check if user is authenticated AND email verified
+     * This is the main authentication check for protected routes
+     */
+    const isFullyAuthenticated = () => {
+        return state.isAuthenticated && isEmailVerified();
     };
 
     /**
@@ -291,6 +406,13 @@ export const UserAuthProvider = ({ children }) => {
      */
     const getFavoritesCount = () => {
         return state.user?.favoritesCount || 0;
+    };
+
+    /**
+     * NEW: Get user's email for verification purposes
+     */
+    const getUserEmail = () => {
+        return state.user?.email || null;
     };
 
     // Context value object
@@ -308,10 +430,13 @@ export const UserAuthProvider = ({ children }) => {
         updateProfile,
         refreshUser,
         clearError,
+        handleEmailVerified, // NEW
 
         // Utility functions
         isEmailVerified,
+        isFullyAuthenticated, // NEW
         getFavoritesCount,
+        getUserEmail, // NEW
     };
 
     return (

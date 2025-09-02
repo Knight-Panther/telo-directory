@@ -15,6 +15,8 @@ const adminCategoriesRoutes = require("./routes/admin/categories");
 const adminDashboardRoutes = require("./routes/admin/dashboard");
 const healthRoutes = require("./routes/health");
 const authRoutes = require("./routes/auth");
+// Add this line with your other route imports
+const emailVerificationRoutes = require("./routes/emailVerification");
 
 // NEW: Import report routes
 const reportsRoutes = require("./routes/reports");
@@ -48,6 +50,8 @@ const startServer = async () => {
 
         // NEW: Public reports routes (for user submissions)
         app.use("/api/reports", reportsRoutes);
+        // Add this line with your other route registrations
+        app.use("/api/auth", emailVerificationRoutes);
 
         // Admin routes
         app.use("/api/admin/auth", adminAuthRoutes);

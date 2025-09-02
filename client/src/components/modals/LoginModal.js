@@ -65,7 +65,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                     throw new Error("Please fill in all fields");
                 }
 
-                await login(
+                const result = await login(
                     {
                         email: formData.email,
                         password: formData.password,
@@ -73,8 +73,15 @@ const LoginModal = ({ isOpen, onClose }) => {
                     rememberMe
                 );
 
-                // NEW: Handle post-login navigation instead of just handleClose()
-                handleLoginSuccess();
+                // Handle email verification requirement for login
+                if (result.requiresVerification) {
+                    // Redirect to email verification page
+                    onClose();
+                    navigate(`/verify-email?email=${encodeURIComponent(result.email)}`);
+                } else {
+                    // Normal login success - redirect to dashboard
+                    handleLoginSuccess();
+                }
             } else {
                 if (
                     !formData.name ||
@@ -88,15 +95,22 @@ const LoginModal = ({ isOpen, onClose }) => {
                     throw new Error("Passwords don't match");
                 }
 
-                await register({
+                const result = await register({
                     name: formData.name,
                     email: formData.email,
                     password: formData.password,
                     phone: formData.phone || undefined,
                 });
 
-                // NEW: Handle post-registration navigation instead of just handleClose()
-                handleLoginSuccess();
+                // Handle email verification requirement for registration
+                if (result.requiresVerification) {
+                    // Registration successful but needs email verification
+                    onClose();
+                    navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+                } else {
+                    // Legacy path: immediate login (shouldn't happen with new backend)
+                    handleLoginSuccess();
+                }
             }
         } catch (err) {
             console.error("Authentication error:", err);
