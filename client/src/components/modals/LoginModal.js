@@ -80,11 +80,14 @@ const LoginModal = ({ isOpen, onClose }) => {
                     onClose();
                     navigate(
                         `/verify-email?email=${encodeURIComponent(
-                            result.email
+                            result.email || formData.email
                         )}`
                     );
-                } else {
+                } else if (result.success) {
                     handleLoginSuccess();
+                } else {
+                    // Handle case where login returns success: false but doesn't require verification
+                    throw new Error(result.message || "Login failed");
                 }
             } else {
                 if (
@@ -124,7 +127,16 @@ const LoginModal = ({ isOpen, onClose }) => {
             let errorMessage = "";
 
             // Handle specific error codes from backend
-            if (err.code === "INVALID_CREDENTIALS") {
+            if (err.code === "EMAIL_NOT_VERIFIED") {
+                // This shouldn't reach here normally, but as a fallback
+                onClose();
+                navigate(
+                    `/verify-email?email=${encodeURIComponent(
+                        formData.email
+                    )}`
+                );
+                return; // Exit early, don't show error message
+            } else if (err.code === "INVALID_CREDENTIALS") {
                 errorMessage =
                     "❌ Invalid email or password. Please check your credentials and try again.";
             } else if (err.code === "EMAIL_ALREADY_EXISTS") {

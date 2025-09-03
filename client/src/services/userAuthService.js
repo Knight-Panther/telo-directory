@@ -122,9 +122,11 @@ const createUserAPI = () => {
             const originalRequest = error.config;
 
             // NEW: Handle email verification errors
+            // BUT NOT for login requests - let the login function handle those
             if (
                 error.response?.status === 403 &&
-                error.response?.data?.code === "EMAIL_NOT_VERIFIED"
+                error.response?.data?.code === "EMAIL_NOT_VERIFIED" &&
+                !originalRequest.url.includes('/auth/login')
             ) {
                 // User needs to verify email - clear tokens and emit event
                 tokenManager.clearTokens();
