@@ -131,9 +131,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 // This shouldn't reach here normally, but as a fallback
                 onClose();
                 navigate(
-                    `/verify-email?email=${encodeURIComponent(
-                        formData.email
-                    )}`
+                    `/verify-email?email=${encodeURIComponent(formData.email)}`
                 );
                 return; // Exit early, don't show error message
             } else if (err.code === "INVALID_CREDENTIALS") {
@@ -141,6 +139,9 @@ const LoginModal = ({ isOpen, onClose }) => {
             } else if (err.code === "EMAIL_ALREADY_EXISTS") {
                 errorMessage =
                     "📧 An account with this email already exists. Please try logging in instead.";
+            } else if (err.code === "REGISTRATION_PENDING") {
+                errorMessage =
+                    "⏳ Registration already pending for this email. Please check your inbox for the verification link.";
             } else if (err.code === "ACCOUNT_LOCKED") {
                 errorMessage =
                     "🔒 Account temporarily locked due to too many failed attempts. Please try again later.";
@@ -149,9 +150,25 @@ const LoginModal = ({ isOpen, onClose }) => {
                 err.details &&
                 Array.isArray(err.details)
             ) {
-                errorMessage = `⚠️ ${err.details.join(", ")}`;
+                // Check if this is a disposable email error for better UX
+                const disposableEmailError = err.details.find((detail) =>
+                    detail.toLowerCase().includes("disposable email")
+                );
+                if (disposableEmailError) {
+                    errorMessage = `🚫 ${disposableEmailError}`;
+                } else {
+                    errorMessage = `⚠️ ${err.details.join(", ")}`;
+                }
             } else if (err.details && Array.isArray(err.details)) {
-                errorMessage = err.details.join(", ");
+                // Check for disposable email in generic details too
+                const disposableEmailError = err.details.find((detail) =>
+                    detail.toLowerCase().includes("disposable email")
+                );
+                if (disposableEmailError) {
+                    errorMessage = `🚫 ${disposableEmailError}`;
+                } else {
+                    errorMessage = err.details.join(", ");
+                }
             } else if (err.message) {
                 errorMessage = err.message;
             } else {

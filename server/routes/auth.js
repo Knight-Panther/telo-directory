@@ -16,6 +16,11 @@ const {
     generateVerificationToken,
     getTokenExpiration,
 } = require("../services/emailService");
+// NEW: Temporary registration storage service
+const {
+    storeTempRegistration,
+    hasEmailPendingRegistration,
+} = require("../services/tempRegistrationService");
 const router = express.Router();
 
 /**
@@ -33,20 +38,21 @@ const router = express.Router();
 
 /**
  * POST /api/auth/register
- * Register a new user account
+ * Register a new user account with verify-before-save architecture
  *
- * UPDATED: This endpoint now requires email verification before login:
- * - Input validation and sanitization
- * - Duplicate email checking
- * - Automatic password hashing (via User model middleware)
+ * NEW ARCHITECTURE: This endpoint now stores registration data temporarily
+ * and only creates the actual user account AFTER email verification:
+ * - Input validation and sanitization (including disposable email blocking)
+ * - Duplicate email checking (both in database and temporary storage)
+ * - Temporary storage of registration data
  * - Email verification token generation and email sending
- * - NO immediate token generation (requires email verification first)
+ * - NO database user creation until email is verified
  */
 router.post("/register", validateUserRegistration, async (req, res) => {
     try {
         const { email, password, name, phone } = req.body;
 
-        // Check if user already exists (case-insensitive email check)
+        // Check if user already exists in database (case-insensitive email check)
         const existingUser = await User.findByEmail(email);
 
         if (existingUser) {
@@ -58,108 +64,92 @@ router.post("/register", validateUserRegistration, async (req, res) => {
             });
         }
 
+        // NEW: Check if email has a pending registration in temporary storage
+        if (hasEmailPendingRegistration(email)) {
+            return res.status(409).json({
+                error: "A registration is already pending for this email address",
+                code: "REGISTRATION_PENDING",
+                message:
+                    "Please check your email to verify your account, or wait 24 hours to register again.",
+                suggestion: "Check your email inbox and spam folder for the verification link.",
+            });
+        }
+
         // Generate email verification token
         const verificationToken = generateVerificationToken();
-        const tokenExpiration = getTokenExpiration();
 
-        // Create new user (password automatically hashed by User model middleware)
-        const user = new User({
+        // NEW: Store registration data temporarily instead of saving to database
+        const registrationData = {
             email: email.toLowerCase().trim(),
-            password,
+            password, // Will be hashed by tempRegistrationService
             name: name.trim(),
             phone: phone ? phone.trim() : undefined,
-            // NEW: Email verification fields
-            isEmailVerified: false,
-            emailVerificationToken: verificationToken,
-            emailVerificationExpires: tokenExpiration,
-        });
+            // Additional metadata for security tracking
+            ipAddress: req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0],
+            userAgent: req.headers['user-agent'] || 'unknown'
+        };
 
-        await user.save();
+        const storageSuccess = await storeTempRegistration(verificationToken, registrationData);
+
+        if (!storageSuccess) {
+            console.error("Failed to store temporary registration for:", email);
+            return res.status(500).json({
+                error: "Unable to process registration at this time",
+                code: "REGISTRATION_STORAGE_ERROR",
+                message: "Please try again in a few minutes.",
+            });
+        }
 
         // Send verification email
         try {
             await sendVerificationEmail(
-                user.email,
-                user.name,
+                registrationData.email,
+                registrationData.name,
                 verificationToken
             );
 
-            // Log successful registration for monitoring
+            // Log successful temporary registration for monitoring
             console.log(
-                `New user registered: ${
-                    user.email
+                `📧 Temporary registration created for: ${
+                    registrationData.email
                 } at ${new Date().toISOString()}`
             );
 
-            // UPDATED: Return success WITHOUT JWT tokens (requires email verification)
+            // Return success - user must verify email to complete registration
             res.status(201).json({
                 success: true,
                 message:
-                    "Account created successfully! Please check your email to verify your account before logging in.",
+                    "Registration initiated! Please check your email to verify your account and complete the registration process.",
                 requiresVerification: true,
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    name: user.name,
-                    phone: user.phone,
-                    isEmailVerified: false,
-                    createdAt: user.createdAt,
-                },
-                // NEW: No tokens provided - user must verify email first
+                email: registrationData.email,
+                // NEW: No user object returned since user isn't created yet
+                tempRegistration: true,
+                expiresIn: "24 hours",
+                nextStep: "Check your email and click the verification link to create your account."
             });
         } catch (emailError) {
             console.error("Failed to send verification email:", emailError);
 
-            // If email sending fails, we have two options:
-            // 1. Delete the user and return error (strict)
-            // 2. Keep user but inform about email issue (graceful)
-            // We'll go with graceful approach with retry option
-
-            res.status(201).json({
-                success: true,
+            // If email sending fails, we should clean up the temporary registration
+            // since the user won't be able to verify it
+            
+            res.status(500).json({
+                error: "Failed to send verification email",
+                code: "EMAIL_SEND_FAILED",
                 message:
-                    "Account created, but we couldn't send the verification email. Please try resending it.",
-                requiresVerification: true,
-                emailSendFailed: true,
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    name: user.name,
-                    phone: user.phone,
-                    isEmailVerified: false,
-                    createdAt: user.createdAt,
-                },
-                suggestion:
-                    "Click 'Resend Verification Email' on the verification page.",
+                    "We couldn't send the verification email to your address. Please check your email address and try registering again.",
+                suggestion: "Verify your email address is correct and try again in a few minutes.",
+                // Don't reveal that we stored data temporarily
             });
         }
     } catch (error) {
-        // Handle Mongoose validation errors specifically
-        if (error.name === "ValidationError") {
-            const validationErrors = Object.values(error.errors).map(
-                (err) => err.message
-            );
-            return res.status(400).json({
-                error: "Registration data validation failed",
-                code: "VALIDATION_ERROR",
-                details: validationErrors,
-            });
-        }
-
-        // Handle duplicate key errors (backup for email uniqueness)
-        if (error.code === 11000) {
-            return res.status(409).json({
-                error: "An account with this email address already exists",
-                code: "EMAIL_ALREADY_EXISTS",
-            });
-        }
-
         // Log unexpected errors for debugging
         console.error("Registration error:", error);
 
         res.status(500).json({
-            error: "Internal server error during account creation",
+            error: "Internal server error during registration",
             code: "REGISTRATION_ERROR",
+            message: "Something went wrong. Please try again."
         });
     }
 });

@@ -5,6 +5,11 @@ const {
     generateTokenPair,
     verifyAccessToken,
 } = require("../middleware/userAuth");
+// NEW: Import temporary registration service
+const {
+    retrieveAndRemoveTempRegistration,
+    hasTempRegistration,
+} = require("../services/tempRegistrationService");
 const {
     sendVerificationEmail,
     sendEmailChangeVerification,
@@ -32,10 +37,11 @@ const router = express.Router();
 
 /**
  * GET /api/auth/verify-email/:token
- * Verify email address using token from email link
+ * Verify email address and create user account (NEW: verify-before-save)
  *
- * This is called when user clicks the verification link in their email.
- * On success, user gets JWT tokens and is logged in.
+ * NEW BEHAVIOR: This endpoint now handles two scenarios:
+ * 1. NEW REGISTRATIONS: Creates user account from temporary storage
+ * 2. EXISTING USERS: Verifies email for users who already exist (legacy support)
  */
 router.get("/verify-email/:token", async (req, res) => {
     try {
@@ -50,7 +56,86 @@ router.get("/verify-email/:token", async (req, res) => {
             });
         }
 
-        // Find user by verification token
+        // NEW: First check if this is a temporary registration
+        const tempRegistration = retrieveAndRemoveTempRegistration(token);
+
+        if (tempRegistration) {
+            // NEW PATH: Create user account from temporary registration
+            try {
+                // Check if user somehow got created while verification was pending
+                const existingUser = await User.findByEmail(tempRegistration.email);
+                
+                if (existingUser) {
+                    return res.status(409).json({
+                        error: "An account with this email already exists",
+                        code: "EMAIL_ALREADY_EXISTS",
+                        message: "Please try logging in instead.",
+                    });
+                }
+
+                // Create the actual user account
+                const user = new User({
+                    email: tempRegistration.email,
+                    password: tempRegistration.password, // Already hashed by tempRegistrationService
+                    name: tempRegistration.name,
+                    phone: tempRegistration.phone,
+                    // Set as verified immediately since they clicked the verification link
+                    isEmailVerified: true,
+                    emailVerifiedAt: new Date(),
+                    // No verification token fields needed since already verified
+                });
+
+                // Override password hashing middleware since password is already hashed
+                user.$__skipPasswordHashing = true;
+
+                await user.save();
+
+                // Generate JWT tokens for immediate login
+                const tokens = generateTokenPair(user._id);
+
+                console.log(
+                    `🎉 User account created and verified: ${user.email} at ${new Date().toISOString()}`
+                );
+
+                return res.json({
+                    success: true,
+                    message: "Email verified successfully! Your account has been created and you are now logged in.",
+                    user: {
+                        id: user._id,
+                        email: user.email,
+                        name: user.name,
+                        phone: user.phone,
+                        isEmailVerified: true,
+                        emailVerifiedAt: user.emailVerifiedAt,
+                        createdAt: user.createdAt,
+                    },
+                    accessToken: tokens.accessToken,
+                    refreshToken: tokens.refreshToken,
+                    newAccount: true, // Flag to indicate this is a newly created account
+                });
+
+            } catch (userCreationError) {
+                console.error("Failed to create user from temporary registration:", userCreationError);
+                
+                // Handle duplicate key errors
+                if (userCreationError.code === 11000) {
+                    return res.status(409).json({
+                        error: "An account with this email already exists",
+                        code: "EMAIL_ALREADY_EXISTS",
+                        message: "Please try logging in instead.",
+                    });
+                }
+
+                return res.status(500).json({
+                    error: "Failed to create your account",
+                    code: "ACCOUNT_CREATION_ERROR",
+                    message: "Something went wrong while creating your account. Please try registering again.",
+                });
+            }
+        }
+
+        // LEGACY PATH: Handle existing users who need email verification
+        // This supports users who were created before the verify-before-save change
         const user = await User.findOne({
             emailVerificationToken: token,
             emailVerificationExpires: { $gt: new Date() }, // Token must not be expired
@@ -87,7 +172,7 @@ router.get("/verify-email/:token", async (req, res) => {
             });
         }
 
-        // Mark user as verified and clear verification fields
+        // Mark existing user as verified and clear verification fields
         user.isEmailVerified = true;
         user.emailVerificationToken = undefined;
         user.emailVerificationExpires = undefined;
@@ -100,7 +185,7 @@ router.get("/verify-email/:token", async (req, res) => {
 
         // Log successful verification for monitoring
         console.log(
-            `✅ Email verified for user: ${
+            `✅ Email verified for existing user: ${
                 user.email
             } at ${new Date().toISOString()}`
         );
@@ -153,6 +238,16 @@ router.post("/resend-verification", async (req, res) => {
             return res.status(400).json({
                 error: "Valid email address is required",
                 code: "INVALID_EMAIL_FORMAT",
+            });
+        }
+
+        // NEW: First check if there's a pending temporary registration
+        if (hasEmailPendingRegistration(email.toLowerCase().trim())) {
+            return res.json({
+                success: true,
+                message:
+                    "Your registration is still pending. Please check your email for the verification link, or wait 24 hours to register again.",
+                suggestion: "Check your email inbox and spam folder for the verification link.",
             });
         }
 

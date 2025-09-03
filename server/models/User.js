@@ -252,6 +252,11 @@ userSchema.pre("save", async function (next) {
     // This prevents rehashing when updating other user fields
     if (!this.isModified("password")) return next();
 
+    // NEW: Skip password hashing if explicitly requested (for pre-hashed passwords)
+    if (this.$__skipPasswordHashing) {
+        return next();
+    }
+
     try {
         // ✅ CHANGED: Use environment variable instead of hardcoded 12
         // Generate a salt with cost factor from BCRYPT_ROUNDS (default: 12)

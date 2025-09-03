@@ -1,5 +1,8 @@
 // server/middleware/validation.js (this replaces express-validator.checks http request before mongoose schema)
 
+// Import disposable email detection service
+const { isDisposableEmail } = require('../services/disposableEmailService');
+
 /**
  * Sanitize input by removing HTML tags and dangerous characters
  */
@@ -270,6 +273,14 @@ const validateUserRegistration = (req, res, next) => {
         const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
         if (!emailRegex.test(email.trim())) {
             errors.push("Please enter a valid email address");
+        } else {
+            // NEW: Check for disposable email addresses
+            const disposableCheck = isDisposableEmail(email.trim());
+            if (disposableCheck.isDisposable) {
+                errors.push(
+                    `Disposable email addresses from ${disposableCheck.domain} are not allowed. Please use a permanent email address.`
+                );
+            }
         }
     }
 
