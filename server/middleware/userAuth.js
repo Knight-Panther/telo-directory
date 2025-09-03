@@ -15,10 +15,17 @@ const User = require("../models/User");
  * UPDATED: Now includes email verification enforcement
  */
 
-// JWT secrets from environment variables
-const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "access-secret-key";
-const JWT_REFRESH_SECRET =
-    process.env.JWT_REFRESH_SECRET || "refresh-secret-key";
+// JWT secrets from environment variables - REQUIRED
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+
+// Validate required JWT secrets at startup
+if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
+    console.error(
+        "❌ SECURITY ERROR: JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be set in environment variables"
+    );
+    process.exit(1);
+}
 
 // Token expiration times (configurable via environment)
 const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY || "15m"; // Short-lived for security

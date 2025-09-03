@@ -1,13 +1,24 @@
 // server/middleware/auth.js
 const jwt = require("jsonwebtoken");
 
-// Basic admin credentials (in production, use proper user management)
+// Admin credentials - MUST be set in environment variables
 const ADMIN_CREDENTIALS = {
-    username: process.env.ADMIN_USERNAME || "admin",
-    password: process.env.ADMIN_PASSWORD || "admin123",
+    username: process.env.ADMIN_USERNAME,
+    password: process.env.ADMIN_PASSWORD,
 };
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Validate required environment variables at startup
+if (!ADMIN_CREDENTIALS.username || !ADMIN_CREDENTIALS.password) {
+    console.error('❌ SECURITY ERROR: ADMIN_USERNAME and ADMIN_PASSWORD must be set in environment variables');
+    process.exit(1);
+}
+
+if (!JWT_SECRET) {
+    console.error('❌ SECURITY ERROR: JWT_SECRET must be set in environment variables');
+    process.exit(1);
+}
 
 // Generate token
 const generateToken = (username) => {

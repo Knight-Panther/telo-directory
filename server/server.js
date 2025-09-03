@@ -4,6 +4,37 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
+// Environment Variables Validation
+const validateEnvironment = () => {
+    const requiredVars = [
+        "MONGODB_URI",
+        "JWT_ACCESS_SECRET",
+        "JWT_REFRESH_SECRET",
+        "ADMIN_USERNAME",
+        "ADMIN_PASSWORD",
+        "EMAIL_USER",
+        "EMAIL_PASS",
+    ];
+
+    const missing = requiredVars.filter((varName) => !process.env[varName]);
+
+    if (missing.length > 0) {
+        console.error("❌ CRITICAL: Missing required environment variables:");
+        missing.forEach((varName) => {
+            console.error(`   - ${varName}`);
+        });
+        console.error(
+            "\n💡 Please check your .env file and ensure all required variables are set."
+        );
+        process.exit(1);
+    }
+
+    console.log("✅ All required environment variables are present");
+};
+
+// Validate environment before proceeding
+validateEnvironment();
+
 const { connectDB } = require("./config/database");
 const errorHandler = require("./middleware/errorHandler");
 
