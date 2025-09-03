@@ -72,6 +72,9 @@ router.post("/register", validateUserRegistration, async (req, res) => {
                 message:
                     "Please check your email to verify your account, or wait 24 hours to register again.",
                 suggestion: "Check your email inbox and spam folder for the verification link.",
+                // NEW: Provide redirect information for better UX
+                redirectTo: `/verify-email?email=${encodeURIComponent(email)}`,
+                action: "redirect_to_verification"
             });
         }
 
@@ -105,7 +108,8 @@ router.post("/register", validateUserRegistration, async (req, res) => {
             await sendVerificationEmail(
                 registrationData.email,
                 registrationData.name,
-                verificationToken
+                verificationToken,
+                registrationData.ipAddress
             );
 
             // Log successful temporary registration for monitoring

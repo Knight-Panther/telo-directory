@@ -140,8 +140,12 @@ const LoginModal = ({ isOpen, onClose }) => {
                 errorMessage =
                     "📧 An account with this email already exists. Please try logging in instead.";
             } else if (err.code === "REGISTRATION_PENDING") {
-                errorMessage =
-                    "⏳ Registration already pending for this email. Please check your inbox for the verification link.";
+                // Instead of showing error, redirect to verify-email page
+                onClose();
+                navigate(
+                    `/verify-email?email=${encodeURIComponent(formData.email)}`
+                );
+                return; // Exit early, don't show error message
             } else if (err.code === "ACCOUNT_LOCKED") {
                 errorMessage =
                     "🔒 Account temporarily locked due to too many failed attempts. Please try again later.";

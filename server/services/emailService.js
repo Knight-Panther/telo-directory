@@ -36,6 +36,9 @@ const EMAIL_CONFIG = {
 // Rate limiting storage (in production, use Redis)
 const emailRateLimit = new Map();
 
+// IP-based rate limiting for additional security (in production, use Redis)
+const ipRateLimit = new Map();
+
 /**
  * Create and configure nodemailer transporter
  * Supports Gmail and SMTP configurations
@@ -256,20 +259,43 @@ const createVerificationEmailTemplate = (userName, verificationUrl) => {
 
 /**
  * Check rate limiting for email sending
- * Prevents spam and abuse
+ * Prevents spam and abuse with both email and IP-based limits
  */
-const checkRateLimit = (email) => {
+const checkRateLimit = (email, ipAddress = null) => {
     const now = Date.now();
     const rateLimitKey = `email_${email}`;
     const lastSent = emailRateLimit.get(rateLimitKey);
 
-    // 1 minute rate limit
+    // Email-based rate limit: 1 minute between emails to same address
     if (lastSent && now - lastSent < 60000) {
         const remainingTime = Math.ceil((60000 - (now - lastSent)) / 1000);
         return {
             allowed: false,
             remainingSeconds: remainingTime,
+            reason: 'email_rate_limit'
         };
+    }
+
+    // IP-based rate limit: 10 emails per hour from same IP (prevents bulk abuse)
+    if (ipAddress) {
+        const ipKey = `ip_${ipAddress}`;
+        const ipRequests = ipRateLimit.get(ipKey) || [];
+        
+        // Clean up requests older than 1 hour
+        const hourAgo = now - 3600000;
+        const recentRequests = ipRequests.filter(timestamp => timestamp > hourAgo);
+        
+        if (recentRequests.length >= 10) {
+            return {
+                allowed: false,
+                remainingSeconds: Math.ceil((recentRequests[0] + 3600000 - now) / 1000),
+                reason: 'ip_rate_limit'
+            };
+        }
+        
+        // Update IP request log
+        recentRequests.push(now);
+        ipRateLimit.set(ipKey, recentRequests);
     }
 
     return { allowed: true };
@@ -337,20 +363,26 @@ const sendEmailWithRetry = async (mailOptions, maxRetries = 3) => {
 const sendVerificationEmail = async (
     userEmail,
     userName,
-    verificationToken
+    verificationToken,
+    ipAddress = null
 ) => {
-    // Check rate limiting
-    const rateCheck = checkRateLimit(userEmail);
+    // Check rate limiting (both email and IP-based)
+    const rateCheck = checkRateLimit(userEmail, ipAddress);
     if (!rateCheck.allowed) {
+        const errorMessage = rateCheck.reason === 'ip_rate_limit' 
+            ? "Too many verification emails sent from your location"
+            : "Rate limit exceeded";
+        
         throw {
             success: false,
-            error: "Rate limit exceeded",
+            error: errorMessage,
             code: "RATE_LIMIT_EXCEEDED",
             remainingSeconds: rateCheck.remainingSeconds,
+            reason: rateCheck.reason,
         };
     }
 
-    // Create verification URL
+    // Create verification URL - pointing to the frontend route that will handle API call
     const verificationUrl = `${EMAIL_CONFIG.baseUrl}/verify-email/confirm/${verificationToken}`;
 
     // Create email content
@@ -399,16 +431,22 @@ const sendVerificationEmail = async (
 const sendEmailChangeVerification = async (
     newEmail,
     userName,
-    verificationToken
+    verificationToken,
+    ipAddress = null
 ) => {
     // Similar to main verification but different template
-    const rateCheck = checkRateLimit(newEmail);
+    const rateCheck = checkRateLimit(newEmail, ipAddress);
     if (!rateCheck.allowed) {
+        const errorMessage = rateCheck.reason === 'ip_rate_limit' 
+            ? "Too many verification emails sent from your location"
+            : "Rate limit exceeded";
+            
         throw {
             success: false,
-            error: "Rate limit exceeded",
+            error: errorMessage,
             code: "RATE_LIMIT_EXCEEDED",
             remainingSeconds: rateCheck.remainingSeconds,
+            reason: rateCheck.reason,
         };
     }
 

@@ -256,6 +256,37 @@ function clearAllTempRegistrations() {
 }
 
 /**
+ * Get pending registration data by email (for resending verification)
+ * Returns the registration data if found and not expired
+ *
+ * @param {string} email - Email to look up
+ * @returns {Object|null} - Registration data or null if not found/expired
+ */
+function getPendingRegistrationByEmail(email) {
+    if (!email) return null;
+    
+    const normalizedEmail = email.toLowerCase().trim();
+    const now = new Date();
+    
+    for (const [token, registration] of tempRegistrations) {
+        if (registration.email === normalizedEmail) {
+            // Check if still valid
+            if (registration.expiresAt >= now) {
+                return {
+                    ...registration,
+                    verificationToken: token // Include the token for resending
+                };
+            } else {
+                // Clean up expired registration
+                tempRegistrations.delete(token);
+            }
+        }
+    }
+    
+    return null;
+}
+
+/**
  * Get all pending emails (for admin monitoring)
  * Returns only email addresses, not full registration data for privacy
  *
@@ -321,6 +352,7 @@ module.exports = {
     retrieveAndRemoveTempRegistration,
     hasTempRegistration,
     hasEmailPendingRegistration,
+    getPendingRegistrationByEmail,
 
     // Management functions
     cleanupExpiredRegistrations,

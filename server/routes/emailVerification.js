@@ -9,6 +9,7 @@ const {
 const {
     retrieveAndRemoveTempRegistration,
     hasTempRegistration,
+    getPendingRegistrationByEmail,
 } = require("../services/tempRegistrationService");
 const {
     sendVerificationEmail,
@@ -241,14 +242,63 @@ router.post("/resend-verification", async (req, res) => {
             });
         }
 
-        // NEW: First check if there's a pending temporary registration
-        if (hasEmailPendingRegistration(email.toLowerCase().trim())) {
-            return res.json({
-                success: true,
-                message:
-                    "Your registration is still pending. Please check your email for the verification link, or wait 24 hours to register again.",
-                suggestion: "Check your email inbox and spam folder for the verification link.",
-            });
+        // NEW: Check if there's a pending temporary registration and resend if needed
+        const normalizedEmail = email.toLowerCase().trim();
+        const pendingRegistration = getPendingRegistrationByEmail(normalizedEmail);
+        
+        if (pendingRegistration) {
+            // Check rate limiting for temp registration resends
+            const rateCheck = checkRateLimit(normalizedEmail);
+            if (!rateCheck.allowed) {
+                return res.status(429).json({
+                    error: "Too many verification emails sent",
+                    code: "RATE_LIMIT_EXCEEDED",
+                    message: `Please wait ${rateCheck.remainingSeconds} seconds before requesting another email.`,
+                    remainingSeconds: rateCheck.remainingSeconds,
+                });
+            }
+
+            // Resend verification email with existing token
+            try {
+                const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
+                await sendVerificationEmail(
+                    pendingRegistration.email,
+                    pendingRegistration.name,
+                    pendingRegistration.verificationToken,
+                    clientIp
+                );
+
+                console.log(`📧 Verification email resent for temp registration: ${pendingRegistration.email}`);
+
+                return res.json({
+                    success: true,
+                    message:
+                        "Verification email sent successfully! Please check your inbox and spam folder.",
+                    sentTo: pendingRegistration.email.replace(/(.{2})(.*)(@.*)/, "$1***$3"),
+                    expiresIn: "24 hours",
+                    isPendingRegistration: true,
+                });
+            } catch (emailError) {
+                console.error("Failed to resend verification email for temp registration:", emailError);
+
+                if (emailError.code === "RATE_LIMIT_EXCEEDED") {
+                    return res.status(429).json({
+                        error: "Too many verification emails sent",
+                        code: "RATE_LIMIT_EXCEEDED",
+                        message: `Please wait ${emailError.remainingSeconds} seconds before trying again.`,
+                        remainingSeconds: emailError.remainingSeconds,
+                    });
+                }
+
+                return res.status(500).json({
+                    error: "Failed to send verification email",
+                    code: "EMAIL_SEND_FAILED",
+                    message:
+                        "Unable to send email at this time. Please check your email address and try again, or contact support if the problem persists.",
+                    suggestion:
+                        "Verify your email address is correct and try again in a few minutes.",
+                });
+            }
         }
 
         // Find user by email (case-insensitive)
@@ -299,10 +349,12 @@ router.post("/resend-verification", async (req, res) => {
 
         // Send verification email
         try {
+            const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
             await sendVerificationEmail(
                 user.email,
                 user.name,
-                verificationToken
+                verificationToken,
+                clientIp
             );
 
             console.log(`📧 Verification email resent to: ${user.email}`);
@@ -414,10 +466,12 @@ router.post("/request-email-change", verifyAccessToken, async (req, res) => {
 
         // Send verification email to NEW email address
         try {
+            const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
             await sendEmailChangeVerification(
                 normalizedEmail,
                 currentUser.name,
-                verificationToken
+                verificationToken,
+                clientIp
             );
 
             console.log(
