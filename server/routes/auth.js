@@ -185,7 +185,7 @@ router.post("/login", validateUserLogin, async (req, res) => {
         if (!user) {
             // Don't reveal whether email exists for security
             return res.status(401).json({
-                error: "Invalid email or password",
+                error: "This email is not registered",
                 code: "INVALID_CREDENTIALS",
             });
         }

@@ -137,8 +137,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 );
                 return; // Exit early, don't show error message
             } else if (err.code === "INVALID_CREDENTIALS") {
-                errorMessage =
-                    "❌ Invalid email or password. Please check your credentials and try again.";
+                errorMessage = `❌ ${err.message}`;
             } else if (err.code === "EMAIL_ALREADY_EXISTS") {
                 errorMessage =
                     "📧 An account with this email already exists. Please try logging in instead.";
