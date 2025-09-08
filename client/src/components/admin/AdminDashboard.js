@@ -10,6 +10,7 @@ import ManageBusinesses from "./ManageBusinesses";
 import BusinessForm from "./BusinessForm";
 import CategoryManager from "./CategoryManager";
 import ReportsManagement from "./ReportsManagement"; // NEW: Import reports component
+import UserManagement from "./UserManagement"; // NEW: Import user management component
 import "../../styles/admin.css";
 
 const AdminDashboard = ({ onLogout }) => {
@@ -83,6 +84,9 @@ const AdminDashboard = ({ onLogout }) => {
                         <Link to="/admin/reports" className="admin-nav-link">
                             Reports
                         </Link>
+                        <Link to="/admin/users" className="admin-nav-link">
+                            User Management
+                        </Link>
                     </nav>
 
                     <div className="admin-main">
@@ -123,6 +127,10 @@ const AdminDashboard = ({ onLogout }) => {
                             <Route
                                 path="/reports"
                                 element={<ReportsManagement />}
+                            />
+                            <Route
+                                path="/users"
+                                element={<UserManagement />}
                             />
                         </Routes>
                     </div>

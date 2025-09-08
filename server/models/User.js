@@ -176,6 +176,21 @@ const userSchema = new mongoose.Schema(
             // Helps detect suspicious account activity
         },
 
+        // === DELAYED DELETION SYSTEM ===
+
+        deletionScheduledAt: {
+            type: Date,
+            // When the user requested account deletion (timestamp)
+            // Used for audit trail and admin monitoring
+        },
+
+        deletionScheduledFor: {
+            type: Date,
+            // When the account will be permanently deleted
+            // Calculated as deletionScheduledAt + USER_DELETION_DELAY_DAYS
+            // Background job uses this field to find expired accounts
+        },
+
         // === PASSWORD RESET FUNCTIONALITY ===
 
         resetPasswordToken: {
@@ -234,6 +249,8 @@ const userSchema = new mongoose.Schema(
             { emailChangeToken: 1 }, // NEW: Fast email change token lookups
             { pendingEmailChange: 1 }, // NEW: Fast pending email lookups
             { favorites: 1 }, // Fast queries for user's favorited businesses
+            { deletionScheduledFor: 1 }, // NEW: Fast cleanup job queries
+            { deletionScheduledAt: 1 }, // NEW: Fast admin dashboard queries
         ],
     }
 );
@@ -310,6 +327,37 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 userSchema.virtual("isLocked").get(function () {
     // Account is locked if lockUntil exists and is in the future
     return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+/**
+ * Check if the account is scheduled for deletion
+ *
+ * This virtual property provides a clean way to check if an account
+ * has been scheduled for delayed deletion.
+ */
+userSchema.virtual("isScheduledForDeletion").get(function () {
+    // Account is scheduled for deletion if deletionScheduledFor exists and is in the future
+    return !!(this.deletionScheduledFor && this.deletionScheduledFor > Date.now());
+});
+
+/**
+ * Get remaining days until account deletion
+ *
+ * Returns the number of days remaining before the account will be permanently deleted.
+ * Returns 0 if deletion is not scheduled or has already passed.
+ */
+userSchema.virtual("remainingDaysUntilDeletion").get(function () {
+    if (!this.deletionScheduledFor) return 0;
+    
+    const now = new Date();
+    const deletionTime = new Date(this.deletionScheduledFor);
+    
+    if (deletionTime <= now) return 0;
+    
+    const diffTime = deletionTime - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
 });
 
 /**
@@ -446,6 +494,47 @@ userSchema.statics.findByEmailChangeToken = function (token) {
 };
 
 /**
+ * NEW: Find users scheduled for deletion that have expired
+ *
+ * This method finds all users whose deletion time has passed and
+ * should be permanently deleted by the cleanup service.
+ *
+ * @returns {Array} - Array of user documents ready for permanent deletion
+ */
+userSchema.statics.findExpiredDeletions = function () {
+    return this.find({
+        deletionScheduledFor: { $lte: new Date() }, // Deletion time has passed
+    });
+};
+
+/**
+ * NEW: Find users with pending deletions
+ *
+ * This method finds all users who have scheduled deletion but
+ * the deletion time hasn't arrived yet. Used for admin dashboard.
+ *
+ * @returns {Array} - Array of user documents with pending deletions
+ */
+userSchema.statics.findPendingDeletions = function () {
+    return this.find({
+        deletionScheduledAt: { $exists: true },
+        deletionScheduledFor: { $gt: new Date() }, // Deletion time is in future
+    }).select('email name deletionScheduledAt deletionScheduledFor createdAt');
+};
+
+/**
+ * NEW: Count users with pending deletions
+ *
+ * @returns {Number} - Count of users with pending deletions
+ */
+userSchema.statics.countPendingDeletions = function () {
+    return this.countDocuments({
+        deletionScheduledAt: { $exists: true },
+        deletionScheduledFor: { $gt: new Date() },
+    });
+};
+
+/**
  * Generate and set password reset token
  * 
  * Creates a secure reset token with 30-minute expiration as per Phase 4 requirements.
@@ -485,6 +574,47 @@ userSchema.methods.isPasswordResetTokenValid = function () {
         this.resetPasswordExpires && 
         this.resetPasswordExpires > Date.now()
     );
+};
+
+/**
+ * Schedule account for delayed deletion
+ * 
+ * Sets the deletion schedule based on USER_DELETION_DELAY_DAYS environment variable.
+ * This method modifies the document but does not save it - caller must save.
+ * 
+ * @returns {Date} - The scheduled deletion date
+ */
+userSchema.methods.scheduleDeletion = function () {
+    const delayDays = parseInt(process.env.USER_DELETION_DELAY_DAYS) || 5;
+    const now = new Date();
+    const deletionDate = new Date(now.getTime() + (delayDays * 24 * 60 * 60 * 1000));
+    
+    this.deletionScheduledAt = now;
+    this.deletionScheduledFor = deletionDate;
+    
+    return deletionDate;
+};
+
+/**
+ * Cancel scheduled account deletion
+ * 
+ * Removes the deletion schedule from the account.
+ * This method modifies the document but does not save it - caller must save.
+ * 
+ * @returns {void}
+ */
+userSchema.methods.cancelDeletion = function () {
+    this.deletionScheduledAt = undefined;
+    this.deletionScheduledFor = undefined;
+};
+
+/**
+ * Check if account deletion has expired and should be permanently deleted
+ * 
+ * @returns {boolean} - True if the account should be permanently deleted
+ */
+userSchema.methods.isDeletionExpired = function () {
+    return !!(this.deletionScheduledFor && this.deletionScheduledFor <= Date.now());
 };
 
 // ✅ NEW ADDITION: Get current security configuration

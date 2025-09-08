@@ -147,6 +147,27 @@ export const adminService = {
         const response = await api.get(`/admin/reports/business/${businessId}`);
         return response.data;
     },
+
+    // NEW: User management endpoints
+    getUserStats: async () => {
+        const response = await api.get("/admin/dashboard/users/stats");
+        return response.data;
+    },
+
+    getPendingDeletions: async () => {
+        const response = await api.get("/admin/dashboard/users/pending-deletions");
+        return response.data;
+    },
+
+    getCleanupServiceStatus: async () => {
+        const response = await api.get("/admin/dashboard/cleanup-service/status");
+        return response.data;
+    },
+
+    triggerManualCleanup: async () => {
+        const response = await api.post("/admin/dashboard/cleanup-service/manual-run");
+        return response.data;
+    },
 };
 
 export default adminService;

@@ -6,7 +6,8 @@
       "Bash(npx eslint:*)",
       "Bash(npm run build:*)",
       "Bash(npm start)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

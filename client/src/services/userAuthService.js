@@ -266,7 +266,7 @@ const userAuthService = {
                 };
             } else {
                 // Normal login flow
-                const { user, accessToken, refreshToken } = data;
+                const { user, accessToken, refreshToken, deletionCancelled } = data;
 
                 // Store tokens and user data with remember me preference
                 tokenManager.setTokens(accessToken, refreshToken, rememberMe);
@@ -277,6 +277,7 @@ const userAuthService = {
                     user,
                     message: data.message,
                     requiresVerification: false,
+                    deletionCancelled: deletionCancelled || false,
                 };
             }
         } catch (error) {
@@ -697,8 +698,8 @@ const userAuthService = {
     },
 
     /**
-     * NEW: Delete user account
-     * Permanently deletes the user account and all associated data
+     * NEW: Delete user account (Schedule for delayed deletion)
+     * Schedules the user account for delayed deletion and logs them out immediately
      */
     deleteAccount: async (confirmationText = "DELETE") => {
         try {
@@ -706,14 +707,46 @@ const userAuthService = {
                 data: { confirmationText }
             });
             
-            // Clear tokens after successful deletion
-            tokenManager.clearTokens();
+            const data = response.data;
             
-            return {
-                success: true,
-                message: response.data.message
-            };
+            // Handle delayed deletion scheduling
+            if (data.scheduledDeletion) {
+                // Clear tokens immediately as instructed by server
+                if (data.forceLogout) {
+                    tokenManager.clearTokens();
+                }
+                
+                return {
+                    success: true,
+                    message: data.message,
+                    scheduledDeletion: true,
+                    scheduledFor: data.scheduledFor,
+                    delayDays: data.delayDays,
+                    canCancelBy: data.canCancelBy,
+                    forceLogout: data.forceLogout
+                };
+            } else {
+                // Fallback for immediate deletion (shouldn't happen with new system)
+                tokenManager.clearTokens();
+                return {
+                    success: true,
+                    message: data.message,
+                    scheduledDeletion: false
+                };
+            }
         } catch (error) {
+            // Handle already scheduled deletion
+            if (error.response?.status === 400 && error.response?.data?.code === "DELETION_ALREADY_SCHEDULED") {
+                return {
+                    success: false,
+                    message: error.response.data.message,
+                    code: "DELETION_ALREADY_SCHEDULED",
+                    alreadyScheduled: true,
+                    scheduledFor: error.response.data.scheduledFor,
+                    remainingDays: error.response.data.remainingDays
+                };
+            }
+            
             if (error.response?.status === 400) {
                 throw {
                     message: "Account deletion requires typing 'DELETE' as confirmation",
@@ -722,7 +755,7 @@ const userAuthService = {
             }
 
             throw {
-                message: error.response?.data?.error || "Failed to delete account",
+                message: error.response?.data?.error || "Failed to schedule account deletion",
                 code: error.response?.data?.code || "DELETE_ACCOUNT_ERROR"
             };
         }

@@ -229,8 +229,22 @@ router.post("/login", validateUserLogin, async (req, res) => {
             });
         }
 
-        // Successful login - reset any failed login attempt counters
+        // NEW: Check if account is scheduled for deletion and cancel it
+        let deletionCancelled = false;
+        if (user.isScheduledForDeletion) {
+            user.cancelDeletion();
+            deletionCancelled = true;
+            console.log(`Account deletion cancelled by login: ${user.email} (ID: ${user._id})`);
+        }
+
+        // Successful login - reset any failed login attempt counters and save user changes
         await user.resetLoginAttempts();
+        
+        // NEW: Save user changes (including deletion cancellation) to database
+        if (deletionCancelled) {
+            await user.save();
+            console.log(`✅ Deletion cancellation saved to database for: ${user.email}`);
+        }
 
         // Generate new token pair for this login session
         const tokens = generateTokenPair(user._id);
@@ -238,9 +252,15 @@ router.post("/login", validateUserLogin, async (req, res) => {
         // Log successful login for security monitoring
         console.log(`User login: ${user.email} at ${new Date().toISOString()}`);
 
+        // Prepare response message
+        let loginMessage = "Login successful";
+        if (deletionCancelled) {
+            loginMessage = "Welcome back! Your account deletion has been cancelled.";
+        }
+
         res.json({
             success: true,
-            message: "Login successful",
+            message: loginMessage,
             user: {
                 id: user._id,
                 email: user.email,
@@ -252,6 +272,8 @@ router.post("/login", validateUserLogin, async (req, res) => {
             },
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
+            // NEW: Include deletion cancellation info
+            deletionCancelled: deletionCancelled,
         });
     } catch (error) {
         console.error("Login error:", error);
@@ -802,19 +824,28 @@ router.post("/change-password", verifyAccessToken, async (req, res) => {
 
 /**
  * DELETE /api/auth/account
- * Delete user account and all associated data
+ * Schedule user account for delayed deletion
  * 
- * Secure account deletion:
+ * NEW: Delayed deletion system:
  * - User must be authenticated
  * - Requires typing "DELETE" for confirmation
- * - Removes all associated data (favorites, pending changes)
- * - Logs deletion for audit trail
- * - Irreversible action with proper safeguards
+ * - Schedules deletion based on USER_DELETION_DELAY_DAYS
+ * - Logs out user immediately after scheduling
+ * - Can be cancelled by logging in before deletion date
+ * - Actual deletion handled by background cleanup service
  */
 router.delete("/account", verifyAccessToken, async (req, res) => {
     try {
         const { confirmationText } = req.body;
-        const user = req.user; // From verifyAccessToken middleware
+        // Need full user object with password field excluded but with all other fields
+        const user = await User.findById(req.user._id).select("-password");
+        
+        if (!user) {
+            return res.status(404).json({
+                error: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
         
         // Require confirmation text
         if (confirmationText !== "DELETE") {
@@ -824,31 +855,50 @@ router.delete("/account", verifyAccessToken, async (req, res) => {
             });
         }
         
+        // Check if deletion is already scheduled
+        if (user.isScheduledForDeletion) {
+            return res.status(400).json({
+                error: "Account deletion is already scheduled",
+                code: "DELETION_ALREADY_SCHEDULED",
+                message: `Your account is already scheduled for deletion on ${user.deletionScheduledFor.toDateString()}. You can cancel this by logging in again.`,
+                scheduledFor: user.deletionScheduledFor,
+                remainingDays: user.remainingDaysUntilDeletion
+            });
+        }
+        
         try {
-            // Log account deletion for audit trail
-            console.log(`Account deletion initiated: ${user.email} (ID: ${user._id})`);
+            // Schedule the deletion
+            const deletionDate = user.scheduleDeletion();
+            await user.save();
             
-            // Delete the user account (this will cascade delete associated data)
-            await User.findByIdAndDelete(user._id);
+            // Log scheduled deletion for audit trail
+            console.log(`Account deletion scheduled: ${user.email} (ID: ${user._id}) - will be deleted on ${deletionDate.toISOString()}`);
             
-            console.log(`Account deletion completed: ${user.email} (ID: ${user._id})`);
+            // Get delay days for response
+            const delayDays = parseInt(process.env.USER_DELETION_DELAY_DAYS) || 5;
             
             res.json({
                 success: true,
-                message: "Account deleted successfully. We're sorry to see you go!"
+                message: `Account deletion has been scheduled. Your account will be permanently deleted in ${delayDays} days. You can cancel this by logging in again before ${deletionDate.toDateString()}.`,
+                scheduledDeletion: true,
+                scheduledFor: deletionDate,
+                delayDays: delayDays,
+                canCancelBy: deletionDate,
+                // Instruct client to logout user immediately
+                forceLogout: true
             });
             
-        } catch (deleteError) {
-            console.error("Error deleting user account:", deleteError);
+        } catch (scheduleError) {
+            console.error("Error scheduling user account deletion:", scheduleError);
             
             return res.status(500).json({
-                error: "Failed to delete account. Please try again or contact support.",
-                code: "DELETE_ERROR"
+                error: "Failed to schedule account deletion. Please try again or contact support.",
+                code: "SCHEDULE_DELETION_ERROR"
             });
         }
         
     } catch (error) {
-        console.error("Account deletion error:", error);
+        console.error("Account deletion scheduling error:", error);
         
         res.status(500).json({
             error: "Internal server error",
