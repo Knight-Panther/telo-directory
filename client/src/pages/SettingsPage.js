@@ -221,7 +221,7 @@ const SettingsPage = () => {
         try {
             await userAuthService.changePassword(passwordForm);
 
-            showNotification("Password changed successfully!", "success");
+            alert("✅ Password Changed Successfully!\n\nYour password has been updated and is now active.");
             setPasswordForm({
                 currentPassword: "",
                 newPassword: "",
@@ -229,10 +229,7 @@ const SettingsPage = () => {
             });
             setPasswordErrors({});
         } catch (error) {
-            showNotification(
-                error.message || "Failed to change password",
-                "error"
-            );
+            alert("❌ Password Change Failed\n\n" + (error.message || "Failed to change password"));
 
             // Handle specific field errors from backend
             if (error.field) {
