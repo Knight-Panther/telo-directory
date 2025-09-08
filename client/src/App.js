@@ -15,6 +15,9 @@ import SettingsPage from "./pages/SettingsPage";
 import AdminPage from "./pages/AdminPage";
 // NEW: Import email verification page
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+// NEW: Import password reset pages
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import "./App.css";
 
 // Create a client for React Query
@@ -57,6 +60,16 @@ function App() {
                                 <Route
                                     path="/verify-email/confirm/:token"
                                     element={<VerifyEmailPage />}
+                                />
+
+                                {/* NEW: Password Reset Routes */}
+                                <Route
+                                    path="/forgot-password"
+                                    element={<ForgotPasswordPage />}
+                                />
+                                <Route
+                                    path="/reset-password/:token"
+                                    element={<ResetPasswordPage />}
                                 />
 
                                 {/* PROTECTED: Dashboard route now requires authentication AND email verification */}

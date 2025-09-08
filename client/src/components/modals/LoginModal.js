@@ -452,9 +452,10 @@ const LoginModal = ({ isOpen, onClose }) => {
                             <button
                                 type="button"
                                 className="forgot-password-link"
-                                onClick={() =>
-                                    setError("Password reset coming soon!")
-                                }
+                                onClick={() => {
+                                    handleClose();
+                                    navigate("/forgot-password");
+                                }}
                             >
                                 Forgot your password?
                             </button>

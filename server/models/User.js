@@ -445,6 +445,48 @@ userSchema.statics.findByEmailChangeToken = function (token) {
     });
 };
 
+/**
+ * Generate and set password reset token
+ * 
+ * Creates a secure reset token with 30-minute expiration as per Phase 4 requirements.
+ * This method generates the token and sets expiration but does not save the document.
+ * 
+ * @param {string} token - The generated reset token from emailService
+ * @returns {void}
+ */
+userSchema.methods.setPasswordResetToken = function (token) {
+    this.resetPasswordToken = token;
+    // Set expiration to 30 minutes from now (Phase 4 requirement)
+    this.resetPasswordExpires = new Date(Date.now() + 30 * 60 * 1000);
+};
+
+/**
+ * Clear password reset token and expiration
+ * 
+ * Called after successful password reset to invalidate the token.
+ * This prevents the same token from being used multiple times.
+ * This method modifies the document but does not save it.
+ * 
+ * @returns {void}
+ */
+userSchema.methods.clearPasswordResetToken = function () {
+    this.resetPasswordToken = undefined;
+    this.resetPasswordExpires = undefined;
+};
+
+/**
+ * Check if password reset token is valid and not expired
+ * 
+ * @returns {boolean} - True if token is valid and not expired
+ */
+userSchema.methods.isPasswordResetTokenValid = function () {
+    return !!(
+        this.resetPasswordToken && 
+        this.resetPasswordExpires && 
+        this.resetPasswordExpires > Date.now()
+    );
+};
+
 // ✅ NEW ADDITION: Get current security configuration
 /**
  * Get current security configuration

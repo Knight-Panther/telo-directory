@@ -483,6 +483,233 @@ const sendEmailChangeVerification = async (
 };
 
 /**
+ * HTML Email Template for Password Reset
+ * Professional, mobile-responsive design matching verification template
+ */
+const createPasswordResetEmailTemplate = (userName, resetUrl) => {
+    return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Reset Your Password - TELO Directory</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                line-height: 1.6; 
+                color: #333;
+                background-color: #f8f9fa;
+            }
+            .container { 
+                max-width: 600px; 
+                margin: 40px auto; 
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+            .header { 
+                background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+                color: white; 
+                padding: 40px 30px;
+                text-align: center;
+            }
+            .header h1 { 
+                font-size: 28px; 
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+            .content { 
+                padding: 40px 30px;
+            }
+            .greeting { 
+                font-size: 18px; 
+                margin-bottom: 20px;
+                color: #2d3748;
+            }
+            .message { 
+                margin-bottom: 30px; 
+                line-height: 1.7;
+                color: #4a5568;
+            }
+            .reset-button { 
+                display: inline-block;
+                background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+                color: white;
+                padding: 16px 32px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 16px;
+                margin: 20px 0;
+                transition: transform 0.2s;
+            }
+            .reset-button:hover { 
+                transform: translateY(-2px);
+            }
+            .footer { 
+                background: #f7fafc;
+                padding: 30px;
+                text-align: center;
+                color: #718096;
+                font-size: 14px;
+                border-top: 1px solid #e2e8f0;
+            }
+            .security-note {
+                background: #fed7e2;
+                border-left: 4px solid #e53e3e;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            .warning-note {
+                background: #fef5e7;
+                border-left: 4px solid #f6ad55;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            @media (max-width: 600px) {
+                .container { margin: 20px; }
+                .header, .content { padding: 30px 20px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🔐 Password Reset</h1>
+                <p>TELO Directory Security</p>
+            </div>
+            
+            <div class="content">
+                <div class="greeting">Hello ${userName}! 👋</div>
+                
+                <div class="message">
+                    <p>We received a request to reset your password for your TELO Directory account.</p>
+                    
+                    <p>If you requested this password reset, please click the button below to create a new password:</p>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="${resetUrl}" class="reset-button">
+                        🔄 Reset My Password
+                    </a>
+                </div>
+                
+                <div class="security-note">
+                    <strong>🔒 Security Note:</strong> This password reset link will expire in 30 minutes for your security. If you didn't request a password reset, please ignore this email and your password will remain unchanged.
+                </div>
+                
+                <div class="warning-note">
+                    <strong>⚠️ Important:</strong> If you continue to receive password reset emails that you didn't request, please contact our support team immediately.
+                </div>
+                
+                <div class="message">
+                    <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+                    <p style="word-break: break-all; color: #e53e3e; font-size: 14px;">${resetUrl}</p>
+                </div>
+                
+                <div class="message">
+                    <p>For your security, please:</p>
+                    <ul style="margin: 10px 0 0 20px; color: #4a5568;">
+                        <li>Choose a strong, unique password</li>
+                        <li>Don't share this reset link with anyone</li>
+                        <li>Complete the reset within 30 minutes</li>
+                        <li>Log out of other devices if you suspect unauthorized access</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p><strong>TELO Directory Security Team</strong></p>
+                <p>Protecting businesses across Georgia 🇬🇪</p>
+                <p style="margin-top: 15px; font-size: 12px;">
+                    If you have any questions or concerns, please contact our support team immediately.
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+};
+
+/**
+ * Send password reset email
+ * Follows same patterns as verification email with security focus
+ */
+const sendPasswordResetEmail = async (
+    userEmail,
+    userName,
+    resetToken,
+    ipAddress = null
+) => {
+    // Check rate limiting (stricter for password resets)
+    const rateCheck = checkRateLimit(userEmail, ipAddress);
+    if (!rateCheck.allowed) {
+        const errorMessage = rateCheck.reason === 'ip_rate_limit' 
+            ? "Too many password reset emails sent from your location"
+            : "Rate limit exceeded for password reset";
+        
+        throw {
+            success: false,
+            error: errorMessage,
+            code: "RATE_LIMIT_EXCEEDED",
+            remainingSeconds: rateCheck.remainingSeconds,
+            reason: rateCheck.reason,
+        };
+    }
+
+    // Create password reset URL - pointing to frontend reset page
+    const resetUrl = `${EMAIL_CONFIG.baseUrl}/reset-password/${resetToken}`;
+
+    // Create email content
+    const mailOptions = {
+        from: `"${EMAIL_CONFIG.fromName} Security" <${EMAIL_CONFIG.fromAddress}>`,
+        to: userEmail,
+        subject: `🔐 Password Reset Request - TELO Directory`,
+        html: createPasswordResetEmailTemplate(userName, resetUrl),
+        // Fallback text version
+        text: `
+            Hello ${userName}!
+            
+            We received a request to reset your password for your TELO Directory account.
+            
+            To reset your password, visit: ${resetUrl}
+            
+            This link will expire in 30 minutes for security.
+            
+            If you didn't request this reset, please ignore this email.
+            
+            For security questions, contact our support team.
+            
+            Best regards,
+            TELO Directory Security Team
+        `,
+    };
+
+    try {
+        const result = await sendEmailWithRetry(mailOptions);
+
+        // Update rate limit on successful send
+        updateRateLimit(userEmail);
+
+        return result;
+    } catch (error) {
+        // Log error for debugging
+        console.error(
+            "Failed to send password reset email after all retries:",
+            error
+        );
+        throw error;
+    }
+};
+
+/**
  * Utility function to validate email format
  */
 const isValidEmail = (email) => {
@@ -494,11 +721,13 @@ const isValidEmail = (email) => {
 module.exports = {
     sendVerificationEmail,
     sendEmailChangeVerification,
+    sendPasswordResetEmail,
     generateVerificationToken,
     getTokenExpiration,
     isValidEmail,
     checkRateLimit,
     // Export for testing
     createVerificationEmailTemplate,
+    createPasswordResetEmailTemplate,
     EMAIL_CONFIG,
 };

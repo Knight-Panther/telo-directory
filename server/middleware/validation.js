@@ -483,6 +483,105 @@ const validatePasswordChange = (req, res, next) => {
     next();
 };
 
+/**
+ * Forgot Password Validation Middleware
+ * 
+ * Validates email for password reset request.
+ * Follows security best practices by not revealing if email exists.
+ */
+const validateForgotPassword = (req, res, next) => {
+    const { email } = req.body;
+    const errors = [];
+
+    // Email validation
+    if (!email?.trim()) {
+        errors.push("Email address is required");
+    } else {
+        // Basic format check
+        if (!email.includes("@") || !email.includes(".")) {
+            errors.push("Please enter a valid email address");
+        }
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            error: "Validation failed",
+            code: "VALIDATION_ERROR",
+            details: errors,
+        });
+    }
+
+    // Sanitize email input
+    req.body.email = email.trim().toLowerCase();
+
+    next();
+};
+
+/**
+ * Reset Password Validation Middleware
+ * 
+ * Validates new password and confirmation for password reset.
+ * Uses same password strength requirements as registration.
+ */
+const validateResetPassword = (req, res, next) => {
+    const { newPassword, confirmPassword } = req.body;
+    const errors = [];
+
+    // New password validation (same rules as registration)
+    if (!newPassword) {
+        errors.push("New password is required");
+    } else {
+        if (newPassword.length < 8) {
+            errors.push("Password must be at least 8 characters long");
+        }
+
+        const hasLowercase = /(?=.*[a-z])/.test(newPassword);
+        const hasUppercase = /(?=.*[A-Z])/.test(newPassword);
+        const hasNumber = /(?=.*\d)/.test(newPassword);
+        const hasSpecialChar = /(?=.*[!@#$%^&*(),.?":{}|<>])/.test(newPassword);
+
+        if (!hasLowercase)
+            errors.push("Password must contain at least one lowercase letter");
+        if (!hasUppercase)
+            errors.push("Password must contain at least one uppercase letter");
+        if (!hasNumber)
+            errors.push("Password must contain at least one number");
+        if (!hasSpecialChar)
+            errors.push("Password must contain at least one special character");
+
+        // Check for common weak passwords
+        const commonPasswords = [
+            "password",
+            "password123",
+            "123456789",
+            "qwerty123",
+            "admin123",
+            "welcome123",
+            "letmein123",
+        ];
+        if (commonPasswords.includes(newPassword.toLowerCase())) {
+            errors.push("Password is too common. Please choose a more unique password");
+        }
+    }
+
+    // Confirm password validation
+    if (!confirmPassword) {
+        errors.push("Password confirmation is required");
+    } else if (newPassword !== confirmPassword) {
+        errors.push("Password and confirmation do not match");
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            error: "Password reset validation failed",
+            code: "VALIDATION_ERROR",
+            details: errors,
+        });
+    }
+
+    next();
+};
+
 // Update the existing module.exports to include new validation functions
 module.exports = {
     validateBusiness,
@@ -490,8 +589,11 @@ module.exports = {
     validateReport,
     validateReportStatusUpdate,
     validateRateLimit,
-    // NEW USER VALIDATION FUNCTIONS
+    // USER VALIDATION FUNCTIONS
     validateUserRegistration,
     validateUserLogin,
     validatePasswordChange,
+    // PASSWORD RESET VALIDATION FUNCTIONS
+    validateForgotPassword,
+    validateResetPassword,
 };

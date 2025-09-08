@@ -514,6 +514,81 @@ const userAuthService = {
     },
 
     /**
+     * NEW: Request password reset
+     * Phase 4B: Frontend password reset functionality
+     */
+    requestPasswordReset: async (email) => {
+        try {
+            const response = await userAPI.post("/auth/forgot-password", { email });
+            
+            return {
+                success: true,
+                message: response.data.message,
+                email: response.data.email
+            };
+        } catch (error) {
+            // Handle rate limiting
+            if (error.response?.status === 429) {
+                throw {
+                    message: error.response.data.error,
+                    code: "RATE_LIMIT_EXCEEDED",
+                    retryAfter: error.response.data.retryAfter
+                };
+            }
+            
+            throw {
+                message: error.response?.data?.error || "Failed to send password reset email",
+                code: error.response?.data?.code || "PASSWORD_RESET_ERROR",
+            };
+        }
+    },
+
+    /**
+     * NEW: Reset password using token
+     * Phase 4B: Complete password reset process
+     */
+    resetPassword: async (token, newPassword, confirmPassword) => {
+        try {
+            const response = await userAPI.post(`/auth/reset-password/${token}`, {
+                newPassword,
+                confirmPassword
+            });
+            
+            return {
+                success: true,
+                message: response.data.message,
+                email: response.data.email
+            };
+        } catch (error) {
+            // Handle various reset errors
+            if (error.response?.status === 400) {
+                const errorCode = error.response.data.code;
+                
+                if (errorCode === "INVALID_RESET_TOKEN" || errorCode === "EXPIRED_RESET_TOKEN") {
+                    throw {
+                        message: error.response.data.error,
+                        code: errorCode,
+                        expired: true
+                    };
+                }
+                
+                if (errorCode === "VALIDATION_ERROR") {
+                    throw {
+                        message: error.response.data.error,
+                        details: error.response.data.details || [],
+                        code: errorCode
+                    };
+                }
+            }
+            
+            throw {
+                message: error.response?.data?.error || "Failed to reset password",
+                code: error.response?.data?.code || "PASSWORD_RESET_ERROR",
+            };
+        }
+    },
+
+    /**
      * NEW: Validate email format
      */
     isValidEmail: (email) => {

@@ -9,10 +9,13 @@ const {
 const {
     validateUserRegistration,
     validateUserLogin,
+    validateForgotPassword,
+    validateResetPassword,
 } = require("../middleware/validation");
-// NEW: Email verification service
+// NEW: Email verification and password reset services
 const {
     sendVerificationEmail,
+    sendPasswordResetEmail,
     generateVerificationToken,
     getTokenExpiration,
 } = require("../services/emailService");
@@ -406,6 +409,179 @@ router.put("/profile", verifyAccessToken, async (req, res) => {
         res.status(500).json({
             error: "Error updating profile",
             code: "PROFILE_UPDATE_ERROR",
+        });
+    }
+});
+
+/**
+ * POST /api/auth/forgot-password
+ * Request password reset
+ * 
+ * Phase 4A implementation:
+ * - Rate limited to 1 request per hour per email (security requirement)
+ * - Always returns success message (prevents email enumeration)
+ * - Only sends email if account exists and is verified
+ * - Uses 30-minute token expiration for security
+ */
+router.post("/forgot-password", validateForgotPassword, async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        // Get client IP for rate limiting
+        const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
+        
+        // Find user by email
+        const user = await User.findByEmail(email);
+        
+        // SECURITY: Always respond with success message regardless of whether email exists
+        // This prevents email enumeration attacks
+        const successResponse = {
+            success: true,
+            message: "If an account with that email exists, we've sent password reset instructions.",
+            email: email
+        };
+        
+        // If user doesn't exist, just return success (don't reveal this info)
+        if (!user) {
+            console.log(`Password reset requested for non-existent email: ${email}`);
+            return res.json(successResponse);
+        }
+        
+        // If user exists but email is not verified, don't send reset email
+        // This prevents password reset bypass of email verification
+        if (!user.isEmailVerified) {
+            console.log(`Password reset requested for unverified email: ${email}`);
+            return res.json(successResponse);
+        }
+        
+        try {
+            // Generate secure reset token
+            const resetToken = generateVerificationToken();
+            
+            // Set the reset token on the user (30-minute expiration)
+            user.setPasswordResetToken(resetToken);
+            await user.save();
+            
+            // Send password reset email
+            await sendPasswordResetEmail(
+                user.email,
+                user.name,
+                resetToken,
+                clientIp
+            );
+            
+            console.log(`Password reset email sent to: ${user.email}`);
+            
+            return res.json(successResponse);
+            
+        } catch (emailError) {
+            // If email sending fails, we should clear the reset token
+            if (user.resetPasswordToken) {
+                user.clearPasswordResetToken();
+                await user.save();
+            }
+            
+            // Check if it's a rate limiting error
+            if (emailError.code === "RATE_LIMIT_EXCEEDED") {
+                return res.status(429).json({
+                    error: "Too many password reset requests. Please wait before trying again.",
+                    code: "RATE_LIMIT_EXCEEDED",
+                    retryAfter: emailError.remainingSeconds
+                });
+            }
+            
+            console.error("Failed to send password reset email:", emailError);
+            
+            // Still return success to prevent enumeration, but log the error
+            return res.json({
+                ...successResponse,
+                message: "Password reset request received. If there was an issue, please try again in a few minutes."
+            });
+        }
+        
+    } catch (error) {
+        console.error("Forgot password error:", error);
+        
+        res.status(500).json({
+            error: "Internal server error",
+            code: "FORGOT_PASSWORD_ERROR",
+        });
+    }
+});
+
+/**
+ * POST /api/auth/reset-password/:token
+ * Reset password using token from email
+ * 
+ * Phase 4A implementation:
+ * - Validates token and expiration (30 minutes)
+ * - Updates password with new hash
+ * - Clears reset token after use
+ * - Invalidates all user sessions for security
+ */
+router.post("/reset-password/:token", validateResetPassword, async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+        
+        // Find user by valid reset token
+        const user = await User.findByResetToken(token);
+        
+        if (!user) {
+            return res.status(400).json({
+                error: "Password reset token is invalid or has expired",
+                code: "INVALID_RESET_TOKEN",
+                message: "Please request a new password reset if you need to change your password."
+            });
+        }
+        
+        // Additional security check (should be redundant with findByResetToken)
+        if (!user.isPasswordResetTokenValid()) {
+            return res.status(400).json({
+                error: "Password reset token has expired",
+                code: "EXPIRED_RESET_TOKEN",
+                message: "Please request a new password reset."
+            });
+        }
+        
+        try {
+            // Update password (will be automatically hashed by User model middleware)
+            user.password = newPassword;
+            
+            // Clear the reset token to prevent reuse
+            user.clearPasswordResetToken();
+            
+            // Reset any account locking from failed attempts
+            user.loginAttempts = 0;
+            user.lockUntil = undefined;
+            
+            // Save all changes
+            await user.save();
+            
+            console.log(`Password reset successful for: ${user.email}`);
+            
+            res.json({
+                success: true,
+                message: "Password has been reset successfully. You can now log in with your new password.",
+                // Provide user email for login convenience
+                email: user.email
+            });
+            
+        } catch (saveError) {
+            console.error("Error saving password reset:", saveError);
+            
+            return res.status(500).json({
+                error: "Failed to reset password. Please try again.",
+                code: "PASSWORD_RESET_SAVE_ERROR"
+            });
+        }
+        
+    } catch (error) {
+        console.error("Reset password error:", error);
+        
+        res.status(500).json({
+            error: "Internal server error",
+            code: "RESET_PASSWORD_ERROR",
         });
     }
 });
