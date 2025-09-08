@@ -30,6 +30,19 @@ const Header = () => {
         }
     }, [searchParams, setSearchParams]);
 
+    // NEW: Listen for custom login modal events (for password reset flow)
+    useEffect(() => {
+        const handleOpenLoginModal = () => {
+            setIsLoginModalOpen(true);
+        };
+
+        window.addEventListener("open-login-modal", handleOpenLoginModal);
+        
+        return () => {
+            window.removeEventListener("open-login-modal", handleOpenLoginModal);
+        };
+    }, []);
+
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };

@@ -29,6 +29,21 @@ const LoginModal = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
+    // NEW: Pre-fill email from sessionStorage (for password reset flow)
+    useEffect(() => {
+        if (isOpen) {
+            const storedEmail = sessionStorage.getItem("loginEmail");
+            if (storedEmail) {
+                setFormData((prev) => ({
+                    ...prev,
+                    email: storedEmail
+                }));
+                // Clear the stored email after using it
+                sessionStorage.removeItem("loginEmail");
+            }
+        }
+    }, [isOpen]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
