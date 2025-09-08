@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useUserAuth } from "../contexts/UserAuthContext";
+import userAuthService from "../services/userAuthService";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import "../styles/settings.css"; // UPDATED: Using dedicated settings.css file
 
@@ -159,12 +160,32 @@ const SettingsPage = () => {
 
         setIsSubmitting(true);
         try {
+            // Handle email change separately if email was modified
+            const emailChanged = profileForm.email.trim() !== user.email;
+            
+            if (emailChanged) {
+                try {
+                    const emailResult = await userAuthService.changeEmail(profileForm.email.trim());
+                    showNotification(emailResult.message);
+                } catch (emailError) {
+                    console.error("Email change error:", emailError);
+                    showNotification(
+                        emailError.message || "Failed to change email",
+                        "error"
+                    );
+                    // Don't return here - still update name and phone
+                }
+            }
+
+            // Update name and phone (always safe to do)
             await updateProfile({
                 name: profileForm.name.trim(),
                 phone: profileForm.phone.trim() || undefined,
             });
 
-            showNotification("Profile updated successfully!");
+            if (!emailChanged) {
+                showNotification("Profile updated successfully!");
+            }
             setProfileErrors({});
         } catch (error) {
             showNotification(
@@ -188,7 +209,6 @@ const SettingsPage = () => {
 
     /**
      * Handle password change submission
-     * Note: This would require additional API endpoint implementation
      */
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
@@ -199,10 +219,9 @@ const SettingsPage = () => {
 
         setIsSubmitting(true);
         try {
-            // TODO: Implement password change API endpoint
-            // await userAuthService.changePassword(passwordForm);
+            await userAuthService.changePassword(passwordForm);
 
-            showNotification("Password change feature coming soon!", "info");
+            showNotification("Password changed successfully!", "success");
             setPasswordForm({
                 currentPassword: "",
                 newPassword: "",
@@ -214,6 +233,14 @@ const SettingsPage = () => {
                 error.message || "Failed to change password",
                 "error"
             );
+
+            // Handle specific field errors from backend
+            if (error.field) {
+                setPasswordErrors(prev => ({
+                    ...prev,
+                    [error.field]: error.message
+                }));
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -230,13 +257,21 @@ const SettingsPage = () => {
 
         setIsSubmitting(true);
         try {
-            // TODO: Implement account deletion API endpoint
-            // await userAuthService.deleteAccount();
-
-            showNotification("Account deletion feature coming soon!", "info");
+            const result = await userAuthService.deleteAccount(deleteConfirmText);
+            
+            showNotification(result.message, "success");
+            
+            // Clear confirmation modal
             setShowDeleteConfirm(false);
             setDeleteConfirmText("");
+            
+            // Redirect to home page after a brief delay
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 2000);
+            
         } catch (error) {
+            console.error("Account deletion error:", error);
             showNotification(
                 error.message || "Failed to delete account",
                 "error"
@@ -414,11 +449,9 @@ const SettingsPage = () => {
                                             profileErrors.email ? "error" : ""
                                         }
                                         placeholder="Enter your email"
-                                        disabled // Email changes require separate verification process
                                     />
                                     <small className="user-settings-field-note">
-                                        Email changes require verification.
-                                        Contact support to change your email.
+                                        Email changes require verification. A verification email will be sent to your new email address.
                                     </small>
                                     {profileErrors.email && (
                                         <span className="user-settings-error-message">

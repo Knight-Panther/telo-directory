@@ -582,6 +582,47 @@ const validateResetPassword = (req, res, next) => {
     next();
 };
 
+/**
+ * Email Change Validation Middleware
+ * 
+ * Validates new email address for email change requests.
+ */
+const validateEmailChange = (req, res, next) => {
+    const { newEmail } = req.body;
+    const errors = [];
+
+    // Email validation
+    if (!newEmail?.trim()) {
+        errors.push("New email address is required");
+    } else {
+        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+        if (!emailRegex.test(newEmail.trim())) {
+            errors.push("Please enter a valid email address");
+        } else {
+            // Check for disposable email addresses
+            const disposableCheck = isDisposableEmail(newEmail.trim());
+            if (disposableCheck.isDisposable) {
+                errors.push(
+                    `Disposable email addresses from ${disposableCheck.domain} are not allowed. Please use a permanent email address.`
+                );
+            }
+        }
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            error: "Email change validation failed",
+            code: "VALIDATION_ERROR",
+            details: errors,
+        });
+    }
+
+    // Sanitize email input
+    req.body.newEmail = newEmail.trim().toLowerCase();
+
+    next();
+};
+
 // Update the existing module.exports to include new validation functions
 module.exports = {
     validateBusiness,
@@ -596,4 +637,6 @@ module.exports = {
     // PASSWORD RESET VALIDATION FUNCTIONS
     validateForgotPassword,
     validateResetPassword,
+    // EMAIL CHANGE VALIDATION FUNCTIONS
+    validateEmailChange,
 };

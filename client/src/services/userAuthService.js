@@ -589,6 +589,146 @@ const userAuthService = {
     },
 
     /**
+     * NEW: Change email address
+     * Initiates email change with verification
+     */
+    changeEmail: async (newEmail) => {
+        try {
+            const response = await userAPI.post("/auth/change-email", { newEmail });
+            
+            return {
+                success: true,
+                message: response.data.message,
+                newEmail: response.data.newEmail
+            };
+        } catch (error) {
+            // Handle specific email change errors
+            if (error.response?.status === 400) {
+                const errorCode = error.response.data.code;
+                
+                if (errorCode === "SAME_EMAIL") {
+                    throw {
+                        message: "New email address is the same as your current email",
+                        code: errorCode
+                    };
+                } else if (errorCode === "PENDING_EMAIL_CHANGE_EXISTS") {
+                    throw {
+                        message: error.response.data.error,
+                        code: errorCode,
+                        pendingEmail: error.response.data.pendingEmail
+                    };
+                }
+            } else if (error.response?.status === 409) {
+                throw {
+                    message: "This email address is already associated with another account",
+                    code: "EMAIL_ALREADY_EXISTS"
+                };
+            } else if (error.response?.status === 429) {
+                throw {
+                    message: error.response.data.error,
+                    code: "RATE_LIMIT_EXCEEDED",
+                    retryAfter: error.response.data.retryAfter
+                };
+            }
+
+            throw {
+                message: error.response?.data?.error || "Failed to initiate email change",
+                code: error.response?.data?.code || "EMAIL_CHANGE_ERROR",
+                details: error.response?.data?.details || []
+            };
+        }
+    },
+
+    /**
+     * NEW: Change user password
+     * Changes password with current password verification
+     */
+    changePassword: async (passwordData) => {
+        try {
+            const response = await userAPI.post("/auth/change-password", passwordData);
+            
+            return {
+                success: true,
+                message: response.data.message
+            };
+        } catch (error) {
+            // Handle specific password change errors
+            if (error.response?.status === 400) {
+                const errorCode = error.response.data.code;
+                
+                if (errorCode === "PASSWORD_MISMATCH") {
+                    throw {
+                        message: "New password and confirmation do not match",
+                        code: errorCode,
+                        field: "confirmPassword"
+                    };
+                } else if (errorCode === "PASSWORD_TOO_SHORT") {
+                    throw {
+                        message: "Password must be at least 8 characters long",
+                        code: errorCode,
+                        field: "newPassword"
+                    };
+                } else if (errorCode === "PASSWORD_TOO_WEAK") {
+                    throw {
+                        message: "Password must contain uppercase, lowercase and number",
+                        code: errorCode,
+                        field: "newPassword"
+                    };
+                } else if (errorCode === "SAME_PASSWORD") {
+                    throw {
+                        message: "New password must be different from current password",
+                        code: errorCode,
+                        field: "newPassword"
+                    };
+                }
+            } else if (error.response?.status === 401) {
+                throw {
+                    message: "Current password is incorrect",
+                    code: "INVALID_CURRENT_PASSWORD",
+                    field: "currentPassword"
+                };
+            }
+
+            throw {
+                message: error.response?.data?.error || "Failed to change password",
+                code: error.response?.data?.code || "PASSWORD_CHANGE_ERROR"
+            };
+        }
+    },
+
+    /**
+     * NEW: Delete user account
+     * Permanently deletes the user account and all associated data
+     */
+    deleteAccount: async (confirmationText = "DELETE") => {
+        try {
+            const response = await userAPI.delete("/auth/account", {
+                data: { confirmationText }
+            });
+            
+            // Clear tokens after successful deletion
+            tokenManager.clearTokens();
+            
+            return {
+                success: true,
+                message: response.data.message
+            };
+        } catch (error) {
+            if (error.response?.status === 400) {
+                throw {
+                    message: "Account deletion requires typing 'DELETE' as confirmation",
+                    code: "INVALID_CONFIRMATION"
+                };
+            }
+
+            throw {
+                message: error.response?.data?.error || "Failed to delete account",
+                code: error.response?.data?.code || "DELETE_ACCOUNT_ERROR"
+            };
+        }
+    },
+
+    /**
      * NEW: Validate email format
      */
     isValidEmail: (email) => {

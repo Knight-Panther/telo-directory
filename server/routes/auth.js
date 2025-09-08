@@ -11,11 +11,13 @@ const {
     validateUserLogin,
     validateForgotPassword,
     validateResetPassword,
+    validateEmailChange,
 } = require("../middleware/validation");
 // NEW: Email verification and password reset services
 const {
     sendVerificationEmail,
     sendPasswordResetEmail,
+    sendEmailChangeVerification,
     generateVerificationToken,
     getTokenExpiration,
 } = require("../services/emailService");
@@ -414,6 +416,110 @@ router.put("/profile", verifyAccessToken, async (req, res) => {
 });
 
 /**
+ * POST /api/auth/change-email
+ * Request email address change
+ * 
+ * Secure email change workflow:
+ * - User must be authenticated
+ * - Validates new email address
+ * - Checks if email is already in use
+ * - Sends verification to new email address
+ * - Email change only completes after verification
+ */
+router.post("/change-email", verifyAccessToken, validateEmailChange, async (req, res) => {
+    try {
+        const { newEmail } = req.body;
+        const user = req.user; // From verifyAccessToken middleware
+        
+        // Check if new email is same as current
+        if (newEmail === user.email) {
+            return res.status(400).json({
+                error: "New email address is the same as your current email",
+                code: "SAME_EMAIL"
+            });
+        }
+        
+        // Check if new email is already in use by another account
+        const existingUser = await User.findByEmail(newEmail);
+        if (existingUser) {
+            return res.status(409).json({
+                error: "This email address is already associated with another account",
+                code: "EMAIL_ALREADY_EXISTS"
+            });
+        }
+        
+        // Check if user already has a pending email change
+        if (user.pendingEmailChange) {
+            return res.status(400).json({
+                error: "You already have a pending email change. Please complete or cancel it first.",
+                code: "PENDING_EMAIL_CHANGE_EXISTS",
+                pendingEmail: user.pendingEmailChange
+            });
+        }
+        
+        try {
+            // Generate verification token
+            const verificationToken = generateVerificationToken();
+            
+            // Set pending email change
+            user.pendingEmailChange = newEmail;
+            user.emailChangeToken = verificationToken;
+            user.emailChangeTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+            
+            await user.save();
+            
+            // Send verification email to new address
+            const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
+            
+            await sendEmailChangeVerification(
+                newEmail,
+                user.name,
+                verificationToken,
+                clientIp
+            );
+            
+            console.log(`Email change requested: ${user.email} → ${newEmail}`);
+            
+            res.json({
+                success: true,
+                message: "Verification email sent to your new email address. Please check your inbox and click the verification link to complete the change.",
+                newEmail: newEmail
+            });
+            
+        } catch (emailError) {
+            // If email sending fails, clean up the pending change
+            user.pendingEmailChange = undefined;
+            user.emailChangeToken = undefined;
+            user.emailChangeTokenExpires = undefined;
+            await user.save();
+            
+            if (emailError.code === "RATE_LIMIT_EXCEEDED") {
+                return res.status(429).json({
+                    error: "Too many email change requests. Please wait before trying again.",
+                    code: "RATE_LIMIT_EXCEEDED",
+                    retryAfter: emailError.remainingSeconds
+                });
+            }
+            
+            console.error("Failed to send email change verification:", emailError);
+            
+            return res.status(500).json({
+                error: "Failed to send verification email. Please try again later.",
+                code: "EMAIL_SEND_FAILED"
+            });
+        }
+        
+    } catch (error) {
+        console.error("Email change error:", error);
+        
+        res.status(500).json({
+            error: "Internal server error",
+            code: "EMAIL_CHANGE_ERROR",
+        });
+    }
+});
+
+/**
  * POST /api/auth/forgot-password
  * Request password reset
  * 
@@ -582,6 +688,171 @@ router.post("/reset-password/:token", validateResetPassword, async (req, res) =>
         res.status(500).json({
             error: "Internal server error",
             code: "RESET_PASSWORD_ERROR",
+        });
+    }
+});
+
+/**
+ * POST /api/auth/change-password
+ * Change user password with current password verification
+ * 
+ * Secure password change workflow:
+ * - User must be authenticated
+ * - Validates current password before change
+ * - Enforces password strength requirements
+ * - Updates password with proper hashing
+ * - Logs password change for security audit
+ */
+router.post("/change-password", verifyAccessToken, async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        // Need to fetch user with password field since verifyAccessToken excludes it
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                error: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
+        
+        // Validate input
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({
+                error: "Current password, new password, and confirmation are required",
+                code: "MISSING_FIELDS"
+            });
+        }
+        
+        // Check if new passwords match
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({
+                error: "New password and confirmation do not match",
+                code: "PASSWORD_MISMATCH"
+            });
+        }
+        
+        // Validate new password strength
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                error: "New password must be at least 8 characters long",
+                code: "PASSWORD_TOO_SHORT"
+            });
+        }
+        
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPassword)) {
+            return res.status(400).json({
+                error: "New password must contain at least one uppercase letter, one lowercase letter, and one number",
+                code: "PASSWORD_TOO_WEAK"
+            });
+        }
+        
+        // Check if new password is same as current
+        if (currentPassword === newPassword) {
+            return res.status(400).json({
+                error: "New password must be different from current password",
+                code: "SAME_PASSWORD"
+            });
+        }
+        
+        // Verify current password
+        const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+        if (!isCurrentPasswordValid) {
+            return res.status(401).json({
+                error: "Current password is incorrect",
+                code: "INVALID_CURRENT_PASSWORD"
+            });
+        }
+        
+        try {
+            // Update password (will be automatically hashed by User model middleware)
+            user.password = newPassword;
+            
+            // Reset any account locking from failed attempts
+            user.loginAttempts = 0;
+            user.lockUntil = undefined;
+            
+            // Save changes
+            await user.save();
+            
+            console.log(`Password changed for user: ${user.email}`);
+            
+            res.json({
+                success: true,
+                message: "Password changed successfully"
+            });
+            
+        } catch (saveError) {
+            console.error("Error saving password change:", saveError);
+            
+            return res.status(500).json({
+                error: "Failed to change password. Please try again.",
+                code: "PASSWORD_SAVE_ERROR"
+            });
+        }
+        
+    } catch (error) {
+        console.error("Change password error:", error);
+        
+        res.status(500).json({
+            error: "Internal server error",
+            code: "CHANGE_PASSWORD_ERROR",
+        });
+    }
+});
+
+/**
+ * DELETE /api/auth/account
+ * Delete user account and all associated data
+ * 
+ * Secure account deletion:
+ * - User must be authenticated
+ * - Requires typing "DELETE" for confirmation
+ * - Removes all associated data (favorites, pending changes)
+ * - Logs deletion for audit trail
+ * - Irreversible action with proper safeguards
+ */
+router.delete("/account", verifyAccessToken, async (req, res) => {
+    try {
+        const { confirmationText } = req.body;
+        const user = req.user; // From verifyAccessToken middleware
+        
+        // Require confirmation text
+        if (confirmationText !== "DELETE") {
+            return res.status(400).json({
+                error: "Account deletion requires typing 'DELETE' as confirmation",
+                code: "INVALID_CONFIRMATION"
+            });
+        }
+        
+        try {
+            // Log account deletion for audit trail
+            console.log(`Account deletion initiated: ${user.email} (ID: ${user._id})`);
+            
+            // Delete the user account (this will cascade delete associated data)
+            await User.findByIdAndDelete(user._id);
+            
+            console.log(`Account deletion completed: ${user.email} (ID: ${user._id})`);
+            
+            res.json({
+                success: true,
+                message: "Account deleted successfully. We're sorry to see you go!"
+            });
+            
+        } catch (deleteError) {
+            console.error("Error deleting user account:", deleteError);
+            
+            return res.status(500).json({
+                error: "Failed to delete account. Please try again or contact support.",
+                code: "DELETE_ERROR"
+            });
+        }
+        
+    } catch (error) {
+        console.error("Account deletion error:", error);
+        
+        res.status(500).json({
+            error: "Internal server error",
+            code: "ACCOUNT_DELETION_ERROR",
         });
     }
 });

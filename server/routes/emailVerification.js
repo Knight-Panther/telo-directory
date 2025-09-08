@@ -614,4 +614,107 @@ router.get(
     }
 );
 
+/**
+ * GET /api/auth/verify-email-change/:token
+ * Verify email change and update user's email address
+ * 
+ * Completes the email change process:
+ * - Validates the email change token
+ * - Updates user's email address
+ * - Clears pending email change data
+ * - Updates email change audit trail
+ */
+router.get("/verify-email-change/:token", async (req, res) => {
+    try {
+        const { token } = req.params;
+        
+        if (!token) {
+            return res.status(400).json({
+                success: false,
+                error: "Email change token is required",
+                code: "MISSING_TOKEN"
+            });
+        }
+        
+        // Find user with valid email change token
+        const user = await User.findByEmailChangeToken(token);
+        
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid or expired email change token",
+                code: "INVALID_TOKEN",
+                message: "This email change link is invalid or has expired. Please request a new email change from your settings."
+            });
+        }
+        
+        // Verify user has pending email change
+        if (!user.pendingEmailChange) {
+            return res.status(400).json({
+                success: false,
+                error: "No pending email change found",
+                code: "NO_PENDING_CHANGE"
+            });
+        }
+        
+        // Check if new email is still available (in case another user claimed it)
+        const existingUser = await User.findByEmail(user.pendingEmailChange);
+        if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+            // Clean up the pending change since email is no longer available
+            user.pendingEmailChange = undefined;
+            user.emailChangeToken = undefined;
+            user.emailChangeTokenExpires = undefined;
+            await user.save();
+            
+            return res.status(409).json({
+                success: false,
+                error: "This email address is now associated with another account",
+                code: "EMAIL_NO_LONGER_AVAILABLE"
+            });
+        }
+        
+        try {
+            // Store old email for logging
+            const oldEmail = user.email;
+            
+            // Complete the email change
+            user.email = user.pendingEmailChange;
+            user.emailChangedAt = new Date();
+            
+            // Clear pending email change data
+            user.pendingEmailChange = undefined;
+            user.emailChangeToken = undefined;
+            user.emailChangeTokenExpires = undefined;
+            
+            await user.save();
+            
+            console.log(`Email change completed: ${oldEmail} → ${user.email}`);
+            
+            res.json({
+                success: true,
+                message: "Email address changed successfully! You can now use your new email address to log in.",
+                newEmail: user.email
+            });
+            
+        } catch (saveError) {
+            console.error("Error saving email change:", saveError);
+            
+            return res.status(500).json({
+                success: false,
+                error: "Failed to complete email change. Please try again or contact support.",
+                code: "SAVE_ERROR"
+            });
+        }
+        
+    } catch (error) {
+        console.error("Email change verification error:", error);
+        
+        res.status(500).json({
+            success: false,
+            error: "Internal server error",
+            code: "EMAIL_CHANGE_VERIFICATION_ERROR"
+        });
+    }
+});
+
 module.exports = router;
