@@ -278,6 +278,19 @@ export const UserAuthProvider = ({ children }) => {
                     type: AUTH_ACTIONS.LOGIN_SUCCESS,
                     payload: result.user,
                 });
+                
+                // NEW: Show deletion cancellation message if applicable
+                if (result.deletionCancelled) {
+                    // Show alert after a brief delay to ensure user sees it
+                    setTimeout(() => {
+                        alert(
+                            "🎉 Welcome Back!\n\n" +
+                            "Your account deletion has been successfully cancelled.\n" +
+                            "Your account is now safe and active again."
+                        );
+                    }, 500);
+                }
+                
                 return result;
             }
         } catch (error) {

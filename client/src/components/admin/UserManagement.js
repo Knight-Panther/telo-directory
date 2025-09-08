@@ -37,9 +37,28 @@ const UserManagement = () => {
             const response = await adminService.triggerManualCleanup();
             
             if (response.success) {
-                alert(`Manual cleanup completed successfully!\n\nUsers processed: ${response.result.usersProcessed}\nUsers deleted: ${response.result.usersDeleted}\nDuration: ${response.result.totalDuration}ms`);
+                const result = response.result;
+                let message = `🧹 Manual Cleanup Completed Successfully!\n\n`;
                 
-                // Refresh data
+                if (result.usersProcessed === 0) {
+                    message += `✅ No users found with expired deletions.\n`;
+                    message += `All scheduled deletions are still within the grace period.\n\n`;
+                } else {
+                    message += `📊 Results:\n`;
+                    message += `• Users processed: ${result.usersProcessed}\n`;
+                    message += `• Users deleted: ${result.usersDeleted}\n`;
+                    if (result.errors && result.errors.length > 0) {
+                        message += `• Errors: ${result.errors.length}\n`;
+                    }
+                    message += `\n`;
+                }
+                
+                message += `⏱️ Duration: ${result.totalDuration}ms\n`;
+                message += `🔢 Run #${result.runNumber}`;
+                
+                alert(message);
+                
+                // Refresh data to show updated counts
                 await fetchUserData();
             }
         } catch (err) {

@@ -247,7 +247,7 @@ const SettingsPage = () => {
     };
 
     /**
-     * Handle account deletion
+     * Handle account deletion scheduling
      */
     const handleDeleteAccount = async () => {
         if (deleteConfirmText !== "DELETE") {
@@ -259,16 +259,46 @@ const SettingsPage = () => {
         try {
             const result = await userAuthService.deleteAccount(deleteConfirmText);
             
-            showNotification(result.message, "success");
-            
-            // Clear confirmation modal
+            // Clear confirmation modal first
             setShowDeleteConfirm(false);
             setDeleteConfirmText("");
             
-            // Redirect to home page after a brief delay
-            setTimeout(() => {
-                window.location.href = "/";
-            }, 2000);
+            if (result.scheduledDeletion) {
+                // Show comprehensive deletion scheduling confirmation modal
+                const delayDays = result.delayDays || 5;
+                const scheduledDate = new Date(result.scheduledFor).toLocaleDateString();
+                
+                const confirmed = window.confirm(
+                    `✅ Account Deletion Scheduled\n\n` +
+                    `Your account has been scheduled for deletion in ${delayDays} days (${scheduledDate}).\n\n` +
+                    `Important:\n` +
+                    `• You will be logged out immediately\n` +
+                    `• You can CANCEL this deletion by logging in again before ${scheduledDate}\n` +
+                    `• After ${scheduledDate}, your account will be permanently deleted\n\n` +
+                    `Click OK to proceed with logout, or Cancel to stay logged in.`
+                );
+                
+                if (confirmed) {
+                    // Show success notification briefly before logout
+                    showNotification("Account deletion scheduled. You will be logged out.", "success");
+                    
+                    // Logout after short delay to let user see the message
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 1500);
+                }
+            } else {
+                // Handle already scheduled deletion
+                if (result.alreadyScheduled) {
+                    showNotification(result.message, "info");
+                } else {
+                    showNotification(result.message, "success");
+                    // Redirect to home page after a brief delay
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 2000);
+                }
+            }
             
         } catch (error) {
             console.error("Account deletion error:", error);
