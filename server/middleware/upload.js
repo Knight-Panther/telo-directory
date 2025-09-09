@@ -19,13 +19,13 @@ const upload = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
+        fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024, // Use env or default 5MB
     },
 });
 
 // Image processing function
 const processImage = async (buffer, filename) => {
-    const uploadsDir = path.join(__dirname, "../uploads/businesses");
+    const uploadsDir = path.join(__dirname, "..", process.env.UPLOAD_PATH || "uploads", "businesses");
 
     // Ensure directory exists
     if (!fs.existsSync(uploadsDir)) {
@@ -40,7 +40,7 @@ const processImage = async (buffer, filename) => {
         .jpeg({ quality: 80 })
         .toFile(filepath);
 
-    return `/uploads/businesses/${filename}`;
+    return `/${process.env.UPLOAD_PATH || "uploads"}/businesses/${filename}`;
 };
 
 module.exports = { upload, processImage };

@@ -4,9 +4,9 @@ client/node_modules/
 server/node_modules/
 
 # Env files
-.env
-client/.env
-server/.env
+# .env
+# client/.env
+# server/.env
 
 # OS files
 .DS_Store
