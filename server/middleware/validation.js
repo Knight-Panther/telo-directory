@@ -585,28 +585,45 @@ const validateResetPassword = (req, res, next) => {
 /**
  * Email Change Validation Middleware
  * 
- * Validates new email address for email change requests.
+ * Validates email change requests for both steps:
+ * Step 1: newEmail - validate new email address
+ * Step 2: verificationCode - validate verification code
  */
 const validateEmailChange = (req, res, next) => {
-    const { newEmail } = req.body;
+    const { newEmail, verificationCode } = req.body;
     const errors = [];
 
-    // Email validation
-    if (!newEmail?.trim()) {
-        errors.push("New email address is required");
-    } else {
-        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-        if (!emailRegex.test(newEmail.trim())) {
-            errors.push("Please enter a valid email address");
+    // Step 2: Verification code validation
+    if (verificationCode) {
+        // If verificationCode is provided, this is step 2 - validate the code
+        if (!verificationCode.trim() || verificationCode.trim().length !== 6) {
+            errors.push("Verification code must be exactly 6 digits");
+        } else if (!/^\d{6}$/.test(verificationCode.trim())) {
+            errors.push("Verification code must contain only numbers");
+        }
+    } 
+    // Step 1: New email validation
+    else if (newEmail) {
+        // If newEmail is provided, this is step 1 - validate the email
+        if (!newEmail?.trim()) {
+            errors.push("New email address is required");
         } else {
-            // Check for disposable email addresses
-            const disposableCheck = isDisposableEmail(newEmail.trim());
-            if (disposableCheck.isDisposable) {
-                errors.push(
-                    `Disposable email addresses from ${disposableCheck.domain} are not allowed. Please use a permanent email address.`
-                );
+            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+            if (!emailRegex.test(newEmail.trim())) {
+                errors.push("Please enter a valid email address");
+            } else {
+                // Check for disposable email addresses
+                const disposableCheck = isDisposableEmail(newEmail.trim());
+                if (disposableCheck.isDisposable) {
+                    errors.push(
+                        `Disposable email addresses from ${disposableCheck.domain} are not allowed. Please use a permanent email address.`
+                    );
+                }
             }
         }
+    } else {
+        // Neither newEmail nor verificationCode provided
+        errors.push("Either new email address or verification code is required");
     }
 
     if (errors.length > 0) {
@@ -617,8 +634,13 @@ const validateEmailChange = (req, res, next) => {
         });
     }
 
-    // Sanitize email input
-    req.body.newEmail = newEmail.trim().toLowerCase();
+    // Sanitize inputs
+    if (newEmail) {
+        req.body.newEmail = newEmail.trim().toLowerCase();
+    }
+    if (verificationCode) {
+        req.body.verificationCode = verificationCode.trim();
+    }
 
     next();
 };
