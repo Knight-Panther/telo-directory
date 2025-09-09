@@ -774,6 +774,9 @@ const userAuthService = {
      */
     tokenManager,
 
+    // Export userAPI for direct access to axios instance
+    userAPI,
+
     // NEW: Export token management functions for external use
     setTokens: tokenManager.setTokens,
     setUserData: tokenManager.setUserData,

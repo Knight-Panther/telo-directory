@@ -676,3 +676,57 @@
         display: none;
     }
 }
+
+/* ========================================
+   EMAIL CHANGE STYLING
+   ======================================== */
+.user-settings-email-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+}
+
+.user-settings-email-value {
+    font-family: 'Courier New', monospace;
+    color: var(--gray-700);
+    font-weight: var(--font-weight-medium);
+}
+
+.user-settings-change-email-btn {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.user-settings-change-email-btn:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-1px);
+}
+
+.user-settings-change-email-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+    .user-settings-email-display {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-sm);
+    }
+    
+    .user-settings-change-email-btn {
+        width: 100%;
+    }
+}

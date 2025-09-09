@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
 // Load environment variables
-require('dotenv').config();
+require("dotenv").config();
 
 /**
  * Email Service for TELO Directory
@@ -44,9 +44,13 @@ const ipRateLimit = new Map();
  * Supports Gmail and SMTP configurations
  */
 const createTransporter = () => {
-    console.log('📧 Creating email transporter with config:', {
+    console.log("📧 Creating email transporter with config:", {
         service: EMAIL_CONFIG.service,
-        user: EMAIL_CONFIG.user ? `${EMAIL_CONFIG.user.substring(0, 3)}***@${EMAIL_CONFIG.user.split('@')[1]}` : 'undefined',
+        user: EMAIL_CONFIG.user
+            ? `${EMAIL_CONFIG.user.substring(0, 3)}***@${
+                  EMAIL_CONFIG.user.split("@")[1]
+              }`
+            : "undefined",
         fromAddress: EMAIL_CONFIG.fromAddress,
     });
 
@@ -76,9 +80,9 @@ const createTransporter = () => {
     // Verify transporter configuration
     transporter.verify((error, success) => {
         if (error) {
-            console.error('❌ Email transporter verification failed:', error);
+            console.error("❌ Email transporter verification failed:", error);
         } else {
-            console.log('✅ Email transporter verified and ready');
+            console.log("✅ Email transporter verified and ready");
         }
     });
 
@@ -272,7 +276,7 @@ const checkRateLimit = (email, ipAddress = null) => {
         return {
             allowed: false,
             remainingSeconds: remainingTime,
-            reason: 'email_rate_limit'
+            reason: "email_rate_limit",
         };
     }
 
@@ -280,19 +284,23 @@ const checkRateLimit = (email, ipAddress = null) => {
     if (ipAddress) {
         const ipKey = `ip_${ipAddress}`;
         const ipRequests = ipRateLimit.get(ipKey) || [];
-        
+
         // Clean up requests older than 1 hour
         const hourAgo = now - 3600000;
-        const recentRequests = ipRequests.filter(timestamp => timestamp > hourAgo);
-        
+        const recentRequests = ipRequests.filter(
+            (timestamp) => timestamp > hourAgo
+        );
+
         if (recentRequests.length >= 10) {
             return {
                 allowed: false,
-                remainingSeconds: Math.ceil((recentRequests[0] + 3600000 - now) / 1000),
-                reason: 'ip_rate_limit'
+                remainingSeconds: Math.ceil(
+                    (recentRequests[0] + 3600000 - now) / 1000
+                ),
+                reason: "ip_rate_limit",
             };
         }
-        
+
         // Update IP request log
         recentRequests.push(now);
         ipRateLimit.set(ipKey, recentRequests);
@@ -369,10 +377,11 @@ const sendVerificationEmail = async (
     // Check rate limiting (both email and IP-based)
     const rateCheck = checkRateLimit(userEmail, ipAddress);
     if (!rateCheck.allowed) {
-        const errorMessage = rateCheck.reason === 'ip_rate_limit' 
-            ? "Too many verification emails sent from your location"
-            : "Rate limit exceeded";
-        
+        const errorMessage =
+            rateCheck.reason === "ip_rate_limit"
+                ? "Too many verification emails sent from your location"
+                : "Rate limit exceeded";
+
         throw {
             success: false,
             error: errorMessage,
@@ -437,10 +446,11 @@ const sendEmailChangeVerification = async (
     // Similar to main verification but different template
     const rateCheck = checkRateLimit(newEmail, ipAddress);
     if (!rateCheck.allowed) {
-        const errorMessage = rateCheck.reason === 'ip_rate_limit' 
-            ? "Too many verification emails sent from your location"
-            : "Rate limit exceeded";
-            
+        const errorMessage =
+            rateCheck.reason === "ip_rate_limit"
+                ? "Too many verification emails sent from your location"
+                : "Rate limit exceeded";
+
         throw {
             success: false,
             error: errorMessage,
@@ -478,6 +488,40 @@ const sendEmailChangeVerification = async (
         return result;
     } catch (error) {
         console.error("Failed to send email change verification:", error);
+        throw error;
+    }
+};
+
+/**
+ * Send 6-digit verification code for email change (simplified approach)
+ * Sends code to current email for security
+ */
+const sendEmailChangeCode = async (currentEmail, userName, code, newEmail) => {
+    const mailOptions = {
+        from: `"${EMAIL_CONFIG.fromName}" <${EMAIL_CONFIG.fromAddress}>`,
+        to: currentEmail,
+        subject: `🔑 Email Change Verification Code - TELO Directory`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <h2 style="color: #333; text-align: center;">Email Change Request</h2>
+                <p>Hello ${userName},</p>
+                <p>You requested to change your email address to:</p>
+                <p style="background: #e9ecef; padding: 10px; border-radius: 4px; font-family: monospace;">${newEmail}</p>
+                <p>Please enter this verification code to complete the change:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <span style="background: #007bff; color: white; padding: 15px 30px; font-size: 24px; font-weight: bold; border-radius: 6px; font-family: monospace; letter-spacing: 2px;">${code}</span>
+                </div>
+                <p style="color: #666; font-size: 14px;">This code expires in 10 minutes for security.</p>
+                <p style="color: #666; font-size: 14px;">If you didn't request this change, please ignore this email.</p>
+            </div>
+        `,
+        text: `Email change verification code: ${code}. New email: ${newEmail}. Code expires in 10 minutes.`,
+    };
+
+    try {
+        return await sendEmailWithRetry(mailOptions);
+    } catch (error) {
+        console.error("Failed to send email change code:", error);
         throw error;
     }
 };
@@ -651,10 +695,11 @@ const sendPasswordResetEmail = async (
     // Check rate limiting (stricter for password resets)
     const rateCheck = checkRateLimit(userEmail, ipAddress);
     if (!rateCheck.allowed) {
-        const errorMessage = rateCheck.reason === 'ip_rate_limit' 
-            ? "Too many password reset emails sent from your location"
-            : "Rate limit exceeded for password reset";
-        
+        const errorMessage =
+            rateCheck.reason === "ip_rate_limit"
+                ? "Too many password reset emails sent from your location"
+                : "Rate limit exceeded for password reset";
+
         throw {
             success: false,
             error: errorMessage,
@@ -721,6 +766,7 @@ const isValidEmail = (email) => {
 module.exports = {
     sendVerificationEmail,
     sendEmailChangeVerification,
+    sendEmailChangeCode,
     sendPasswordResetEmail,
     generateVerificationToken,
     getTokenExpiration,

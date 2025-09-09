@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useUserAuth } from "../contexts/UserAuthContext";
 import userAuthService from "../services/userAuthService";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+import EmailChangeModal from "../components/modals/EmailChangeModal";
 import "../styles/settings.css"; // UPDATED: Using dedicated settings.css file
 
 /**
@@ -43,6 +44,7 @@ const SettingsPage = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteConfirmText, setDeleteConfirmText] = useState("");
     const [notification, setNotification] = useState(null);
+    const [showEmailModal, setShowEmailModal] = useState(false);
 
     // Form validation states
     const [profileErrors, setProfileErrors] = useState({});
@@ -142,6 +144,16 @@ const SettingsPage = () => {
     };
 
     /**
+     * Handle email change completion from modal
+     */
+    const handleEmailChange = (newEmail) => {
+        setProfileForm(prev => ({ ...prev, email: newEmail }));
+        showNotification("Email address changed successfully!");
+        // Update user context with new email
+        updateProfile({ email: newEmail });
+    };
+
+    /**
      * Show notification helper
      */
     const showNotification = (message, type = "success") => {
@@ -160,32 +172,13 @@ const SettingsPage = () => {
 
         setIsSubmitting(true);
         try {
-            // Handle email change separately if email was modified
-            const emailChanged = profileForm.email.trim() !== user.email;
-            
-            if (emailChanged) {
-                try {
-                    const emailResult = await userAuthService.changeEmail(profileForm.email.trim());
-                    showNotification(emailResult.message);
-                } catch (emailError) {
-                    console.error("Email change error:", emailError);
-                    showNotification(
-                        emailError.message || "Failed to change email",
-                        "error"
-                    );
-                    // Don't return here - still update name and phone
-                }
-            }
-
-            // Update name and phone (always safe to do)
+            // Update name and phone only (email changes through modal)
             await updateProfile({
                 name: profileForm.name.trim(),
                 phone: profileForm.phone.trim() || undefined,
             });
 
-            if (!emailChanged) {
-                showNotification("Profile updated successfully!");
-            }
+            showNotification("Profile updated successfully!");
             setProfileErrors({});
         } catch (error) {
             showNotification(
@@ -461,30 +454,20 @@ const SettingsPage = () => {
                                 </div>
 
                                 <div className="user-settings-form-group">
-                                    <label htmlFor="email">Email Address</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        value={profileForm.email}
-                                        onChange={(e) =>
-                                            handleProfileChange(
-                                                "email",
-                                                e.target.value
-                                            )
-                                        }
-                                        className={
-                                            profileErrors.email ? "error" : ""
-                                        }
-                                        placeholder="Enter your email"
-                                    />
+                                    <label>Email Address</label>
+                                    <div className="user-settings-email-display">
+                                        <span className="user-settings-email-value">{user?.email}</span>
+                                        <button
+                                            type="button"
+                                            className="user-settings-change-email-btn"
+                                            onClick={() => setShowEmailModal(true)}
+                                        >
+                                            Change
+                                        </button>
+                                    </div>
                                     <small className="user-settings-field-note">
-                                        Email changes require verification. A verification email will be sent to your new email address.
+                                        To change your email, we'll send a verification code to your current email for security.
                                     </small>
-                                    {profileErrors.email && (
-                                        <span className="user-settings-error-message">
-                                            {profileErrors.email}
-                                        </span>
-                                    )}
                                 </div>
 
                                 <div className="user-settings-form-group">
@@ -774,6 +757,14 @@ const SettingsPage = () => {
                     )}
                 </div>
             </div>
+
+            {/* Email Change Modal */}
+            <EmailChangeModal
+                isOpen={showEmailModal}
+                onClose={() => setShowEmailModal(false)}
+                onEmailChange={handleEmailChange}
+                currentEmail={user?.email}
+            />
         </div>
     );
 };

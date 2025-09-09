@@ -439,104 +439,92 @@ router.put("/profile", verifyAccessToken, async (req, res) => {
 
 /**
  * POST /api/auth/change-email
- * Request email address change
+ * Simplified email change with 6-digit verification
  * 
- * Secure email change workflow:
- * - User must be authenticated
- * - Validates new email address
- * - Checks if email is already in use
- * - Sends verification to new email address
- * - Email change only completes after verification
+ * Two-step process:
+ * 1. POST with newEmail - sends 6-digit code to current email
+ * 2. POST with verificationCode - completes the change
+ * 
+ * Security: Code sent to current email (user has access)
+ * Rate limit: 1 change per hour
  */
 router.post("/change-email", verifyAccessToken, validateEmailChange, async (req, res) => {
     try {
-        const { newEmail } = req.body;
-        const user = req.user; // From verifyAccessToken middleware
+        const { newEmail, verificationCode } = req.body;
+        const user = req.user;
         
-        // Check if new email is same as current
+        // Step 2: Verify code and complete change
+        if (verificationCode) {
+            if (!user.verifyEmailChangeCode(verificationCode)) {
+                return res.status(400).json({
+                    error: "Invalid or expired verification code",
+                    code: "INVALID_CODE"
+                });
+            }
+            
+            // Complete the email change
+            user.completeEmailChange();
+            await user.save();
+            
+            return res.json({
+                success: true,
+                message: "Email address changed successfully",
+                newEmail: user.email
+            });
+        }
+        
+        // Step 1: Request email change
+        if (!newEmail) {
+            return res.status(400).json({
+                error: "New email address is required",
+                code: "MISSING_EMAIL"
+            });
+        }
+        
+        // Validate new email
         if (newEmail === user.email) {
             return res.status(400).json({
-                error: "New email address is the same as your current email",
+                error: "New email is same as current email",
                 code: "SAME_EMAIL"
             });
         }
         
-        // Check if new email is already in use by another account
+        // Check rate limiting
+        if (!user.canChangeEmail()) {
+            return res.status(429).json({
+                error: "You can only change your email once per hour",
+                code: "RATE_LIMITED"
+            });
+        }
+        
+        // Check if email already exists
         const existingUser = await User.findByEmail(newEmail);
         if (existingUser) {
             return res.status(409).json({
-                error: "This email address is already associated with another account",
-                code: "EMAIL_ALREADY_EXISTS"
+                error: "Email address already in use",
+                code: "EMAIL_EXISTS"
             });
         }
         
-        // Check if user already has a pending email change
-        if (user.pendingEmailChange) {
-            return res.status(400).json({
-                error: "You already have a pending email change. Please complete or cancel it first.",
-                code: "PENDING_EMAIL_CHANGE_EXISTS",
-                pendingEmail: user.pendingEmailChange
-            });
-        }
+        // Generate 6-digit code
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        user.setEmailChangeCode(code, newEmail);
+        await user.save();
         
-        try {
-            // Generate verification token
-            const verificationToken = generateVerificationToken();
-            
-            // Set pending email change
-            user.pendingEmailChange = newEmail;
-            user.emailChangeToken = verificationToken;
-            user.emailChangeTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-            
-            await user.save();
-            
-            // Send verification email to new address
-            const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
-            
-            await sendEmailChangeVerification(
-                newEmail,
-                user.name,
-                verificationToken,
-                clientIp
-            );
-            
-            console.log(`Email change requested: ${user.email} → ${newEmail}`);
-            
-            res.json({
-                success: true,
-                message: "Verification email sent to your new email address. Please check your inbox and click the verification link to complete the change.",
-                newEmail: newEmail
-            });
-            
-        } catch (emailError) {
-            // If email sending fails, clean up the pending change
-            user.pendingEmailChange = undefined;
-            user.emailChangeToken = undefined;
-            user.emailChangeTokenExpires = undefined;
-            await user.save();
-            
-            if (emailError.code === "RATE_LIMIT_EXCEEDED") {
-                return res.status(429).json({
-                    error: "Too many email change requests. Please wait before trying again.",
-                    code: "RATE_LIMIT_EXCEEDED",
-                    retryAfter: emailError.remainingSeconds
-                });
-            }
-            
-            console.error("Failed to send email change verification:", emailError);
-            
-            return res.status(500).json({
-                error: "Failed to send verification email. Please try again later.",
-                code: "EMAIL_SEND_FAILED"
-            });
-        }
+        // Send code to current email
+        const emailService = require('../services/emailService');
+        await emailService.sendEmailChangeCode(user.email, user.name, code, newEmail);
+        
+        res.json({
+            success: true,
+            message: "Verification code sent to your current email address"
+        });
         
     } catch (error) {
         console.error("Email change error:", error);
-        
         res.status(500).json({
             error: "Internal server error",
-            code: "EMAIL_CHANGE_ERROR",
+            code: "EMAIL_CHANGE_ERROR"
         });
     }
 });
