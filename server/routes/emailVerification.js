@@ -10,6 +10,7 @@ const {
     retrieveAndRemoveTempRegistration,
     hasTempRegistration,
     getPendingRegistrationByEmail,
+    regenerateVerificationToken,
 } = require("../services/tempRegistrationService");
 const {
     sendVerificationEmail,
@@ -258,25 +259,38 @@ router.post("/resend-verification", async (req, res) => {
                 });
             }
 
-            // Resend verification email with existing token
+            // Generate new verification token (invalidates old one)
+            const newVerificationToken = generateVerificationToken();
+            const updatedRegistration = regenerateVerificationToken(normalizedEmail, newVerificationToken);
+            
+            if (!updatedRegistration) {
+                return res.status(400).json({
+                    error: "Registration not found or expired",
+                    code: "REGISTRATION_NOT_FOUND",
+                    message: "Your registration may have expired. Please register again.",
+                });
+            }
+
+            // Resend verification email with new token
             try {
                 const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
                 await sendVerificationEmail(
-                    pendingRegistration.email,
-                    pendingRegistration.name,
-                    pendingRegistration.verificationToken,
+                    updatedRegistration.email,
+                    updatedRegistration.name,
+                    updatedRegistration.verificationToken,
                     clientIp
                 );
 
-                console.log(`📧 Verification email resent for temp registration: ${pendingRegistration.email}`);
+                console.log(`📧 Verification email resent with new token for temp registration: ${updatedRegistration.email}`);
 
                 return res.json({
                     success: true,
                     message:
-                        "Verification email sent successfully! Please check your inbox and spam folder.",
-                    sentTo: pendingRegistration.email.replace(/(.{2})(.*)(@.*)/, "$1***$3"),
+                        "Verification email sent successfully! Please check your inbox and spam folder. Previous verification links are now invalid.",
+                    sentTo: updatedRegistration.email.replace(/(.{2})(.*)(@.*)/, "$1***$3"),
                     expiresIn: "24 hours",
                     isPendingRegistration: true,
+                    tokenRegenerated: true, // Inform frontend that old links are invalid
                 });
             } catch (emailError) {
                 console.error("Failed to resend verification email for temp registration:", emailError);

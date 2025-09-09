@@ -287,6 +287,64 @@ function getPendingRegistrationByEmail(email) {
 }
 
 /**
+ * Regenerate verification token for existing temporary registration
+ * This invalidates the old token and creates a new one for security
+ * 
+ * @param {string} email - Email to regenerate token for
+ * @param {string} newVerificationToken - New token to use
+ * @returns {Object|null} - Updated registration data or null if not found/expired
+ */
+function regenerateVerificationToken(email, newVerificationToken) {
+    if (!email || !newVerificationToken) return null;
+    
+    const normalizedEmail = email.toLowerCase().trim();
+    const now = new Date();
+    
+    // Find existing registration
+    let oldToken = null;
+    let registration = null;
+    
+    for (const [token, reg] of tempRegistrations) {
+        if (reg.email === normalizedEmail) {
+            // Check if still valid
+            if (reg.expiresAt >= now) {
+                oldToken = token;
+                registration = reg;
+                break;
+            } else {
+                // Clean up expired registration
+                tempRegistrations.delete(token);
+            }
+        }
+    }
+    
+    if (!registration || !oldToken) {
+        return null;
+    }
+    
+    // Remove old token entry
+    tempRegistrations.delete(oldToken);
+    
+    // Update registration with new token and reset expiry
+    const updatedRegistration = {
+        ...registration,
+        verificationToken: newVerificationToken,
+        expiresAt: new Date(Date.now() + CONFIG.REGISTRATION_EXPIRY_MS), // Reset expiry to full 24h
+        tokenRegeneratedAt: new Date() // Track when token was regenerated
+    };
+    
+    // Store with new token
+    tempRegistrations.set(newVerificationToken, updatedRegistration);
+    
+    console.log(`🔄 Verification token regenerated for ${normalizedEmail} (old token invalidated)`);
+    
+    return {
+        ...updatedRegistration,
+        verificationToken: newVerificationToken
+    };
+}
+
+/**
  * Get all pending emails (for admin monitoring)
  * Returns only email addresses, not full registration data for privacy
  *
@@ -353,6 +411,7 @@ module.exports = {
     hasTempRegistration,
     hasEmailPendingRegistration,
     getPendingRegistrationByEmail,
+    regenerateVerificationToken,
 
     // Management functions
     cleanupExpiredRegistrations,
