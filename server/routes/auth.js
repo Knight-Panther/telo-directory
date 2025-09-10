@@ -811,6 +811,176 @@ router.post("/change-password", verifyAccessToken, async (req, res) => {
 });
 
 /**
+ * POST /api/auth/favorites/toggle/:businessId
+ * Toggle business in user's favorites list
+ */
+router.post("/favorites/toggle/:businessId", verifyAccessToken, async (req, res) => {
+    try {
+        const { businessId } = req.params;
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                error: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
+
+        // Validate business ID format
+        if (!businessId || businessId.length !== 24) {
+            return res.status(400).json({
+                error: "Invalid business ID",
+                code: "INVALID_BUSINESS_ID"
+            });
+        }
+
+        // Check if business is already favorited
+        const isFavorited = user.favorites.includes(businessId);
+
+        if (isFavorited) {
+            // Remove from favorites
+            user.favorites = user.favorites.filter(id => id.toString() !== businessId);
+            await user.save();
+
+            res.json({
+                success: true,
+                action: "removed",
+                message: "Business removed from favorites",
+                favoritesCount: user.favorites.length
+            });
+        } else {
+            // Add to favorites (using $addToSet to prevent duplicates)
+            await User.findByIdAndUpdate(
+                user._id,
+                { $addToSet: { favorites: businessId } },
+                { new: true }
+            );
+
+            res.json({
+                success: true,
+                action: "added",
+                message: "Business added to favorites",
+                favoritesCount: user.favorites.length + 1
+            });
+        }
+    } catch (error) {
+        console.error("Toggle favorites error:", error);
+        res.status(500).json({
+            error: "Internal server error",
+            code: "FAVORITES_ERROR"
+        });
+    }
+});
+
+/**
+ * GET /api/auth/favorites
+ * Get user's favorites list with business details
+ */
+router.get("/favorites", verifyAccessToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+            .populate("favorites")
+            .exec();
+
+        if (!user) {
+            return res.status(404).json({
+                error: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
+
+        res.json({
+            success: true,
+            favorites: user.favorites,
+            favoritesCount: user.favorites.length
+        });
+    } catch (error) {
+        console.error("Get favorites error:", error);
+        res.status(500).json({
+            error: "Internal server error",
+            code: "FAVORITES_ERROR"
+        });
+    }
+});
+
+/**
+ * DELETE /api/auth/favorites/:businessId
+ * Remove single business from favorites
+ */
+router.delete("/favorites/:businessId", verifyAccessToken, async (req, res) => {
+    try {
+        const { businessId } = req.params;
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                error: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
+
+        // Remove from favorites
+        user.favorites = user.favorites.filter(id => id.toString() !== businessId);
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Business removed from favorites",
+            favoritesCount: user.favorites.length
+        });
+    } catch (error) {
+        console.error("Delete favorite error:", error);
+        res.status(500).json({
+            error: "Internal server error",
+            code: "FAVORITES_ERROR"
+        });
+    }
+});
+
+/**
+ * POST /api/auth/favorites/bulk-delete
+ * Remove multiple businesses from favorites
+ */
+router.post("/favorites/bulk-delete", verifyAccessToken, async (req, res) => {
+    try {
+        const { businessIds } = req.body;
+        
+        if (!businessIds || !Array.isArray(businessIds)) {
+            return res.status(400).json({
+                error: "Business IDs array is required",
+                code: "INVALID_REQUEST"
+            });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                error: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
+
+        // Remove all specified business IDs
+        user.favorites = user.favorites.filter(id => 
+            !businessIds.includes(id.toString())
+        );
+        await user.save();
+
+        res.json({
+            success: true,
+            message: `${businessIds.length} businesses removed from favorites`,
+            favoritesCount: user.favorites.length
+        });
+    } catch (error) {
+        console.error("Bulk delete favorites error:", error);
+        res.status(500).json({
+            error: "Internal server error",
+            code: "FAVORITES_ERROR"
+        });
+    }
+});
+
+/**
  * DELETE /api/auth/account
  * Schedule user account for delayed deletion
  * 

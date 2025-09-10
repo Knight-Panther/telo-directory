@@ -196,11 +196,6 @@ const Header = () => {
                                                 💻
                                             </span>
                                             Dashboard
-                                            {user?.favoritesCount > 0 && (
-                                                <span className="favorites-count">
-                                                    {user.favoritesCount}
-                                                </span>
-                                            )}
                                         </Link>
                                         <Link
                                             to="/settings"

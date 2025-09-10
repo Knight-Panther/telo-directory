@@ -6,6 +6,7 @@ import { UserAuthProvider } from "./contexts/UserAuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
+import { Toaster } from "react-hot-toast";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
@@ -13,6 +14,7 @@ import BusinessDetailPage from "./pages/BusinessDetailPage";
 import DashboardPage from "./pages/DashboardPage";
 import SettingsPage from "./pages/SettingsPage";
 import AdminPage from "./pages/AdminPage";
+import FavoritesPage from "./pages/FavoritesPage";
 // NEW: Import email verification page
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 // NEW: Import password reset pages
@@ -90,6 +92,15 @@ function App() {
                                         </ProtectedRoute>
                                     }
                                 />
+                                {/* PROTECTED: Favorites route requires authentication */}
+                                <Route
+                                    path="/favorites"
+                                    element={
+                                        <ProtectedRoute>
+                                            <FavoritesPage />
+                                        </ProtectedRoute>
+                                    }
+                                />
                                 <Route
                                     path="/admin/*"
                                     element={<AdminPage />}
@@ -97,6 +108,30 @@ function App() {
                             </Routes>
                         </main>
                         <Footer />
+                        
+                        {/* Toast notifications */}
+                        <Toaster
+                            position="top-right"
+                            toastOptions={{
+                                duration: 3000,
+                                style: {
+                                    background: '#333',
+                                    color: '#fff',
+                                },
+                                success: {
+                                    iconTheme: {
+                                        primary: '#4ade80',
+                                        secondary: '#fff',
+                                    },
+                                },
+                                error: {
+                                    iconTheme: {
+                                        primary: '#ef4444',
+                                        secondary: '#fff',
+                                    },
+                                },
+                            }}
+                        />
                     </div>
                 </Router>
             </UserAuthProvider>{" "}

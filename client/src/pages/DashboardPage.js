@@ -397,13 +397,13 @@ const DashboardPage = () => {
                     {/* My Favorites Container */}
                     <div
                         className="user-activity-container user-favorites-container"
-                        onClick={() => openModal("favorites")}
+                        onClick={() => navigate("/favorites")}
                     >
                         <div className="user-container-icon">💫</div>
                         <div className="user-container-content">
                             <h3>My Favorites</h3>
                             <div className="user-container-count">
-                                {dashboardData.favorites.length}
+                                {user?.favoritesCount || 0}
                             </div>
                             <p>Saved businesses you love</p>
                         </div>

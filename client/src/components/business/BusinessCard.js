@@ -1,9 +1,11 @@
 // client/src/components/business/BusinessCard.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LazyImage from "../common/LazyImage";
 import StarRating from "../common/StarRating";
 import ReportIssueModal from "../modals/ReportIssueModal";
+import { useUserAuth } from "../../contexts/UserAuthContext";
+import toast from "react-hot-toast";
 import "../../styles/components.css";
 
 const BusinessCard = ({ business }) => {
@@ -20,11 +22,21 @@ const BusinessCard = ({ business }) => {
         socialLinks,
     } = business;
 
+    const { user, isAuthenticated, refreshUser } = useUserAuth();
+
     // State for report issue modal
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     // State for favorites functionality
     const [isFavorited, setIsFavorited] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Check if business is in user's favorites on component mount
+    useEffect(() => {
+        if (user && user.favorites) {
+            setIsFavorited(user.favorites.includes(_id));
+        }
+    }, [user, _id]);
 
     // Handle image loading error
     const handleImageError = (e) => {
@@ -43,19 +55,65 @@ const BusinessCard = ({ business }) => {
         setIsReportModalOpen(false);
     };
 
-    // Favorite button handler
-    const handleFavoriteClick = (e) => {
+    // Favorite button handler with real API calls
+    const handleFavoriteClick = async (e) => {
         e.preventDefault(); // Prevent navigation
         e.stopPropagation(); // Prevent event bubbling
+
+        // Check if user is authenticated
+        if (!isAuthenticated) {
+            toast.error("Please log in to save favorites");
+            return;
+        }
+
+        // Prevent multiple clicks
+        if (isLoading) return;
+
+        setIsLoading(true);
+        const previousState = isFavorited;
+        
+        // Optimistic update
         setIsFavorited(!isFavorited);
 
-        // Future implementation will save to favorites database
-        if (process.env.NODE_ENV === "development") {
-            console.log(
-                `${
-                    isFavorited ? "Removed from" : "Added to"
-                } favorites: ${businessName}`
-            );
+        try {
+            // Get token from proper storage location
+            const accessToken = localStorage.getItem("telo_user_access_token") || 
+                              sessionStorage.getItem("telo_user_access_token");
+                              
+            if (!accessToken) {
+                throw new Error("No access token found");
+            }
+
+            const response = await fetch(`/api/auth/favorites/toggle/${_id}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to update favorites");
+            }
+
+            // Update user data to reflect new favorites count
+            await refreshUser();
+
+            // Show success message
+            toast.success(data.message);
+
+        } catch (error) {
+            console.error("Favorites toggle error:", error);
+            
+            // Rollback optimistic update
+            setIsFavorited(previousState);
+            
+            // Show error message
+            toast.error(error.message || "Failed to update favorites");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -107,20 +165,25 @@ const BusinessCard = ({ business }) => {
                             <button
                                 className={`favorite-btn-small ${
                                     isFavorited ? "favorited" : ""
-                                }`}
+                                } ${isLoading ? "loading" : ""}`}
                                 onClick={handleFavoriteClick}
+                                disabled={isLoading}
                                 title={
-                                    isFavorited
+                                    isLoading
+                                        ? "Updating..."
+                                        : isFavorited
                                         ? "Remove from favorites"
                                         : "Add to favorites"
                                 }
                                 aria-label={`${
-                                    isFavorited ? "Remove" : "Add"
+                                    isLoading
+                                        ? "Updating"
+                                        : isFavorited ? "Remove" : "Add"
                                 } ${businessName} ${
                                     isFavorited ? "from" : "to"
                                 } favorites`}
                             >
-                                {isFavorited ? "❤️" : "🤍"}
+                                {isLoading ? "⏳" : isFavorited ? "❤️" : "🤍"}
                             </button>
 
                             {/* Report button (preserved with same functionality) */}
