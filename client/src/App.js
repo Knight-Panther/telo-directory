@@ -1,26 +1,32 @@
 // client/src/App.js
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 import { UserAuthProvider } from "./contexts/UserAuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
-import { Toaster } from "react-hot-toast";
+import PageLoadingSpinner from "./components/common/PageLoadingSpinner";
+import ChunkErrorBoundary from "./components/common/ChunkErrorBoundary";
+// Core pages - loaded immediately
 import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
 import BusinessDetailPage from "./pages/BusinessDetailPage";
-import DashboardPage from "./pages/DashboardPage";
-import SettingsPage from "./pages/SettingsPage";
-import AdminPage from "./pages/AdminPage";
-import FavoritesPage from "./pages/FavoritesPage";
-// NEW: Import email verification page
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-// NEW: Import password reset pages
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
+// Styles
 import "./App.css";
+
+// Lazy-loaded pages - high impact routes
+const AdminPage = React.lazy(() => import("./pages/AdminPage"));
+const DashboardPage = React.lazy(() => import("./pages/DashboardPage"));
+const SettingsPage = React.lazy(() => import("./pages/SettingsPage"));
+const FavoritesPage = React.lazy(() => import("./pages/FavoritesPage"));
+// Auth flow pages - lazy loaded
+const VerifyEmailPage = React.lazy(() => import("./pages/VerifyEmailPage"));
+const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
+// Secondary pages - lazy loaded
+const AboutPage = React.lazy(() => import("./pages/AboutPage"));
+const ContactPage = React.lazy(() => import("./pages/ContactPage"));
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -36,13 +42,13 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <UserAuthProvider>
-                {" "}
-                {/* NEW: Wrap app with user authentication context */}
                 <Router>
                     <div className="App">
                         <Header />
                         <main className="main-content">
-                            <Routes>
+                            <ChunkErrorBoundary>
+                                <Suspense fallback={<PageLoadingSpinner />}>
+                                    <Routes>
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/about" element={<AboutPage />} />
                                 <Route
@@ -105,7 +111,9 @@ function App() {
                                     path="/admin/*"
                                     element={<AdminPage />}
                                 />
-                            </Routes>
+                                    </Routes>
+                                </Suspense>
+                            </ChunkErrorBoundary>
                         </main>
                         <Footer />
                         
@@ -134,8 +142,7 @@ function App() {
                         />
                     </div>
                 </Router>
-            </UserAuthProvider>{" "}
-            {/* NEW: Close user auth provider */}
+            </UserAuthProvider>
         </QueryClientProvider>
     );
 }

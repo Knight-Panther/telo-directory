@@ -9,7 +9,8 @@
       "Bash(taskkill:*)",
       "Bash(curl:*)",
       "Bash(npm run server:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
