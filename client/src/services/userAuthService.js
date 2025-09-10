@@ -237,11 +237,11 @@ const userAuthService = {
                 };
             }
         } catch (error) {
-            throw {
+            throw new Error(JSON.stringify({
                 message: error.response?.data?.error || "Registration failed",
                 details: error.response?.data?.details || [],
                 code: error.response?.data?.code || "REGISTRATION_ERROR",
-            };
+            }));
         }
     },
 
@@ -295,11 +295,11 @@ const userAuthService = {
                 };
             }
 
-            throw {
+            throw new Error(JSON.stringify({
                 message: error.response?.data?.error || "Login failed",
                 details: error.response?.data?.details || [],
                 code: error.response?.data?.code || "LOGIN_ERROR",
-            };
+            }));
         }
     },
 

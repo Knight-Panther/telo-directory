@@ -32,7 +32,7 @@ const DashboardPage = () => {
     const [selectedItems, setSelectedItems] = useState([]);
 
     // Mock data - TODO: Replace with real API calls
-    const [dashboardData, setDashboardData] = useState({
+    const [dashboardData] = useState({
         favorites: [
             {
                 id: 1,

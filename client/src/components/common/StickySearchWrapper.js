@@ -11,13 +11,8 @@ const StickySearchWrapper = ({
     activeFilterCount = 0,
 }) => {
     const [isSticky, setIsSticky] = useState(false);
-    const [heroHeight, setHeroHeight] = useState(0);
 
     useEffect(() => {
-        const heroSection = document.querySelector(".hero-section");
-        if (heroSection) {
-            setHeroHeight(heroSection.offsetHeight);
-        }
 
         const handleScroll = () => {
             const scrollY = window.scrollY;

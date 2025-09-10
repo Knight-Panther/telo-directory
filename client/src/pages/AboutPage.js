@@ -1,5 +1,5 @@
 // client/src/pages/AboutPage.js
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import HeroSection from "../components/common/HeroSection"; //hero section improted
 import "../styles/about.css";
 
@@ -8,17 +8,17 @@ const AboutPage = () => {
     const [isSticky, setIsSticky] = useState(false);
 
     // Navigation sections
-    const sections = [
+    const sections = useMemo(() => [
         { id: "team", title: "Our Team", icon: "👥" },
         { id: "mission", title: "Mission & Vision", icon: "🎯" },
         { id: "how-it-works", title: "How It Works", icon: "🔧" },
         { id: "rules", title: "Rules & Guidelines", icon: "📋" },
         { id: "key-messages", title: "Why Choose Us", icon: "⭐" },
         { id: "contact-cta", title: "Get Started", icon: "🚀" },
-    ];
+    ], []);
 
     // Team members data with photos
-    const teamMembers = [
+    const teamMembers = useMemo(() => [
         {
             id: "giorgi-teliashvili",
             name: "Giorgi Teliashvili",
@@ -51,7 +51,7 @@ const AboutPage = () => {
             photo: "/images/team/Sarah.jpg",
             initials: "SR",
         },
-    ];
+    ], []);
 
     // 🎯 SIMPLIFIED: Team Member Component (removed complex loading logic)
     const TeamMember = ({ member }) => {
@@ -148,7 +148,7 @@ const AboutPage = () => {
             const img = new Image();
             img.src = member.photo;
         });
-    }, []);
+    }, [teamMembers]);
 
     // Smooth scroll to section
     const scrollToSection = useCallback((sectionId) => {

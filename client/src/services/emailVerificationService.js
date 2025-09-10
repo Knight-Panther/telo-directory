@@ -84,14 +84,14 @@ const emailVerificationService = {
         } catch (error) {
             const errorData = error.response?.data || {};
 
-            throw {
+            throw new Error(JSON.stringify({
                 success: false,
                 message: errorData.error || "Email verification failed",
                 code: errorData.code || "VERIFICATION_ERROR",
                 details:
                     errorData.message ||
                     "Please try again or request a new verification email.",
-            };
+            }));
         }
     },
 
@@ -120,16 +120,16 @@ const emailVerificationService = {
 
             // Handle rate limiting specifically
             if (status === 429) {
-                throw {
+                throw new Error(JSON.stringify({
                     success: false,
                     message: errorData.message || "Too many requests",
                     code: "RATE_LIMIT_EXCEEDED",
                     remainingSeconds: errorData.remainingSeconds || 60,
                     rateLimited: true,
-                };
+                }));
             }
 
-            throw {
+            throw new Error(JSON.stringify({
                 success: false,
                 message:
                     errorData.error || "Failed to resend verification email",
@@ -137,7 +137,7 @@ const emailVerificationService = {
                 details:
                     errorData.message ||
                     "Please check your email address and try again.",
-            };
+            }));
         }
     },
 
@@ -167,31 +167,31 @@ const emailVerificationService = {
 
             // Handle different error types
             if (status === 409) {
-                throw {
+                throw new Error(JSON.stringify({
                     success: false,
                     message: "Email address already in use",
                     code: "EMAIL_ALREADY_EXISTS",
                     details: "Please choose a different email address.",
-                };
+                }));
             }
 
             if (status === 429) {
-                throw {
+                throw new Error(JSON.stringify({
                     success: false,
                     message:
                         errorData.message || "Too many email change requests",
                     code: "RATE_LIMIT_EXCEEDED",
                     remainingSeconds: errorData.remainingSeconds || 60,
                     rateLimited: true,
-                };
+                }));
             }
 
-            throw {
+            throw new Error(JSON.stringify({
                 success: false,
                 message: errorData.error || "Failed to request email change",
                 code: errorData.code || "EMAIL_CHANGE_ERROR",
                 details: errorData.message || "Please try again later.",
-            };
+            }));
         }
     },
 
@@ -217,14 +217,14 @@ const emailVerificationService = {
         } catch (error) {
             const errorData = error.response?.data || {};
 
-            throw {
+            throw new Error(JSON.stringify({
                 success: false,
                 message: errorData.error || "Email change verification failed",
                 code: errorData.code || "EMAIL_CHANGE_VERIFICATION_ERROR",
                 details:
                     errorData.message ||
                     "Please try requesting a new email change.",
-            };
+            }));
         }
     },
 
