@@ -1,12 +1,15 @@
 // client/src/components/business/BusinessCard.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Link } from "react-router-dom";
 import LazyImage from "../common/LazyImage";
 import StarRating from "../common/StarRating";
-import ReportIssueModal from "../modals/ReportIssueModal";
+import LoadingSpinner from "../common/LoadingSpinner";
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import toast from "react-hot-toast";
 import "../../styles/components.css";
+
+// Lazy load the ReportIssueModal
+const ReportIssueModal = React.lazy(() => import("../modals/ReportIssueModal"));
 
 const BusinessCard = ({ business }) => {
     const {
@@ -284,13 +287,17 @@ const BusinessCard = ({ business }) => {
                 </div>
             </div>
 
-            {/* Report Issue Modal (PRESERVED - no changes) */}
-            <ReportIssueModal
-                isOpen={isReportModalOpen}
-                onClose={handleCloseReportModal}
-                businessId={_id}
-                businessName={businessName}
-            />
+            {/* Report Issue Modal - Lazy loaded */}
+            {isReportModalOpen && (
+                <Suspense fallback={<div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}><LoadingSpinner /></div>}>
+                    <ReportIssueModal
+                        isOpen={isReportModalOpen}
+                        onClose={handleCloseReportModal}
+                        businessId={_id}
+                        businessName={businessName}
+                    />
+                </Suspense>
+            )}
         </>
     );
 };

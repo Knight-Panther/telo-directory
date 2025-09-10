@@ -1,18 +1,20 @@
 // client/src/pages/BusinessDetailPage.js
 
-import React, { useState, useEffect } from "react"; // UPDATED: Added useEffect import
+import React, { useState, useEffect, Suspense } from "react"; // UPDATED: Added useEffect import
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import businessService from "../services/businessService";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import LazyImage from "../components/common/LazyImage";
-import ReportIssueModal from "../components/modals/ReportIssueModal";
 import {
     getImageUrl,
     getPlaceholderData,
     handleImageError,
 } from "../utils/imageHelper";
 import "../styles/pages.css";
+
+// Lazy load the ReportIssueModal
+const ReportIssueModal = React.lazy(() => import("../components/modals/ReportIssueModal"));
 
 /**
  * BusinessDetailPage Component
@@ -467,13 +469,17 @@ const BusinessDetailPage = () => {
                 </div>
             </div>
 
-            {/* Report Issue Modal */}
-            <ReportIssueModal
-                isOpen={isReportModalOpen}
-                onClose={handleCloseReportModal}
-                businessId={business._id}
-                businessName={business.businessName}
-            />
+            {/* Report Issue Modal - Lazy loaded */}
+            {isReportModalOpen && (
+                <Suspense fallback={<div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}><LoadingSpinner /></div>}>
+                    <ReportIssueModal
+                        isOpen={isReportModalOpen}
+                        onClose={handleCloseReportModal}
+                        businessId={business._id}
+                        businessName={business.businessName}
+                    />
+                </Suspense>
+            )}
         </div>
     );
 };

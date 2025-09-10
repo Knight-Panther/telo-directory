@@ -1,9 +1,12 @@
 // client/src/components/common/Header.js - Enhanced navigation
-import React, { useState, useEffect, useRef } from "react"; // UPDATED: Added useEffect and useRef imports
+import React, { useState, useEffect, useRef, Suspense } from "react"; // UPDATED: Added useEffect and useRef imports
 import { Link, useNavigate, useSearchParams } from "react-router-dom"; // UPDATED: Added useSearchParams import
 import { useUserAuth } from "../../contexts/UserAuthContext";
-import LoginModal from "../modals/LoginModal";
+import LoadingSpinner from "./LoadingSpinner";
 import "../../styles/components.css";
+
+// Lazy load the LoginModal
+const LoginModal = React.lazy(() => import("../modals/LoginModal"));
 
 const Header = () => {
     const navigate = useNavigate();
@@ -334,7 +337,11 @@ const Header = () => {
                 </div>
             </div>
 
-            <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+            {isLoginModalOpen && (
+                <Suspense fallback={<div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}><LoadingSpinner /></div>}>
+                    <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+                </Suspense>
+            )}
         </header>
     );
 };
