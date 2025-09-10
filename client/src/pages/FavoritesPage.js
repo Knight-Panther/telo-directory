@@ -12,6 +12,17 @@ const FavoritesPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedFavorites, setSelectedFavorites] = useState([]);
     const [isDeleting, setIsDeleting] = useState(false);
+    
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 25,
+        hasMore: false
+    });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     // Load favorites on component mount
     useEffect(() => {
@@ -22,12 +33,18 @@ const FavoritesPage = () => {
         }
     }, [isAuthenticated]);
 
-    const loadFavorites = async () => {
+    const loadFavorites = async (page = 1, append = false) => {
         try {
+            if (!append) {
+                setIsLoading(true);
+            } else {
+                setIsLoadingMore(true);
+            }
+
             const accessToken = localStorage.getItem("telo_user_access_token") || 
                               sessionStorage.getItem("telo_user_access_token");
                               
-            const response = await fetch("/api/auth/favorites", {
+            const response = await fetch(`/api/auth/favorites?page=${page}&limit=25`, {
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,
                 },
@@ -39,12 +56,23 @@ const FavoritesPage = () => {
                 throw new Error(data.message || "Failed to load favorites");
             }
 
-            setFavorites(data.favorites);
+            if (append) {
+                // Append new favorites to existing list
+                setFavorites(prev => [...prev, ...data.favorites]);
+            } else {
+                // Replace favorites list
+                setFavorites(data.favorites);
+            }
+            
+            setPagination(data.pagination);
+            setCurrentPage(page);
+            
         } catch (error) {
             console.error("Load favorites error:", error);
             toast.error("Failed to load favorites");
         } finally {
             setIsLoading(false);
+            setIsLoadingMore(false);
         }
     };
 
@@ -178,6 +206,12 @@ const FavoritesPage = () => {
         navigate(`/business/${businessId}`);
     };
 
+    // Handle "Show More" button click
+    const handleShowMore = async () => {
+        const nextPage = currentPage + 1;
+        await loadFavorites(nextPage, true);
+    };
+
     // Redirect if not authenticated
     if (!isAuthenticated) {
         return (
@@ -237,7 +271,7 @@ const FavoritesPage = () => {
             <div className="favorites-page">
                 {/* Header */}
                 <div className="favorites-header">
-                    <h1>❤️ My Favorites ({favorites.length})</h1>
+                    <h1>❤️ My Favorites ({pagination.totalItems})</h1>
                     <p>Manage your saved businesses</p>
                 </div>
 
@@ -312,6 +346,31 @@ const FavoritesPage = () => {
                         </div>
                     ))}
                 </div>
+                
+                {/* Show More Button */}
+                {pagination.hasMore && (
+                    <div className="show-more-container">
+                        <button
+                            className="show-more-btn"
+                            onClick={handleShowMore}
+                            disabled={isLoadingMore}
+                        >
+                            {isLoadingMore ? (
+                                <>
+                                    <span className="loading-spinner">⏳</span>
+                                    Loading more...
+                                </>
+                            ) : (
+                                <>
+                                    Show {Math.min(25, pagination.totalItems - favorites.length)} More
+                                    <span className="show-more-count">
+                                        ({favorites.length} of {pagination.totalItems})
+                                    </span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

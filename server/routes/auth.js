@@ -874,14 +874,16 @@ router.post("/favorites/toggle/:businessId", verifyAccessToken, async (req, res)
 
 /**
  * GET /api/auth/favorites
- * Get user's favorites list with business details
+ * Get user's favorites list with business details and pagination
  */
 router.get("/favorites", verifyAccessToken, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id)
-            .populate("favorites")
-            .exec();
+        const { page = 1, limit = 25 } = req.query;
+        const pageNum = parseInt(page);
+        const limitNum = parseInt(limit);
+        const skip = (pageNum - 1) * limitNum;
 
+        const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({
                 error: "User not found",
@@ -889,10 +891,31 @@ router.get("/favorites", verifyAccessToken, async (req, res) => {
             });
         }
 
+        const totalFavorites = user.favorites.length;
+        
+        // Get paginated favorites with business details
+        const paginatedUser = await User.findById(req.user._id)
+            .populate({
+                path: "favorites",
+                options: {
+                    skip: skip,
+                    limit: limitNum
+                }
+            })
+            .exec();
+
+        const hasMore = (skip + limitNum) < totalFavorites;
+
         res.json({
             success: true,
-            favorites: user.favorites,
-            favoritesCount: user.favorites.length
+            favorites: paginatedUser.favorites,
+            pagination: {
+                currentPage: pageNum,
+                totalPages: Math.ceil(totalFavorites / limitNum),
+                totalItems: totalFavorites,
+                itemsPerPage: limitNum,
+                hasMore: hasMore
+            }
         });
     } catch (error) {
         console.error("Get favorites error:", error);
