@@ -1,5 +1,5 @@
 // client/src/components/common/Header.js - Enhanced navigation
-import React, { useState, useEffect } from "react"; // UPDATED: Added useEffect import
+import React, { useState, useEffect, useRef } from "react"; // UPDATED: Added useEffect and useRef imports
 import { Link, useNavigate, useSearchParams } from "react-router-dom"; // UPDATED: Added useSearchParams import
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import LoginModal from "../modals/LoginModal";
@@ -16,6 +16,10 @@ const Header = () => {
 
     // ✅ NEW: Get authentication state (only addition)
     const { isAuthenticated, user, logout, isLoading } = useUserAuth();
+
+    // ✅ NEW: Refs for outside click detection
+    const userDropdownRef = useRef(null);
+    const mobileMenuRef = useRef(null);
 
     // NEW: Auto-trigger login modal if redirected from protected route
     useEffect(() => {
@@ -42,6 +46,71 @@ const Header = () => {
             window.removeEventListener("open-login-modal", handleOpenLoginModal);
         };
     }, []);
+
+    // ✅ NEW: Handle outside clicks to close dropdowns
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            // Close user dropdown if clicked outside
+            if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+                setIsUserDropdownOpen(false);
+            }
+            
+            // Close mobile menu if clicked outside
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+                // Only close if menu is open and click is not on burger button
+                const burgerButton = event.target.closest('.burger-menu');
+                if (isMenuOpen && !burgerButton) {
+                    setIsMenuOpen(false);
+                }
+            }
+        };
+
+        // Only add listener if either dropdown or mobile menu is open
+        if (isUserDropdownOpen || isMenuOpen) {
+            document.addEventListener('mousedown', handleOutsideClick);
+            document.addEventListener('touchstart', handleOutsideClick);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+            document.removeEventListener('touchstart', handleOutsideClick);
+        };
+    }, [isUserDropdownOpen, isMenuOpen]);
+
+    // ✅ NEW: Handle keyboard events for accessibility
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            // Close dropdowns on Escape key
+            if (event.key === 'Escape') {
+                if (isUserDropdownOpen) {
+                    setIsUserDropdownOpen(false);
+                }
+                if (isMenuOpen) {
+                    setIsMenuOpen(false);
+                }
+            }
+
+            // Handle dropdown navigation with Arrow keys
+            if (isUserDropdownOpen && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+                event.preventDefault();
+                const dropdownLinks = userDropdownRef.current?.querySelectorAll('.dropdown-link');
+                const currentFocus = document.activeElement;
+                const currentIndex = Array.from(dropdownLinks).indexOf(currentFocus);
+
+                let nextIndex = currentIndex;
+                if (event.key === 'ArrowDown') {
+                    nextIndex = currentIndex < dropdownLinks.length - 1 ? currentIndex + 1 : 0;
+                } else {
+                    nextIndex = currentIndex > 0 ? currentIndex - 1 : dropdownLinks.length - 1;
+                }
+                
+                dropdownLinks[nextIndex]?.focus();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isUserDropdownOpen, isMenuOpen]);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -72,7 +141,16 @@ const Header = () => {
     // ✅ NEW: Additional functions (only additions, no changes to existing)
     const toggleUserDropdown = (e) => {
         e.preventDefault();
-        setIsUserDropdownOpen(!isUserDropdownOpen);
+        const newState = !isUserDropdownOpen;
+        setIsUserDropdownOpen(newState);
+        
+        // Focus first dropdown item when opening
+        if (newState) {
+            setTimeout(() => {
+                const firstDropdownLink = userDropdownRef.current?.querySelector('.dropdown-link');
+                firstDropdownLink?.focus();
+            }, 100);
+        }
     };
 
     const handleLogout = async (e) => {
@@ -111,15 +189,6 @@ const Header = () => {
                 </Link>
 
                 <div className="nav-wrapper">
-                    {/* Home always visible on mobile */}
-                    <Link
-                        to="/"
-                        className="nav-link home-link"
-                        onClick={handleHomeNavigation}
-                    >
-                        Home
-                    </Link>
-
                     {/* Burger menu button */}
                     <button
                         className={`burger-menu ${isMenuOpen ? "open" : ""}`}
@@ -132,7 +201,15 @@ const Header = () => {
                     </button>
 
                     {/* Navigation menu */}
-                    <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`}>
+                    <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`} ref={mobileMenuRef}>
+                        {/* Home link now inside nav for proper alignment */}
+                        <Link
+                            to="/"
+                            className="nav-link home-link"
+                            onClick={handleHomeNavigation}
+                        >
+                            Home
+                        </Link>
                         <Link
                             to="/about"
                             className="nav-link"
@@ -164,11 +241,19 @@ const Header = () => {
                                 Loading...
                             </div>
                         ) : isAuthenticated ? (
-                            <div className="user-auth-area">
+                            <div className="user-auth-area" ref={userDropdownRef}>
                                 <button
                                     className="user-profile-btn"
                                     onClick={toggleUserDropdown}
                                     aria-label="User menu"
+                                    aria-expanded={isUserDropdownOpen}
+                                    aria-haspopup="true"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            toggleUserDropdown(e);
+                                        }
+                                    }}
                                 >
                                     <div className="user-avatar">
                                         {getUserInitials()}
@@ -186,11 +271,16 @@ const Header = () => {
                                 </button>
 
                                 {isUserDropdownOpen && (
-                                    <div className="user-dropdown">
+                                    <div 
+                                        className="user-dropdown"
+                                        role="menu"
+                                        aria-labelledby="user-profile-btn"
+                                    >
                                         <Link
                                             to="/dashboard"
                                             className="dropdown-link"
                                             onClick={closeMenu}
+                                            role="menuitem"
                                         >
                                             <span className="dropdown-icon">
                                                 💻
@@ -201,6 +291,7 @@ const Header = () => {
                                             to="/settings"
                                             className="dropdown-link"
                                             onClick={closeMenu}
+                                            role="menuitem"
                                         >
                                             <span className="dropdown-icon">
                                                 👤
@@ -212,6 +303,7 @@ const Header = () => {
                                         <button
                                             className="dropdown-link logout-btn"
                                             onClick={handleLogout}
+                                            role="menuitem"
                                         >
                                             <span className="dropdown-icon">
                                                 🚪
