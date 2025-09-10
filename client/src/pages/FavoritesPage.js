@@ -7,7 +7,7 @@ import "../styles/pages.css";
 
 const FavoritesPage = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated, refreshUser } = useUserAuth();
+    const { user, isAuthenticated, updateFavoritesCount } = useUserAuth();
     const [favorites, setFavorites] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedFavorites, setSelectedFavorites] = useState([]);
@@ -101,8 +101,9 @@ const FavoritesPage = () => {
             // Remove from selected if it was selected
             setSelectedFavorites(prev => prev.filter(id => id !== businessId));
 
-            // Update user data
-            await refreshUser();
+            // PERFORMANCE: Calculate new count locally instead of API call
+            const newCount = (user?.favoritesCount || 0) - 1;
+            updateFavoritesCount(newCount);
 
             toast.success("Business removed from favorites");
         } catch (error) {
@@ -146,11 +147,13 @@ const FavoritesPage = () => {
                 prev.filter(fav => !selectedFavorites.includes(fav._id))
             );
             
+            // PERFORMANCE: Calculate new count locally instead of API call
+            const deletedCount = selectedFavorites.length;
+            const newCount = (user?.favoritesCount || 0) - deletedCount;
+            updateFavoritesCount(newCount);
+            
             // Clear selections
             setSelectedFavorites([]);
-
-            // Update user data
-            await refreshUser();
 
             toast.success(data.message);
         } catch (error) {

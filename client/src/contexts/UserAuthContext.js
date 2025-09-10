@@ -36,6 +36,10 @@ const AUTH_ACTIONS = {
     CLEAR_ERROR: "CLEAR_ERROR",
     // NEW: Registration success without immediate login
     REGISTRATION_SUCCESS: "REGISTRATION_SUCCESS",
+    // PERFORMANCE: Update only favorites count without full user refresh
+    UPDATE_FAVORITES_COUNT: "UPDATE_FAVORITES_COUNT",
+    // PERFORMANCE: Update favorites array and count for visual state
+    UPDATE_USER_FAVORITES: "UPDATE_USER_FAVORITES",
 };
 
 // Reducer function to handle state updates
@@ -93,6 +97,32 @@ const authReducer = (state, action) => {
                 user: null, // No user login until email verified
                 isAuthenticated: false,
                 isLoading: false,
+                error: null,
+            };
+
+        // PERFORMANCE: Update only favorites count without API call
+        case AUTH_ACTIONS.UPDATE_FAVORITES_COUNT:
+            return {
+                ...state,
+                user: state.user ? {
+                    ...state.user,
+                    favoritesCount: action.payload
+                } : null,
+                error: null,
+            };
+
+        // PERFORMANCE: Update favorites array and count for visual state
+        case AUTH_ACTIONS.UPDATE_USER_FAVORITES:
+            const { businessId, action: favoriteAction, newCount } = action.payload;
+            return {
+                ...state,
+                user: state.user ? {
+                    ...state.user,
+                    favorites: favoriteAction === "added"
+                        ? [...(state.user.favorites || []), businessId]
+                        : (state.user.favorites || []).filter(id => id !== businessId),
+                    favoritesCount: newCount
+                } : null,
                 error: null,
             };
 
@@ -422,6 +452,28 @@ export const UserAuthProvider = ({ children }) => {
     };
 
     /**
+     * PERFORMANCE: Update only favorites count without full API call
+     * Use this instead of refreshUser() for favorites operations
+     */
+    const updateFavoritesCount = (newCount) => {
+        dispatch({
+            type: AUTH_ACTIONS.UPDATE_FAVORITES_COUNT,
+            payload: newCount
+        });
+    };
+
+    /**
+     * PERFORMANCE: Update favorites array and count for visual state
+     * Use for toggle operations to maintain visual consistency
+     */
+    const updateUserFavorites = (businessId, action, newCount) => {
+        dispatch({
+            type: AUTH_ACTIONS.UPDATE_USER_FAVORITES,
+            payload: { businessId, action, newCount }
+        });
+    };
+
+    /**
      * NEW: Get user's email for verification purposes
      */
     const getUserEmail = () => {
@@ -449,6 +501,8 @@ export const UserAuthProvider = ({ children }) => {
         isEmailVerified,
         isFullyAuthenticated, // NEW
         getFavoritesCount,
+        updateFavoritesCount, // PERFORMANCE: Efficient count updates
+        updateUserFavorites, // PERFORMANCE: Efficient favorites + visual state updates
         getUserEmail, // NEW
     };
 

@@ -22,7 +22,7 @@ const BusinessCard = ({ business }) => {
         socialLinks,
     } = business;
 
-    const { user, isAuthenticated, refreshUser } = useUserAuth();
+    const { user, isAuthenticated, updateUserFavorites } = useUserAuth();
 
     // State for report issue modal
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -98,8 +98,8 @@ const BusinessCard = ({ business }) => {
                 throw new Error(data.message || "Failed to update favorites");
             }
 
-            // Update user data to reflect new favorites count
-            await refreshUser();
+            // PERFORMANCE: Update favorites array and count for visual state
+            updateUserFavorites(_id, data.action, data.favoritesCount);
 
             // Show success message
             toast.success(data.message);
