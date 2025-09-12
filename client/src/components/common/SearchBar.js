@@ -1,6 +1,6 @@
 // client/src/components/common/SearchBar.js
 import React, { useState, useEffect } from "react";
-import "../../styles/components.css";
+import "../../styles/components-core.css";
 
 const SearchBar = ({
     onSearch,

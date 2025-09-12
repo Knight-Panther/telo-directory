@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef, Suspense } from "react"; // UPDATED
 import { Link, useNavigate, useSearchParams } from "react-router-dom"; // UPDATED: Added useSearchParams import
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import LoadingSpinner from "./LoadingSpinner";
-import "../../styles/components.css";
+import "../../styles/components-core.css";
+import "../../styles/components-user.css";
 
 // Lazy load the LoginModal
 const LoginModal = React.lazy(() => import("../modals/LoginModal"));

@@ -1,6 +1,6 @@
 // client/src/components/common/LoadingSpinner.js
 import React from "react";
-import "../../styles/components.css";
+import "../../styles/components-core.css";
 
 const LoadingSpinner = ({ size = "medium", className = "", text = null }) => {
     return (

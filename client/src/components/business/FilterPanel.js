@@ -2,7 +2,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
-import "../../styles/components.css";
+//do we need to leave below commented out?
+// import "../../styles/components.css";
+import "../../styles/components-filters.css";
 
 const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
     const [openDropdown, setOpenDropdown] = useState(null);

@@ -4,7 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
 import BusinessCard from "./BusinessCard";
 import LoadingSpinner from "../common/LoadingSpinner";
-import "../../styles/components.css";
+import "../../styles/components-core.css";
 
 const BusinessList = ({ searchTerm, filters }) => {
     const [businesses, setBusinesses] = useState([]);

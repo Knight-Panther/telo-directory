@@ -10,7 +10,8 @@
       "Bash(curl:*)",
       "Bash(npm run server:*)",
       "Bash(npm install:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(dir:*)"
     ],
     "deny": []
   }
