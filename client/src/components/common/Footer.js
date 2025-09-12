@@ -1,6 +1,6 @@
 // client/src/components/common/Footer.js
 import React from "react";
-import "../../styles/components-core.css";
+// CSS loaded at page level - removed duplicate import
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();

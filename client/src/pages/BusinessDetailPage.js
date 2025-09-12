@@ -12,6 +12,7 @@ import {
     handleImageError,
 } from "../utils/imageHelper";
 import "../styles/pages.css";
+import "../styles/components-core.css"; // LazyImage, loading spinner, business cards
 
 // Lazy load the ReportIssueModal
 const ReportIssueModal = React.lazy(() => import("../components/modals/ReportIssueModal"));

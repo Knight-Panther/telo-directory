@@ -2,8 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
-//do we need to leave below commented out?
-// import "../../styles/components.css";
+// REMOVED: Heavy components.css - using optimized components-filters.css instead
 import "../../styles/components-filters.css";
 
 const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {

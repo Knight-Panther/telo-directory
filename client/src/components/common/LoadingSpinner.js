@@ -1,6 +1,6 @@
 // client/src/components/common/LoadingSpinner.js
 import React from "react";
-import "../../styles/components-core.css";
+// CSS loaded at page level - removed duplicate import
 
 const LoadingSpinner = ({ size = "medium", className = "", text = null }) => {
     return (

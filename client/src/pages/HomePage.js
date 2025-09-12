@@ -7,6 +7,7 @@ import FullScreenFilterModal from "../components/business/FullScreenFilterModal"
 import FilterPanel from "../components/business/FilterPanel";
 import BusinessList from "../components/business/BusinessList";
 import "../styles/pages.css";
+import "../styles/components-core.css"; // Business cards, search bar, header, footer
 import HeroSection from "../components/common/HeroSection";
 
 const HomePage = () => {

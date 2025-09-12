@@ -1,6 +1,6 @@
 // client/src/components/common/StarRating.js
 import React from "react";
-import "./../../styles/components-core.css";
+// CSS loaded at page level - removed duplicate import
 
 /**
  * StarRating Component - Booking.com Style Rating Display

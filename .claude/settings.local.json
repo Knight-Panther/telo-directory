@@ -1,18 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run dev:*)",
-      "Bash(node:*)",
-      "Bash(npx eslint:*)",
-      "Bash(npm run build:*)",
-      "Bash(npm start)",
-      "Bash(taskkill:*)",
-      "Bash(curl:*)",
-      "Bash(npm run server:*)",
-      "Bash(npm install:*)",
-      "Bash(find:*)",
-      "Bash(dir:*)"
+      "Bash(sort:*)"
     ],
-    "deny": []
+    "deny": [],
+    "ask": []
   }
 }

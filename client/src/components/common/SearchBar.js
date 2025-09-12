@@ -1,6 +1,6 @@
 // client/src/components/common/SearchBar.js
 import React, { useState, useEffect } from "react";
-import "../../styles/components-core.css";
+// CSS loaded at page level - removed duplicate import
 
 const SearchBar = ({
     onSearch,

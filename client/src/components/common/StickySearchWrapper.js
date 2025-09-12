@@ -1,7 +1,7 @@
 // client/src/components/common/StickySearchWrapper.js
 import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
-import "../../styles/components-core.css";
+// CSS loaded at page level - removed duplicate import
 
 const StickySearchWrapper = ({
     searchTerm,

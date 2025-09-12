@@ -6,7 +6,7 @@ import StarRating from "../common/StarRating";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import toast from "react-hot-toast";
-import "../../styles/components-core.css";
+// CSS loaded at page level - removed duplicate import
 
 // Lazy load the ReportIssueModal
 const ReportIssueModal = React.lazy(() => import("../modals/ReportIssueModal"));

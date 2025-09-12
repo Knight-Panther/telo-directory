@@ -1,7 +1,7 @@
 // client/src/components/business/FullScreenFilterModal.js
 import React, { useEffect, useRef } from "react";
 import FilterPanel from "./FilterPanel";
-import "../../styles/components.css";
+import "../../styles/components-filters.css";
 
 const FullScreenFilterModal = ({
     isOpen,
