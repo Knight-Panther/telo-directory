@@ -537,6 +537,52 @@
 }
 
 /* ========================================
+   IPHONE STANDARD (375px+)
+   ======================================== */
+@media (min-width: 375px) {
+    .settings-section {
+        padding: calc(var(--spacing-lg) + 2px);
+    }
+    
+    .settings-title {
+        font-size: 1.4rem;
+    }
+    
+    .form-group input, .form-group select {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+    
+    .save-btn, .cancel-btn {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* ========================================
+   IPHONE PLUS/MAX (414px+)
+   ======================================== */
+@media (min-width: 414px) {
+    .settings-section {
+        padding: calc(var(--spacing-lg) + 4px);
+    }
+    
+    .settings-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-group input, .form-group select {
+        padding: 13px 15px;
+        font-size: 1rem;
+    }
+    
+    .save-btn, .cancel-btn {
+        padding: 13px 24px;
+        font-size: 1rem;
+    }
+}
+
+/* ========================================
    TABLET PORTRAIT (768px+)
    ======================================== */
 @media (min-width: 768px) {
