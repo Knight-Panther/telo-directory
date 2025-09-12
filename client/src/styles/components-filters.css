@@ -23,8 +23,7 @@
     border-radius: 0;
     box-shadow: var(--shadow-xs);
     border: 1px solid var(--gray-200);
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: var(--z-dropdown);
     margin: 0 calc(-1 * var(--padding-mobile)) var(--padding-mobile)
         calc(-1 * var(--padding-mobile));
@@ -33,6 +32,11 @@
 
 .filter-panel.collapsed {
     padding: var(--padding-mobile);
+    position: sticky;
+    top: 70px; /* Below header */
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-sm);
 }
 
 .filter-panel.collapsed .filter-header {
@@ -137,6 +141,13 @@
     box-shadow: var(--shadow-xs);
 }
 
+.dropdown-trigger:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 .dropdown-trigger.open {
     border-color: var(--primary-blue);
     background: #ffffff;
@@ -201,6 +212,12 @@
 
 .dropdown-option:hover {
     background: var(--gray-100);
+}
+
+.dropdown-option:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: -2px;
+    background: var(--gray-50);
 }
 
 .dropdown-option.selected {
@@ -408,6 +425,13 @@
     color: var(--primary-blue);
     transform: var(--hover-lift);
     box-shadow: var(--shadow-md);
+}
+
+.filter-toggle-btn:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .filter-icon {
