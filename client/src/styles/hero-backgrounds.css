@@ -57,6 +57,36 @@
     padding: var(--spacing-lg);
 }
 
+/* iPhone Standard (375px+) */
+@media (min-width: 375px) {
+    .hero-section {
+        min-height: 420px;
+    }
+    
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* iPhone Plus/Max (414px+) */
+@media (min-width: 414px) {
+    .hero-section {
+        min-height: 450px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+}
+
 /* Small Mobile to Large Mobile (480px+) */
 @media (min-width: 480px) {
     .hero-construction-bg {

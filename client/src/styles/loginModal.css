@@ -428,6 +428,52 @@
    RESPONSIVE BREAKPOINTS (Mobile-First)
    ======================================== */
 
+/* iPhone Standard (375px+) */
+@media (min-width: 375px) {
+    .login-modal-content {
+        max-width: 350px;
+        padding: calc(var(--modal-padding-mobile) + 2px);
+    }
+    
+    .login-modal h2 {
+        font-size: 1.4rem;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+    
+    .login-btn, .cancel-btn {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* iPhone Plus/Max (414px+) */
+@media (min-width: 414px) {
+    .login-modal-content {
+        max-width: 380px;
+        padding: calc(var(--modal-padding-mobile) + 4px);
+    }
+    
+    .login-modal h2 {
+        font-size: 1.5rem;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        padding: 13px 15px;
+        font-size: 1rem;
+    }
+    
+    .login-btn, .cancel-btn {
+        padding: 13px 24px;
+        font-size: 1rem;
+    }
+}
+
 /* Small Mobile to Large Mobile (480px+) */
 @media (min-width: 480px) {
     .login-modal-content {

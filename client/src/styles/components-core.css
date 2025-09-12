@@ -39,7 +39,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--padding-mobile);
+    padding: calc(var(--spacing-md) - 1px);
+    min-height: 60px;
 }
 
 .logo {
@@ -49,8 +50,10 @@
 .logo h1 {
     color: var(--primary-blue);
     text-decoration: none;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .nav-wrapper {
@@ -65,7 +68,7 @@
     position: absolute;
     top: 100%;
     right: 0;
-    width: 200px;
+    width: clamp(180px, 50vw, 200px);
     background: white;
     flex-direction: column;
     padding: 0;
@@ -78,6 +81,7 @@
     z-index: var(--z-dropdown);
     border: 1px solid #e0e0e0;
     display: none;
+    max-width: calc(100vw - 20px);
 }
 
 .nav.nav-open {
@@ -382,8 +386,8 @@
 
 .business-image-circular {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 75px;
+    height: 75px;
     border-radius: var(--radius-full);
     overflow: hidden;
     background: var(--gradient-gray);
@@ -1380,6 +1384,68 @@
 /* ========================================
    RESPONSIVE BREAKPOINTS
    ======================================== */
+
+/* iPhone Standard (375px+) */
+@media (min-width: 375px) {
+    .logo h1 {
+        font-size: 1.2rem;
+    }
+    
+    .nav {
+        width: 220px;
+    }
+    
+    .business-image-circular {
+        width: 85px;
+        height: 85px;
+    }
+    
+    .business-name a {
+        font-size: 0.95rem;
+    }
+    
+    .search-input {
+        padding: 11px 40px 11px 14px;
+        font-size: 0.9rem;
+    }
+}
+
+/* iPhone Plus/Max (414px+) */
+@media (min-width: 414px) {
+    .header .container {
+        padding: calc(var(--padding-mobile) + 2px);
+    }
+    
+    .logo h1 {
+        font-size: 1.25rem;
+    }
+    
+    .nav {
+        width: 240px;
+    }
+    
+    .nav-link {
+        padding: var(--padding-mobile) 20px;
+        font-size: 0.9rem;
+    }
+    
+    .business-card {
+        padding: calc(var(--spacing-md) + 2px);
+    }
+    
+    .business-image-circular {
+        width: 88px;
+        height: 88px;
+    }
+    
+    .business-name a {
+        font-size: 1rem;
+    }
+    
+    .search-input {
+        padding: 12px 42px 12px 16px;
+    }
+}
 
 /* Small Mobile to Large Mobile (480px+) */
 @media (min-width: 480px) {

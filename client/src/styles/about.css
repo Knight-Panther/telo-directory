@@ -606,6 +606,48 @@
    RESPONSIVE BREAKPOINTS (Mobile-First)
    ======================================== */
 
+/* iPhone Standard (375px+) */
+@media (min-width: 375px) {
+    .about-content {
+        padding: calc(var(--spacing-lg) + 2px);
+    }
+    
+    .about-hero h1 {
+        font-size: 1.6rem;
+    }
+    
+    .about-hero p {
+        font-size: 1rem;
+    }
+    
+    .feature-item h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* iPhone Plus/Max (414px+) */
+@media (min-width: 414px) {
+    .about-content {
+        padding: calc(var(--spacing-lg) + 4px);
+    }
+    
+    .about-hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .about-hero p {
+        font-size: 1.05rem;
+    }
+    
+    .feature-item h3 {
+        font-size: 1.15rem;
+    }
+    
+    .feature-item p {
+        font-size: 0.95rem;
+    }
+}
+
 /* Small Mobile to Large Mobile (480px+) */
 @media (min-width: 480px) {
     .about-nav-container {

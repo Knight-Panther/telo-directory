@@ -16,14 +16,15 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: var(--padding-mobile) 17px;
+    padding: calc(var(--spacing-md) - 1px) 16px;
     background: none;
     border: none;
     border-bottom: 1px solid #f0f0f0;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--gray-700);
     transition: var(--transition-fast);
+    min-height: 44px;
 }
 
 .user-profile-btn:hover,
@@ -89,8 +90,8 @@
     animation: slideDown 0.2s ease-out;
     z-index: var(--z-dropdown);
     position: relative;
-    min-width: 180px;
-    max-width: 220px;
+    min-width: clamp(160px, 45vw, 180px);
+    max-width: clamp(200px, 60vw, 220px);
     box-shadow: var(--shadow-md);
 }
 
@@ -174,6 +175,57 @@
 /* ========================================
    RESPONSIVE IMPROVEMENTS
    ======================================== */
+
+/* iPhone Standard (375px+) */
+@media (min-width: 375px) {
+    .user-profile-btn {
+        padding: var(--padding-mobile) 20px;
+        font-size: 0.9rem;
+    }
+    
+    .user-avatar {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+    
+    .user-name {
+        max-width: 130px;
+    }
+    
+    .user-dropdown {
+        min-width: 200px;
+        max-width: 240px;
+    }
+}
+
+/* iPhone Plus/Max (414px+) */
+@media (min-width: 414px) {
+    .user-profile-btn {
+        padding: calc(var(--padding-mobile) + 2px) 22px;
+        font-size: 0.95rem;
+    }
+    
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+    
+    .user-name {
+        max-width: 140px;
+    }
+    
+    .user-dropdown {
+        min-width: 220px;
+        max-width: 260px;
+    }
+    
+    .dropdown-link {
+        padding: 14px 20px;
+        font-size: 0.85rem;
+    }
+}
 
 /* Tablet Portrait (768px+) */
 @media (min-width: 768px) {
