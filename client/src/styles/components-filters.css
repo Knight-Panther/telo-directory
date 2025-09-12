@@ -154,7 +154,7 @@
 }
 
 .dropdown-content {
-    position: relative;
+    position: absolute;
     top: 100%;
     left: 0;
     right: 0;
@@ -164,6 +164,7 @@
     border-radius: 0 0 var(--radius-md) var(--radius-md);
     box-shadow: var(--shadow-md);
     z-index: 1000;
+    min-width: 100%;
     max-height: 130px;
     overflow-y: auto;
 }
@@ -690,6 +691,13 @@
     
     .dropdown-option {
         padding: 10px 14px;
+    }
+    
+    /* Better mobile dropdown positioning */
+    .dropdown-content {
+        left: -10px;
+        right: -10px;
+        max-width: calc(100vw - 20px);
     }
 }
 
