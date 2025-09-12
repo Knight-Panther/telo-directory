@@ -1,8 +1,9 @@
 // client/src/components/common/Header.js - Enhanced navigation
 import React, { useState, useEffect, useRef, Suspense } from "react"; // UPDATED: Added useEffect and useRef imports
-import { Link, useNavigate, useSearchParams } from "react-router-dom"; // UPDATED: Added useSearchParams import
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom"; // UPDATED: Added useSearchParams and useLocation imports
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import LoadingSpinner from "./LoadingSpinner";
+import SearchBar from "./SearchBar";
 import "../../styles/components-core.css";
 import "../../styles/components-user.css";
 
@@ -11,9 +12,24 @@ const LoginModal = React.lazy(() => import("../modals/LoginModal"));
 
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams(); // NEW: For URL parameter detection
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    
+    // Mobile search state (only for HomePage)
+    const [mobileSearchData, setMobileSearchData] = useState({
+        searchTerm: "",
+        onSearch: null,
+        onReset: null,
+        onFilterToggle: null,
+        activeFilterCount: 0,
+        enabled: false
+    });
+    
+    // Collapsible search state
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const searchExpandRef = useRef(null);
 
     // ✅ NEW: Add user dropdown state (only addition)
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -51,14 +67,44 @@ const Header = () => {
         };
     }, []);
 
+    // NEW: Listen for mobile search events from HomePage
+    useEffect(() => {
+        const handleMobileSearchUpdate = (event) => {
+            setMobileSearchData(event.detail);
+        };
+
+        window.addEventListener("update-mobile-search", handleMobileSearchUpdate);
+        
+        // Disable mobile search when not on HomePage
+        if (location.pathname !== '/') {
+            setMobileSearchData(prev => ({ ...prev, enabled: false }));
+        }
+        
+        return () => {
+            window.removeEventListener("update-mobile-search", handleMobileSearchUpdate);
+        };
+    }, [location.pathname]);
+
+    // Keep search expanded if there's a search term
+    useEffect(() => {
+        if (mobileSearchData.searchTerm && mobileSearchData.searchTerm.length > 0) {
+            setIsSearchExpanded(true);
+        }
+    }, [mobileSearchData.searchTerm]);
+
     // ✅ NEW: Handle outside clicks to close dropdowns (optimized)
     useEffect(() => {
-        // Early return if no dropdowns are open
-        if (!isUserDropdownOpen && !isMenuOpen) {
+        // Early return if no dropdowns/search are open
+        if (!isUserDropdownOpen && !isMenuOpen && !isSearchExpanded) {
             return;
         }
 
         const handleOutsideClick = (event) => {
+            // Close mobile search if clicked outside
+            if (isSearchExpanded && searchExpandRef.current && !searchExpandRef.current.contains(event.target)) {
+                setIsSearchExpanded(false);
+            }
+            
             // Close user dropdown if clicked outside
             if (isUserDropdownOpen && userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
                 setIsUserDropdownOpen(false);
@@ -82,18 +128,21 @@ const Header = () => {
             document.removeEventListener('mousedown', handleOutsideClick);
             document.removeEventListener('touchstart', handleOutsideClick);
         };
-    }, [isUserDropdownOpen, isMenuOpen]);
+    }, [isUserDropdownOpen, isMenuOpen, isSearchExpanded]);
 
     // ✅ NEW: Handle keyboard events for accessibility (optimized)
     useEffect(() => {
-        // Early return if no dropdowns are open
-        if (!isUserDropdownOpen && !isMenuOpen) {
+        // Early return if no dropdowns/search are open
+        if (!isUserDropdownOpen && !isMenuOpen && !isSearchExpanded) {
             return;
         }
 
         const handleKeyDown = (event) => {
-            // Close dropdowns on Escape key
+            // Close dropdowns/search on Escape key
             if (event.key === 'Escape') {
+                if (isSearchExpanded) {
+                    setIsSearchExpanded(false);
+                }
                 if (isUserDropdownOpen) {
                     setIsUserDropdownOpen(false);
                 }
@@ -125,7 +174,7 @@ const Header = () => {
 
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [isUserDropdownOpen, isMenuOpen]);
+    }, [isUserDropdownOpen, isMenuOpen, isSearchExpanded]);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -196,12 +245,69 @@ const Header = () => {
         return name.substring(0, 2).toUpperCase();
     };
 
+    // Mobile search expansion handlers
+    const expandMobileSearch = () => {
+        setIsSearchExpanded(true);
+        // Focus the search input after expansion
+        setTimeout(() => {
+            const searchInput = searchExpandRef.current?.querySelector('.search-input');
+            searchInput?.focus();
+        }, 300); // Wait for animation
+    };
+
+    const collapseMobileSearch = () => {
+        setIsSearchExpanded(false);
+    };
+
     return (
         <header className="header">
             <div className="container">
                 <Link to="/" className="logo" onClick={handleHomeNavigation}>
                     <h1>TΣLO</h1>
                 </Link>
+
+                {/* Collapsible Mobile Search - Only show below 768px on HomePage */}
+                {mobileSearchData.enabled && mobileSearchData.onSearch && (
+                    <div className="mobile-search-container" ref={searchExpandRef}>
+                        {/* Search Icon Button (collapsed state) */}
+                        {!isSearchExpanded && (
+                            <button
+                                className="mobile-search-toggle-btn"
+                                onClick={expandMobileSearch}
+                                title="Search"
+                            >
+                                <span className="search-icon">🔍</span>
+                            </button>
+                        )}
+                        
+                        {/* Full Search Bar (expanded state) */}
+                        {isSearchExpanded && (
+                            <div className="mobile-search-expanded">
+                                <SearchBar
+                                    searchTerm={mobileSearchData.searchTerm}
+                                    onSearch={mobileSearchData.onSearch}
+                                    onReset={mobileSearchData.onReset}
+                                    placeholder="Search..."
+                                    isSticky={false}
+                                />
+                            </div>
+                        )}
+                        
+                        {/* Filter Button - Always visible */}
+                        <button
+                            className="mobile-filter-btn"
+                            onClick={mobileSearchData.onFilterToggle}
+                            title="Open filters"
+                        >
+                            <span className="filter-icon">⚙️</span>
+                            {mobileSearchData.activeFilterCount > 0 && (
+                                <span className="filter-badge">
+                                    {mobileSearchData.activeFilterCount}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                )}
 
                 <div className="nav-wrapper">
                     {/* Burger menu button */}

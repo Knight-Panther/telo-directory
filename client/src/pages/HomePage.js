@@ -98,6 +98,34 @@ const HomePage = () => {
         return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
+    // Send mobile search data to Header
+    useEffect(() => {
+        const mobileSearchData = {
+            searchTerm,
+            onSearch: handleSearchChange,
+            onReset: resetToMainPage,
+            onFilterToggle: handleFilterToggle,
+            activeFilterCount: getActiveFilterCount(),
+            enabled: true // Enable mobile search on HomePage
+        };
+
+        // Dispatch custom event to Header
+        window.dispatchEvent(
+            new CustomEvent("update-mobile-search", {
+                detail: mobileSearchData
+            })
+        );
+
+        // Cleanup: disable mobile search when component unmounts
+        return () => {
+            window.dispatchEvent(
+                new CustomEvent("update-mobile-search", {
+                    detail: { ...mobileSearchData, enabled: false }
+                })
+            );
+        };
+    }, [searchTerm, filters]); // Update when search or filters change
+
     // Handle sticky behavior and hero fade
     useEffect(() => {
         const handleScroll = () => {
