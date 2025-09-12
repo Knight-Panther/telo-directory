@@ -51,29 +51,32 @@ const Header = () => {
         };
     }, []);
 
-    // ✅ NEW: Handle outside clicks to close dropdowns
+    // ✅ NEW: Handle outside clicks to close dropdowns (optimized)
     useEffect(() => {
+        // Early return if no dropdowns are open
+        if (!isUserDropdownOpen && !isMenuOpen) {
+            return;
+        }
+
         const handleOutsideClick = (event) => {
             // Close user dropdown if clicked outside
-            if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+            if (isUserDropdownOpen && userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
                 setIsUserDropdownOpen(false);
             }
             
             // Close mobile menu if clicked outside
-            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+            if (isMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
                 // Only close if menu is open and click is not on burger button
                 const burgerButton = event.target.closest('.burger-menu');
-                if (isMenuOpen && !burgerButton) {
+                if (!burgerButton) {
                     setIsMenuOpen(false);
                 }
             }
         };
 
-        // Only add listener if either dropdown or mobile menu is open
-        if (isUserDropdownOpen || isMenuOpen) {
-            document.addEventListener('mousedown', handleOutsideClick);
-            document.addEventListener('touchstart', handleOutsideClick);
-        }
+        // Use passive listeners for better performance
+        document.addEventListener('mousedown', handleOutsideClick, { passive: true });
+        document.addEventListener('touchstart', handleOutsideClick, { passive: true });
 
         return () => {
             document.removeEventListener('mousedown', handleOutsideClick);
@@ -81,8 +84,13 @@ const Header = () => {
         };
     }, [isUserDropdownOpen, isMenuOpen]);
 
-    // ✅ NEW: Handle keyboard events for accessibility
+    // ✅ NEW: Handle keyboard events for accessibility (optimized)
     useEffect(() => {
+        // Early return if no dropdowns are open
+        if (!isUserDropdownOpen && !isMenuOpen) {
+            return;
+        }
+
         const handleKeyDown = (event) => {
             // Close dropdowns on Escape key
             if (event.key === 'Escape') {
@@ -92,16 +100,19 @@ const Header = () => {
                 if (isMenuOpen) {
                     setIsMenuOpen(false);
                 }
+                return;
             }
 
-            // Handle dropdown navigation with Arrow keys
+            // Handle dropdown navigation with Arrow keys (only if user dropdown is open)
             if (isUserDropdownOpen && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
                 event.preventDefault();
                 const dropdownLinks = userDropdownRef.current?.querySelectorAll('.dropdown-link');
+                if (!dropdownLinks?.length) return;
+                
                 const currentFocus = document.activeElement;
                 const currentIndex = Array.from(dropdownLinks).indexOf(currentFocus);
 
-                let nextIndex = currentIndex;
+                let nextIndex;
                 if (event.key === 'ArrowDown') {
                     nextIndex = currentIndex < dropdownLinks.length - 1 ? currentIndex + 1 : 0;
                 } else {

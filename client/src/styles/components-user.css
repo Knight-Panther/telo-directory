@@ -29,8 +29,10 @@
 .user-profile-btn:hover,
 .user-profile-btn:focus {
     background-color: var(--gray-100);
-    color: var(--primary-blue);
-    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+.user-profile-btn:focus-visible {
     outline-offset: 2px;
 }
 
@@ -62,6 +64,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 120px;
 }
 
 /* Dropdown Arrow */
@@ -84,6 +87,11 @@
     border-radius: 0 0 var(--radius-md) var(--radius-md);
     margin-top: -1px;
     animation: slideDown 0.2s ease-out;
+    z-index: var(--z-dropdown);
+    position: relative;
+    min-width: 180px;
+    max-width: 220px;
+    box-shadow: var(--shadow-md);
 }
 
 .dropdown-link {
@@ -110,7 +118,7 @@
 .dropdown-link:focus {
     background-color: #e9ecef;
     color: var(--primary-blue);
-    outline: none;
+    outline-offset: -2px;
     box-shadow: inset 2px 0 0 var(--primary-blue);
 }
 
@@ -160,5 +168,38 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE IMPROVEMENTS
+   ======================================== */
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+    .user-auth-area {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+    }
+
+    .user-profile-btn {
+        width: auto;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-bottom: none;
+        border-radius: var(--radius-md);
+    }
+
+    .user-name {
+        max-width: 150px;
+    }
+
+    .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: var(--spacing-xs);
+        border-radius: var(--radius-md);
+        min-width: 200px;
     }
 }
