@@ -255,9 +255,15 @@ const BusinessCard = ({ business }) => {
                     {/* Description - always rendered to maintain consistent spacing */}
                     <p className="description">{shortDescription || ''}</p>
 
-                    {/*Contact section (PRESERVED - no changes) */}
+                    {/* Contact section with clickable phone number */}
                     <div className="business-contact">
-                        <span className="mobile">{mobile}</span>
+                        <a
+                            href={`tel:${mobile}`}
+                            className="mobile"
+                            aria-label={`Call ${businessName} at ${mobile}`}
+                        >
+                            {mobile}
+                        </a>
                     </div>
 
                     {/* Social Links - always rendered to maintain consistent card heights */}
