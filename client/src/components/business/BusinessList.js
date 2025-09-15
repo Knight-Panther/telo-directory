@@ -1,5 +1,5 @@
 // client/src/components/business/BusinessList.js - REPLACE ENTIRE FILE
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
 import BusinessCard from "./BusinessCard";
@@ -45,13 +45,15 @@ const BusinessList = ({ searchTerm, filters }) => {
         keepPreviousData: true,
     });
 
-    // Flatten all pages into single businesses array
-    useEffect(() => {
-        if (data) {
-            const allBusinesses = data.pages.flatMap((page) => page.businesses);
-            setBusinesses(allBusinesses);
-        }
+    // Memoized flatten all pages into single businesses array - prevents unnecessary recalculations
+    const allBusinesses = useMemo(() => {
+        return data ? data.pages.flatMap((page) => page.businesses) : [];
     }, [data]);
+
+    // Update businesses state when memoized array changes
+    useEffect(() => {
+        setBusinesses(allBusinesses);
+    }, [allBusinesses]);
 
     // Infinite scroll handler
     const handleScroll = useCallback(() => {
