@@ -64,6 +64,16 @@ const BusinessCard = memo(({ business }) => {
         setIsReportModalOpen(false);
     }, []);
 
+    // ARIA label helper functions
+    const getFavoriteAriaLabel = () => {
+        if (isLoading) return "Updating favorites";
+        return isFavorited
+            ? `Remove ${businessName} from favorites`
+            : `Add ${businessName} to favorites`;
+    };
+
+    const getReportAriaLabel = () => `Report issue with ${businessName}`;
+
     // Favorite button handler with real API calls - memoized for performance
     const handleFavoriteClick = useCallback(async (e) => {
         e.preventDefault(); // Prevent navigation
@@ -186,22 +196,22 @@ const BusinessCard = memo(({ business }) => {
                                     ? "Remove from favorites"
                                     : "Add to favorites"
                             }
-                            aria-label={`${
-                                isLoading
-                                    ? "Updating"
-                                    : isFavorited ? "Remove" : "Add"
-                            } ${businessName} ${
-                                isFavorited ? "from" : "to"
-                            } favorites`}
+                            aria-label={getFavoriteAriaLabel()}
                         >
-                            {isLoading ? "⏳" : isFavorited ? "❤️" : "🤍"}
+                            {isLoading ? (
+                                <LoadingSpinner size="small" color="white" />
+                            ) : (
+                                <span aria-hidden="true">
+                                    {isFavorited ? "❤️" : "🤍"}
+                                </span>
+                            )}
                         </button>
 
                         <button
                             className="report-btn-overlay"
                             onClick={handleReportIssue}
                             title="Report an issue with this listing"
-                            aria-label={`Report issue with ${businessName}`}
+                            aria-label={getReportAriaLabel()}
                         >
                             🚩
                         </button>
@@ -241,14 +251,20 @@ const BusinessCard = memo(({ business }) => {
                                     isFavorited ? "from" : "to"
                                 } favorites`}
                             >
-                                {isLoading ? "⏳" : isFavorited ? "❤️" : "🤍"}
+                                {isLoading ? (
+                                <LoadingSpinner size="small" color="white" />
+                            ) : (
+                                <span aria-hidden="true">
+                                    {isFavorited ? "❤️" : "🤍"}
+                                </span>
+                            )}
                             </button>
 
                             <button
                                 className="report-btn-small"
                                 onClick={handleReportIssue}
                                 title="Report an issue with this listing"
-                                aria-label={`Report issue with ${businessName}`}
+                                aria-label={getReportAriaLabel()}
                             >
                                 🚩
                             </button>

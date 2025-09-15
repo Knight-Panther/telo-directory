@@ -298,4 +298,52 @@
     /* Mobile Collapse */
     --mobile-content-max-height: 1000px;
     --mobile-content-min-height: 0;
+
+    /* Business Card Variables */
+    /* Card Dimensions */
+    --card-image-size-mobile: 75px;
+    --card-image-size-mobile-plus: 88px;
+    --card-image-size-tablet: 100px;
+    --card-image-size-desktop: 120px;
+    --card-image-size-large: 140px;
+
+    /* Card Spacing */
+    --card-padding-mobile: var(--spacing-md);
+    --card-padding-tablet: var(--spacing-lg);
+    --card-gap: var(--spacing-md);
+
+    /* Action Button Sizes */
+    --action-btn-small: 28px;
+    --action-btn-medium: 32px;
+    --action-btn-large: 34px;
+
+    /* Card Layout */
+    --card-min-height-mobile: 160px;
+    --card-min-height-desktop: 280px;
+}
+
+/* Responsive Business Card Dimensions */
+@media (min-width: 375px) {
+    :root {
+        --card-image-size: var(--card-image-size-mobile-plus);
+    }
+}
+
+@media (min-width: 768px) {
+    :root {
+        --card-image-size: var(--card-image-size-tablet);
+        --card-padding: var(--card-padding-tablet);
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --card-image-size: var(--card-image-size-desktop);
+    }
+}
+
+@media (min-width: 1200px) {
+    :root {
+        --card-image-size: var(--card-image-size-large);
+    }
 }
