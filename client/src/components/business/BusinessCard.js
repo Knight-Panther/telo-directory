@@ -1,5 +1,5 @@
 // client/src/components/business/BusinessCard.js
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, memo, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import LazyImage from "../common/LazyImage";
 import StarRating from "../common/StarRating";
@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 // Lazy load the ReportIssueModal
 const ReportIssueModal = React.lazy(() => import("../modals/ReportIssueModal"));
 
-const BusinessCard = ({ business }) => {
+const BusinessCard = memo(({ business }) => {
     const {
         _id,
         businessName,
@@ -30,36 +30,42 @@ const BusinessCard = ({ business }) => {
     // State for report issue modal
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-    // State for favorites functionality
-    const [isFavorited, setIsFavorited] = useState(false);
+    // State for favorites functionality - optimized with local state for immediate UI feedback
+    const [localFavoriteState, setLocalFavoriteState] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Check if business is in user's favorites on component mount
-    useEffect(() => {
-        if (user && user.favorites) {
-            setIsFavorited(user.favorites.includes(_id));
-        }
-    }, [user, _id]);
+    // Memoized calculation of favorite status - only recalculates when user.favorites or _id changes
+    const isFavoriteFromUser = useMemo(() => {
+        return user && user.favorites ? user.favorites.includes(_id) : false;
+    }, [user?.favorites, _id]);
 
-    // Handle image loading error
-    const handleImageError = (e) => {
+    // Display favorite state: local state takes precedence during loading, otherwise use user state
+    const isFavorited = localFavoriteState !== null ? localFavoriteState : isFavoriteFromUser;
+
+    // Reset local state when user favorites change
+    useEffect(() => {
+        setLocalFavoriteState(null);
+    }, [isFavoriteFromUser]);
+
+    // Memoized event handlers - prevent unnecessary re-renders of child components
+    const handleImageError = useCallback((e) => {
         e.target.src = "/placeholder-business.png";
-    };
+    }, []);
 
     // Handler functions for report issue modal
-    const handleReportIssue = (e) => {
+    const handleReportIssue = useCallback((e) => {
         e.preventDefault(); // Prevent navigation when clicking report
         e.stopPropagation(); // Prevent event bubbling
         setIsReportModalOpen(true);
-    };
+    }, []);
 
     // Close modal handler
-    const handleCloseReportModal = () => {
+    const handleCloseReportModal = useCallback(() => {
         setIsReportModalOpen(false);
-    };
+    }, []);
 
-    // Favorite button handler with real API calls
-    const handleFavoriteClick = async (e) => {
+    // Favorite button handler with real API calls - memoized for performance
+    const handleFavoriteClick = useCallback(async (e) => {
         e.preventDefault(); // Prevent navigation
         e.stopPropagation(); // Prevent event bubbling
 
@@ -74,9 +80,9 @@ const BusinessCard = ({ business }) => {
 
         setIsLoading(true);
         const previousState = isFavorited;
-        
-        // Optimistic update
-        setIsFavorited(!isFavorited);
+
+        // Optimistic update using local state for immediate UI feedback
+        setLocalFavoriteState(!isFavorited);
 
         try {
             // Get token from proper storage location
@@ -110,19 +116,31 @@ const BusinessCard = ({ business }) => {
         } catch (error) {
             console.error("Favorites toggle error:", error);
             
-            // Rollback optimistic update
-            setIsFavorited(previousState);
-            
+            // Rollback optimistic update using local state
+            setLocalFavoriteState(previousState);
+
             // Show error message
             toast.error(error.message || "Failed to update favorites");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [isAuthenticated, isLoading, isFavorited, _id, updateUserFavorites]); // Dependencies for useCallback
 
-    // Generate sample rating (will come from database later)
+    // Generate consistent sample rating based on business ID (will come from database later)
     // 70% chance of having a rating between 7-10, 30% no rating
-    const sampleRating = Math.random() < 0.3 ? null : Math.random() * 3 + 7;
+    // Memoized to ensure consistent rating per business and avoid recalculation on every render
+    const sampleRating = useMemo(() => {
+        // Use business ID as seed for consistent rating across renders
+        const seed = _id.charCodeAt(_id.length - 1) + _id.charCodeAt(0);
+        const random1 = (seed * 9301 + 49297) % 233280 / 233280;
+        const random2 = ((seed + 1) * 9301 + 49297) % 233280 / 233280;
+
+        // 30% chance of no rating
+        if (random1 < 0.3) return null;
+
+        // Rating between 7-10
+        return Number((7 + random2 * 3).toFixed(1));
+    }, [_id]);
 
     return (
         <>
@@ -336,6 +354,9 @@ const BusinessCard = ({ business }) => {
             )}
         </>
     );
-};
+});
+
+// Add display name for better debugging and React DevTools
+BusinessCard.displayName = 'BusinessCard';
 
 export default BusinessCard;
