@@ -147,14 +147,51 @@ const BusinessCard = ({ business }) => {
                             </div>
                         )}
                     </div>
+
                     {/* UPDATED: Verification badge positioned outside circular image */}
                     {verified && (
                         <span className="verified-badge-circular">✓</span>
                     )}
+
+                    {/* UPDATED: Desktop overlay icons positioned near title area */}
+                    <div className="desktop-overlay-icons">
+                        <button
+                            className={`favorite-btn-overlay ${
+                                isFavorited ? "favorited" : ""
+                            } ${isLoading ? "loading" : ""}`}
+                            onClick={handleFavoriteClick}
+                            disabled={isLoading}
+                            title={
+                                isLoading
+                                    ? "Updating..."
+                                    : isFavorited
+                                    ? "Remove from favorites"
+                                    : "Add to favorites"
+                            }
+                            aria-label={`${
+                                isLoading
+                                    ? "Updating"
+                                    : isFavorited ? "Remove" : "Add"
+                            } ${businessName} ${
+                                isFavorited ? "from" : "to"
+                            } favorites`}
+                        >
+                            {isLoading ? "⏳" : isFavorited ? "❤️" : "🤍"}
+                        </button>
+
+                        <button
+                            className="report-btn-overlay"
+                            onClick={handleReportIssue}
+                            title="Report an issue with this listing"
+                            aria-label={`Report issue with ${businessName}`}
+                        >
+                            🚩
+                        </button>
+                    </div>
                 </div>
 
                 <div className="business-info">
-                    {/* Enhanced business-name section with heart + report button */}
+                    {/* Business name with mobile icons (hidden on desktop) */}
                     <div className="business-name-header">
                         <h3 className="business-name">
                             {/* Navigate to business detail page */}
@@ -163,8 +200,8 @@ const BusinessCard = ({ business }) => {
                             </Link>
                         </h3>
 
-                        {/* Icon group with heart and report buttons */}
-                        <div className="icon-group">
+                        {/* Mobile-only icon group (hidden on desktop 1024px+) */}
+                        <div className="icon-group-mobile">
                             <button
                                 className={`favorite-btn-small ${
                                     isFavorited ? "favorited" : ""
@@ -189,7 +226,6 @@ const BusinessCard = ({ business }) => {
                                 {isLoading ? "⏳" : isFavorited ? "❤️" : "🤍"}
                             </button>
 
-                            {/* Report button (preserved with same functionality) */}
                             <button
                                 className="report-btn-small"
                                 onClick={handleReportIssue}

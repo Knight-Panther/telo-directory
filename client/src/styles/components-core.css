@@ -587,6 +587,7 @@
     padding: var(--spacing-xs);
     min-height: auto;
     background: transparent;
+    position: relative;
 }
 
 .business-image-circular {
@@ -642,6 +643,134 @@
     z-index: 10;
 }
 
+/* Desktop Overlay Icons - positioned at bottom of image container, near title area */
+.desktop-overlay-icons {
+    position: absolute;
+    bottom: -8px;
+    right: 8px;
+    display: none;
+    gap: 6px;
+    z-index: 20;
+}
+
+.favorite-btn-overlay,
+.report-btn-overlay {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--danger-red);
+    color: var(--danger-red);
+    padding: 0.25rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.65rem;
+    transition: all 0.3s ease;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+    backdrop-filter: blur(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.favorite-btn-overlay:hover,
+.report-btn-overlay:hover {
+    background: var(--danger-red);
+    color: white;
+    transform: var(--hover-lift);
+    box-shadow: var(--shadow-sm);
+}
+
+.favorite-btn-overlay.favorited {
+    background: var(--danger-red);
+    color: white;
+    border-color: var(--danger-red);
+    animation: heartPulse 0.3s ease-out;
+}
+
+.favorite-btn-overlay.favorited:hover {
+    background: var(--danger-red-dark);
+    border-color: var(--danger-red-dark);
+    transform: var(--hover-lift-scale);
+    box-shadow: var(--shadow-md);
+}
+
+.favorite-btn-overlay:active,
+.report-btn-overlay:active {
+    transform: var(--active-press);
+}
+
+.favorite-btn-overlay:focus,
+.report-btn-overlay:focus {
+    outline: 2px solid var(--danger-red);
+    outline-offset: 2px;
+}
+
+/* Mobile Icon Group - visible until 1024px */
+.icon-group-mobile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.favorite-btn-small,
+.report-btn-small {
+    background: none;
+    border: 1px solid var(--danger-red);
+    color: var(--danger-red);
+    padding: 0.25rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.65rem;
+    transition: all 0.3s ease;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.favorite-btn-small:hover,
+.report-btn-small:hover {
+    background: var(--danger-red);
+    color: white;
+    transform: var(--hover-lift);
+    box-shadow: var(--shadow-sm);
+}
+
+.favorite-btn-small.favorited {
+    background: var(--danger-red);
+    color: white;
+    border-color: var(--danger-red);
+    animation: heartPulse 0.3s ease-out;
+}
+
+.favorite-btn-small.favorited:hover {
+    background: var(--danger-red-dark);
+    border-color: var(--danger-red-dark);
+    transform: var(--hover-lift-scale);
+    box-shadow: var(--shadow-md);
+}
+
+.favorite-btn-small:active,
+.report-btn-small:active {
+    transform: var(--active-press);
+}
+
+.favorite-btn-small:focus,
+.report-btn-small:focus {
+    outline: 2px solid var(--danger-red);
+    outline-offset: 2px;
+}
+
 @keyframes pulse {
     0% {
         box-shadow: var(--shadow-sm);
@@ -695,71 +824,6 @@
 
 .business-name a:hover {
     color: var(--primary-blue);
-}
-
-.icon-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 10;
-}
-
-.favorite-btn-small,
-.report-btn-small {
-    background: none;
-    border: 1px solid var(--danger-red);
-    color: var(--danger-red);
-    padding: 0.2rem 0.3rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.65rem;
-    transition: all 0.3s ease;
-    width: auto;
-    height: fit-content;
-    min-width: 28px;
-    min-height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    line-height: 1;
-}
-
-.favorite-btn-small:hover,
-.report-btn-small:hover {
-    background: var(--danger-red);
-    color: white;
-    transform: var(--hover-lift);
-    box-shadow: var(--shadow-sm);
-}
-
-.favorite-btn-small.favorited {
-    background: var(--danger-red);
-    color: white;
-    border-color: var(--danger-red);
-    animation: heartPulse 0.3s ease-out;
-}
-
-.favorite-btn-small.favorited:hover {
-    background: var(--danger-red-dark);
-    border-color: var(--danger-red-dark);
-    transform: var(--hover-lift-scale);
-    box-shadow: var(--shadow-md);
-}
-
-.favorite-btn-small:active,
-.report-btn-small:active {
-    transform: var(--active-press);
-}
-
-.favorite-btn-small:focus,
-.report-btn-small:focus {
-    outline: 2px solid var(--danger-red);
-    outline-offset: 2px;
 }
 
 @keyframes heartPulse {
@@ -1605,6 +1669,15 @@
         height: 85px;
     }
 
+    .favorite-btn-overlay,
+    .report-btn-overlay {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        font-size: 0.7rem;
+    }
+
     .business-name a {
         font-size: 0.95rem;
     }
@@ -1796,6 +1869,15 @@
         padding: 0 var(--padding-desktop);
     }
 
+    /* Hide mobile buttons on desktop, show overlay buttons */
+    .icon-group-mobile {
+        display: none;
+    }
+
+    .desktop-overlay-icons {
+        display: flex;
+    }
+
     .business-grid {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -1823,6 +1905,20 @@
         height: 120px;
     }
 
+    .favorite-btn-overlay,
+    .report-btn-overlay {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 0.75rem;
+    }
+
+    .desktop-overlay-icons {
+        bottom: -12px;
+        right: 12px;
+    }
+
     .business-info {
         grid-column: 1;
         grid-row: 2;
@@ -1841,10 +1937,7 @@
         font-size: 0.9rem;
     }
 
-    .icon-group {
-        position: static;
-        margin-top: var(--spacing-md);
-    }
+    /* Overlay icons remain positioned on image across all screen sizes */
 
     .footer-content {
         grid-template-columns: repeat(4, 1fr);
@@ -1860,6 +1953,20 @@
     .business-image-circular {
         width: 140px;
         height: 140px;
+    }
+
+    .favorite-btn-overlay,
+    .report-btn-overlay {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
+        font-size: 0.8rem;
+    }
+
+    .desktop-overlay-icons {
+        bottom: -16px;
+        right: 16px;
     }
 
     .business-image-circular-container {
