@@ -1,11 +1,11 @@
 // client/src/components/business/FilterPanel.js - CORRECTED VERSION
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
 // REMOVED: Heavy components.css - using optimized components-filters.css instead
 import "../../styles/components-filters.css";
 
-const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
+const FilterPanel = memo(({ filters, onFilterChange, isMobile = false }) => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const dropdownRefs = useRef({});
     // Search state for dropdowns
@@ -451,6 +451,9 @@ const FilterPanel = ({ filters, onFilterChange, isMobile = false }) => {
             )}
         </div>
     );
-};
+});
+
+// Add display name for better debugging
+FilterPanel.displayName = 'FilterPanel';
 
 export default FilterPanel;

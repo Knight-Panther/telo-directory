@@ -1,12 +1,12 @@
 // client/src/components/business/BusinessList.js - REPLACE ENTIRE FILE
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
 import BusinessCard from "./BusinessCard";
 import LoadingSpinner from "../common/LoadingSpinner";
 // CSS loaded at page level - removed duplicate import
 
-const BusinessList = ({ searchTerm, filters }) => {
+const BusinessList = memo(({ searchTerm, filters }) => {
     const [businesses, setBusinesses] = useState([]);
 
     // Transform filters for API call
@@ -264,6 +264,9 @@ const BusinessList = ({ searchTerm, filters }) => {
             )}
         </div>
     );
-};
+});
+
+// Add display name for better debugging
+BusinessList.displayName = 'BusinessList';
 
 export default BusinessList;
