@@ -338,18 +338,17 @@ const userAuthService = {
                 error.response?.status === 403 &&
                 error.response?.data?.code === "EMAIL_NOT_VERIFIED"
             ) {
-                throw {
-                    message: error.response.data.error,
-                    code: "EMAIL_NOT_VERIFIED",
-                    requiresVerification: true,
-                };
+                const err = new Error(error.response.data.error);
+                err.code = "EMAIL_NOT_VERIFIED";
+                err.requiresVerification = true;
+                throw err;
             }
 
-            throw {
-                message:
-                    error.response?.data?.error || "Failed to get user profile",
-                code: error.response?.data?.code || "PROFILE_ERROR",
-            };
+            const err = new Error(
+                error.response?.data?.error || "Failed to get user profile"
+            );
+            err.code = error.response?.data?.code || "PROFILE_ERROR";
+            throw err;
         }
     },
 
@@ -370,11 +369,10 @@ const userAuthService = {
                 message: response.data.message,
             };
         } catch (error) {
-            throw {
-                message: error.response?.data?.error || "Profile update failed",
-                details: error.response?.data?.details || [],
-                code: error.response?.data?.code || "PROFILE_UPDATE_ERROR",
-            };
+            const err = new Error(error.response?.data?.error || "Profile update failed");
+            err.details = error.response?.data?.details || [];
+            err.code = error.response?.data?.code || "PROFILE_UPDATE_ERROR";
+            throw err;
         }
     },
 
@@ -422,18 +420,16 @@ const userAuthService = {
                 error.response?.data?.code === "EMAIL_NOT_VERIFIED"
             ) {
                 tokenManager.clearTokens();
-                throw {
-                    message: "Email verification required",
-                    code: "EMAIL_NOT_VERIFIED",
-                    requiresVerification: true,
-                };
+                const err = new Error("Email verification required");
+                err.code = "EMAIL_NOT_VERIFIED";
+                err.requiresVerification = true;
+                throw err;
             }
 
             tokenManager.clearTokens();
-            throw {
-                message: "Session expired. Please login again.",
-                code: "REFRESH_TOKEN_EXPIRED",
-            };
+            const err = new Error("Session expired. Please login again.");
+            err.code = "REFRESH_TOKEN_EXPIRED";
+            throw err;
         }
     },
 
@@ -530,17 +526,15 @@ const userAuthService = {
         } catch (error) {
             // Handle rate limiting
             if (error.response?.status === 429) {
-                throw {
-                    message: error.response.data.error,
-                    code: "RATE_LIMIT_EXCEEDED",
-                    retryAfter: error.response.data.retryAfter
-                };
+                const err = new Error(error.response.data.error);
+                err.code = "RATE_LIMIT_EXCEEDED";
+                err.retryAfter = error.response.data.retryAfter;
+                throw err;
             }
             
-            throw {
-                message: error.response?.data?.error || "Failed to send password reset email",
-                code: error.response?.data?.code || "PASSWORD_RESET_ERROR",
-            };
+            const err = new Error(error.response?.data?.error || "Failed to send password reset email");
+            err.code = error.response?.data?.code || "PASSWORD_RESET_ERROR";
+            throw err;
         }
     },
 
@@ -566,26 +560,23 @@ const userAuthService = {
                 const errorCode = error.response.data.code;
                 
                 if (errorCode === "INVALID_RESET_TOKEN" || errorCode === "EXPIRED_RESET_TOKEN") {
-                    throw {
-                        message: error.response.data.error,
-                        code: errorCode,
-                        expired: true
-                    };
+                    const err = new Error(error.response.data.error);
+                    err.code = errorCode;
+                    err.expired = true;
+                    throw err;
                 }
                 
                 if (errorCode === "VALIDATION_ERROR") {
-                    throw {
-                        message: error.response.data.error,
-                        details: error.response.data.details || [],
-                        code: errorCode
-                    };
+                    const err = new Error(error.response.data.error);
+                    err.details = error.response.data.details || [];
+                    err.code = errorCode;
+                    throw err;
                 }
             }
             
-            throw {
-                message: error.response?.data?.error || "Failed to reset password",
-                code: error.response?.data?.code || "PASSWORD_RESET_ERROR",
-            };
+            const err = new Error(error.response?.data?.error || "Failed to reset password");
+            err.code = error.response?.data?.code || "PASSWORD_RESET_ERROR";
+            throw err;
         }
     },
 
@@ -608,35 +599,30 @@ const userAuthService = {
                 const errorCode = error.response.data.code;
                 
                 if (errorCode === "SAME_EMAIL") {
-                    throw {
-                        message: "New email address is the same as your current email",
-                        code: errorCode
-                    };
+                    const err = new Error("New email address is the same as your current email");
+                    err.code = errorCode;
+                    throw err;
                 } else if (errorCode === "PENDING_EMAIL_CHANGE_EXISTS") {
-                    throw {
-                        message: error.response.data.error,
-                        code: errorCode,
-                        pendingEmail: error.response.data.pendingEmail
-                    };
+                    const err = new Error(error.response.data.error);
+                    err.code = errorCode;
+                    err.pendingEmail = error.response.data.pendingEmail;
+                    throw err;
                 }
             } else if (error.response?.status === 409) {
-                throw {
-                    message: "This email address is already associated with another account",
-                    code: "EMAIL_ALREADY_EXISTS"
-                };
+                const err = new Error("This email address is already associated with another account");
+                err.code = "EMAIL_ALREADY_EXISTS";
+                throw err;
             } else if (error.response?.status === 429) {
-                throw {
-                    message: error.response.data.error,
-                    code: "RATE_LIMIT_EXCEEDED",
-                    retryAfter: error.response.data.retryAfter
-                };
+                const err = new Error(error.response.data.error);
+                err.code = "RATE_LIMIT_EXCEEDED";
+                err.retryAfter = error.response.data.retryAfter;
+                throw err;
             }
 
-            throw {
-                message: error.response?.data?.error || "Failed to initiate email change",
-                code: error.response?.data?.code || "EMAIL_CHANGE_ERROR",
-                details: error.response?.data?.details || []
-            };
+            const err = new Error(error.response?.data?.error || "Failed to initiate email change");
+            err.code = error.response?.data?.code || "EMAIL_CHANGE_ERROR";
+            err.details = error.response?.data?.details || [];
+            throw err;
         }
     },
 
@@ -658,42 +644,36 @@ const userAuthService = {
                 const errorCode = error.response.data.code;
                 
                 if (errorCode === "PASSWORD_MISMATCH") {
-                    throw {
-                        message: "New password and confirmation do not match",
-                        code: errorCode,
-                        field: "confirmPassword"
-                    };
+                    const err = new Error("New password and confirmation do not match");
+                    err.code = errorCode;
+                    err.field = "confirmPassword";
+                    throw err;
                 } else if (errorCode === "PASSWORD_TOO_SHORT") {
-                    throw {
-                        message: "Password must be at least 8 characters long",
-                        code: errorCode,
-                        field: "newPassword"
-                    };
+                    const err = new Error("Password must be at least 8 characters long");
+                    err.code = errorCode;
+                    err.field = "newPassword";
+                    throw err;
                 } else if (errorCode === "PASSWORD_TOO_WEAK") {
-                    throw {
-                        message: "Password must contain uppercase, lowercase and number",
-                        code: errorCode,
-                        field: "newPassword"
-                    };
+                    const err = new Error("Password must contain uppercase, lowercase and number");
+                    err.code = errorCode;
+                    err.field = "newPassword";
+                    throw err;
                 } else if (errorCode === "SAME_PASSWORD") {
-                    throw {
-                        message: "New password must be different from current password",
-                        code: errorCode,
-                        field: "newPassword"
-                    };
+                    const err = new Error("New password must be different from current password");
+                    err.code = errorCode;
+                    err.field = "newPassword";
+                    throw err;
                 }
             } else if (error.response?.status === 401) {
-                throw {
-                    message: "Current password is incorrect",
-                    code: "INVALID_CURRENT_PASSWORD",
-                    field: "currentPassword"
-                };
+                const err = new Error("Current password is incorrect");
+                err.code = "INVALID_CURRENT_PASSWORD";
+                err.field = "currentPassword";
+                throw err;
             }
 
-            throw {
-                message: error.response?.data?.error || "Failed to change password",
-                code: error.response?.data?.code || "PASSWORD_CHANGE_ERROR"
-            };
+            const err = new Error(error.response?.data?.error || "Failed to change password");
+            err.code = error.response?.data?.code || "PASSWORD_CHANGE_ERROR";
+            throw err;
         }
     },
 
@@ -748,16 +728,14 @@ const userAuthService = {
             }
             
             if (error.response?.status === 400) {
-                throw {
-                    message: "Account deletion requires typing 'DELETE' as confirmation",
-                    code: "INVALID_CONFIRMATION"
-                };
+                const err = new Error("Account deletion requires typing 'DELETE' as confirmation");
+                err.code = "INVALID_CONFIRMATION";
+                throw err;
             }
 
-            throw {
-                message: error.response?.data?.error || "Failed to schedule account deletion",
-                code: error.response?.data?.code || "DELETE_ACCOUNT_ERROR"
-            };
+            const err = new Error(error.response?.data?.error || "Failed to schedule account deletion");
+            err.code = error.response?.data?.code || "DELETE_ACCOUNT_ERROR";
+            throw err;
         }
     },
 

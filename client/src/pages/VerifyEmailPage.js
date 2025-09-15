@@ -1,5 +1,5 @@
 // client/src/pages/VerifyEmailPage.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useUserAuth } from "../contexts/UserAuthContext";
 import LoadingSpinner from "../components/common/LoadingSpinner";
@@ -72,7 +72,7 @@ const VerifyEmailPage = () => {
         if (token) {
             handleTokenVerification(token);
         }
-    }, [token]);
+    }, [token, handleTokenVerification]);
 
     /**
      * Countdown effect for resend cooldown
@@ -89,7 +89,7 @@ const VerifyEmailPage = () => {
     /**
      * Process email verification token from email link
      */
-    const handleTokenVerification = async (verificationToken) => {
+    const handleTokenVerification = useCallback(async (verificationToken) => {
         setVerificationLoading(true);
         setError(null);
 
@@ -122,7 +122,7 @@ const VerifyEmailPage = () => {
         } finally {
             setVerificationLoading(false);
         }
-    };
+    }, [handleEmailVerified, navigate]);
 
     /**
      * Handle resend verification email
@@ -159,13 +159,6 @@ const VerifyEmailPage = () => {
         }
     };
 
-    /**
-     * Handle manual email input for resend
-     */
-    const handleEmailChange = (e) => {
-        // This could be used if we want to allow users to change their email
-        // For now, we'll keep it simple and use the registered email
-    };
 
     /**
      * Format email for display (partially masked)

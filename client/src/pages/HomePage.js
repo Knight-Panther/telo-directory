@@ -1,5 +1,5 @@
 // client/src/pages/HomePage.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "../components/common/SearchBar";
 import StickySearchWrapper from "../components/common/StickySearchWrapper";
@@ -170,20 +170,20 @@ const HomePage = () => {
     };
 
     // Handle search term changes
-    const handleSearchChange = (newSearchTerm) => {
+    const handleSearchChange = useCallback((newSearchTerm) => {
         setSearchTerm(newSearchTerm);
         updateUrl(newSearchTerm, filters);
-    };
+    }, [filters]);
 
     // Function to reset search and filters
-    const resetToMainPage = () => {
+    const resetToMainPage = useCallback(() => {
         setSearchTerm("");
         setFilters({});
         updateUrl("", {});
-    };
+    }, []);
 
     // Count active filters
-    const getActiveFilterCount = () => {
+    const getActiveFilterCount = useCallback(() => {
         let count = 0;
         if (filters.categories?.length) count += filters.categories.length;
         if (filters.cities?.length) count += filters.cities.length;
@@ -191,7 +191,7 @@ const HomePage = () => {
             count += filters.businessTypes.length;
         if (filters.verified) count += 1;
         return count;
-    };
+    }, [filters]);
 
     // Handle filter modal
     const handleFilterToggle = () => {

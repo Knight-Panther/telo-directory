@@ -38,7 +38,7 @@ const BusinessCard = memo(({ business }) => {
     // Memoized calculation of favorite status - only recalculates when user.favorites or _id changes
     const isFavoriteFromUser = useMemo(() => {
         return user && user.favorites ? user.favorites.includes(_id) : false;
-    }, [user?.favorites, _id]);
+    }, [user, _id]);
 
     // Display favorite state: local state takes precedence during loading, otherwise use user state
     const isFavorited = localFavoriteState !== null ? localFavoriteState : isFavoriteFromUser;
@@ -78,12 +78,6 @@ const BusinessCard = memo(({ business }) => {
         }
     }, [_id]);
 
-    // Focus management helper
-    const handleFocusManagement = useCallback(() => {
-        if (cardRef.current) {
-            cardRef.current.focus();
-        }
-    }, []);
 
     // Favorite button handler with real API calls - memoized for performance
     const handleFavoriteClick = useCallback(async (e) => {

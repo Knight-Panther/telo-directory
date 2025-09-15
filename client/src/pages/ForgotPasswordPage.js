@@ -20,7 +20,6 @@ const ForgotPasswordPage = () => {
     // Component state
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
     const [submitted, setSubmitted] = useState(false);
 
@@ -46,9 +45,8 @@ const ForgotPasswordPage = () => {
         setError("");
 
         try {
-            const result = await userAuthService.requestPasswordReset(email.trim());
+            await userAuthService.requestPasswordReset(email.trim());
             
-            setSuccess(true);
             setSubmitted(true);
             setError("");
 

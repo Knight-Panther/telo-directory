@@ -257,9 +257,6 @@ const Header = () => {
         }, 300); // Wait for animation
     };
 
-    const collapseMobileSearch = () => {
-        setIsSearchExpanded(false);
-    };
 
     return (
         <header className="header">

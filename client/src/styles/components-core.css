@@ -402,7 +402,7 @@
 .sticky-search-wrapper {
     position: fixed;
     top: -100px;
-    left: 14%;
+    left: 50%;
     transform: translateX(-50%) translateY(-100%);
     z-index: var(--z-fixed);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);

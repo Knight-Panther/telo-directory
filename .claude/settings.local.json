@@ -12,7 +12,8 @@
       "Bash(npm start)",
       "Bash(npx tsc:*)",
       "Bash(node:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": []
