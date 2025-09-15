@@ -12,6 +12,45 @@ import toast from "react-hot-toast";
 // Lazy load the ReportIssueModal
 const ReportIssueModal = React.lazy(() => import("../modals/ReportIssueModal"));
 
+// Custom comparison function for React.memo to prevent unnecessary re-renders
+const areBusinessPropsEqual = (prevProps, nextProps) => {
+    const prev = prevProps.business;
+    const next = nextProps.business;
+
+    // Quick reference check first - if same object reference, definitely equal
+    if (prev === next) return true;
+
+    // Compare primitive properties
+    if (
+        prev._id !== next._id ||
+        prev.businessName !== next.businessName ||
+        prev.category !== next.category ||
+        prev.businessType !== next.businessType ||
+        prev.city !== next.city ||
+        prev.shortDescription !== next.shortDescription ||
+        prev.verified !== next.verified ||
+        prev.mobile !== next.mobile ||
+        prev.profileImage !== next.profileImage
+    ) {
+        return false;
+    }
+
+    // Compare socialLinks object (nested comparison)
+    const prevSocial = prev.socialLinks;
+    const nextSocial = next.socialLinks;
+
+    // Handle null/undefined cases
+    if (prevSocial === nextSocial) return true;
+    if (!prevSocial || !nextSocial) return false;
+
+    // Compare social link properties
+    return (
+        prevSocial.facebook === nextSocial.facebook &&
+        prevSocial.instagram === nextSocial.instagram &&
+        prevSocial.tiktok === nextSocial.tiktok
+    );
+};
+
 const BusinessCard = memo(({ business }) => {
     const {
         _id,
@@ -342,7 +381,7 @@ const BusinessCard = memo(({ business }) => {
             )}
         </>
     );
-});
+}, areBusinessPropsEqual);
 
 // Add display name for better debugging and React DevTools
 BusinessCard.displayName = 'BusinessCard';
