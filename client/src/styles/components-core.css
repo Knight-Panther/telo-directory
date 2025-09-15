@@ -816,8 +816,8 @@
     transition: var(--transition-fast);
     line-height: 1.2;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -1847,6 +1847,8 @@
 
     .business-name a {
         font-size: 1.05rem;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
     }
 
     .description {
@@ -1931,8 +1933,8 @@
 
     .business-name a {
         font-size: 1.1rem;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
     }
 
     .description {
@@ -1980,8 +1982,8 @@
 
     .business-name a {
         font-size: 1.15rem;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
     }
 
     .description {
