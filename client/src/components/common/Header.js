@@ -379,7 +379,7 @@ const Header = () => {
                                     <div className="user-avatar">
                                         {getUserInitials()}
                                     </div>
-                                    <span className="user-name">
+                                    <span className="user-name" title={getUserDisplayName()}>
                                         {getUserDisplayName()}
                                     </span>
                                     <span
