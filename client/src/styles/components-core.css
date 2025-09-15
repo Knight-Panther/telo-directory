@@ -58,7 +58,7 @@
         max-width: 300px;
         transition: all 0.3s ease;
     }
-    
+
     /* Collapsed Search Icon Button */
     .mobile-search-toggle-btn {
         display: flex;
@@ -74,28 +74,28 @@
         color: white;
         transition: var(--transition-fast);
     }
-    
+
     .mobile-search-toggle-btn:hover {
         background: var(--primary-blue-dark);
         transform: scale(1.05);
     }
-    
+
     .mobile-search-toggle-btn:focus {
         outline: 2px solid var(--primary-blue);
         outline-offset: 2px;
     }
-    
+
     .mobile-search-toggle-btn .search-icon {
         font-size: 1rem;
     }
-    
+
     /* Expanded Search Bar */
     .mobile-search-expanded {
         flex: 1;
         animation: expandSearch 0.3s ease-out;
         transform-origin: left;
     }
-    
+
     @keyframes expandSearch {
         from {
             opacity: 0;
@@ -106,24 +106,24 @@
             transform: scaleX(1);
         }
     }
-    
+
     .mobile-search-expanded .search-bar {
         flex: 1;
         max-width: none;
         margin: 0;
         box-shadow: var(--shadow-xs);
     }
-    
+
     .mobile-search-expanded .search-input {
         font-size: 0.85rem;
         padding: 8px 40px 8px 12px;
     }
-    
+
     .mobile-search-expanded .search-button {
         padding: 8px 12px;
         min-width: 40px;
     }
-    
+
     .mobile-search-expanded .clear-button {
         width: 28px;
         height: 28px;
@@ -402,14 +402,10 @@
 .sticky-search-wrapper {
     position: fixed;
     top: -100px;
-    left: 0;
-    right: 0;
+    left: 14%;
+    transform: translateX(-50%) translateY(-100%);
     z-index: var(--z-fixed);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--gray-200);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(-100%);
 }
 
 /* Hide sticky search on mobile when mobile search is shown in header */
@@ -420,7 +416,7 @@
 }
 
 .sticky-search-wrapper.is-sticky {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
     top: 70px;
 }
 
@@ -433,8 +429,76 @@
 .sticky-search-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 6px;
     padding: 12px 0;
+}
+
+/* Collapsed sticky search button */
+.sticky-search-collapsed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+}
+
+.sticky-search-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-blue);
+    border: none;
+    border-radius: var(--radius-full);
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    box-shadow: var(--shadow-lg);
+    color: white;
+    font-size: 1.2rem;
+}
+
+.sticky-search-toggle-btn:hover {
+    background: var(--primary-blue-dark);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-xl);
+}
+
+.sticky-search-toggle-btn:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+/* Close button for expanded state */
+.sticky-search-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-500);
+    border: none;
+    border-radius: var(--radius-full);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: white;
+    font-size: 1rem;
+    margin-left: 8px;
+}
+
+.sticky-search-close-btn:hover {
+    background: var(--gray-600);
+    transform: scale(1.1);
+}
+
+/* Expanded state styling */
+.sticky-search-wrapper.is-expanded {
+    /* background: rgba(255, 255, 255, 0.95); */
+    /* backdrop-filter: blur(10px); */
+    /* border-bottom: 1px solid var(--gray-200); */
+    border-radius: var(--radius-lg);
+    margin: 8px;
+    width: auto;
+    box-shadow: var(--shadow-xl);
 }
 
 /* ========================================
@@ -1531,20 +1595,20 @@
     .logo h1 {
         font-size: 1.2rem;
     }
-    
+
     .nav {
         width: 220px;
     }
-    
+
     .business-image-circular {
         width: 85px;
         height: 85px;
     }
-    
+
     .business-name a {
         font-size: 0.95rem;
     }
-    
+
     .search-input {
         padding: 11px 40px 11px 14px;
         font-size: 0.9rem;
@@ -1556,43 +1620,43 @@
     .header .container {
         padding: calc(var(--padding-mobile) + 2px);
     }
-    
+
     .logo h1 {
         font-size: 1.25rem;
     }
-    
+
     .search-input {
         padding: 12px 50px 12px 16px;
         font-size: 0.9rem;
     }
-    
+
     .search-button {
         padding: 12px 20px;
         min-width: 60px;
     }
-    
+
     .nav {
         width: 240px;
     }
-    
+
     .nav-link {
         padding: var(--padding-mobile) 20px;
         font-size: 0.9rem;
     }
-    
+
     .business-card {
         padding: calc(var(--spacing-md) + 2px);
     }
-    
+
     .business-image-circular {
         width: 88px;
         height: 88px;
     }
-    
+
     .business-name a {
         font-size: 1rem;
     }
-    
+
     .search-input {
         padding: 12px 42px 12px 16px;
     }
