@@ -19,8 +19,8 @@ const HomePage = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Helper function to update URL with current state
-    const updateUrl = (newSearchTerm, newFilters) => {
+    // Memoized helper function to update URL with current state - prevents unnecessary re-renders
+    const updateUrl = useCallback((newSearchTerm, newFilters) => {
         const urlParams = new URLSearchParams();
 
         // Add search term
@@ -45,7 +45,7 @@ const HomePage = () => {
         // Update URL without triggering a page reload
         const newUrl = urlParams.toString() ? `/?${urlParams.toString()}` : "/";
         navigate(newUrl, { replace: true });
-    };
+    }, [navigate]);
 
     // Initialize state from URL parameters on component mount
     useEffect(() => {
@@ -98,34 +98,6 @@ const HomePage = () => {
         return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
-    // Send mobile search data to Header
-    useEffect(() => {
-        const mobileSearchData = {
-            searchTerm,
-            onSearch: handleSearchChange,
-            onReset: resetToMainPage,
-            onFilterToggle: handleFilterToggle,
-            activeFilterCount: getActiveFilterCount(),
-            enabled: true // Enable mobile search on HomePage
-        };
-
-        // Dispatch custom event to Header
-        window.dispatchEvent(
-            new CustomEvent("update-mobile-search", {
-                detail: mobileSearchData
-            })
-        );
-
-        // Cleanup: disable mobile search when component unmounts
-        return () => {
-            window.dispatchEvent(
-                new CustomEvent("update-mobile-search", {
-                    detail: { ...mobileSearchData, enabled: false }
-                })
-            );
-        };
-    }, [searchTerm, filters]); // Update when search or filters change
-
     // Handle sticky behavior and hero fade
     useEffect(() => {
         const handleScroll = () => {
@@ -169,18 +141,18 @@ const HomePage = () => {
         }
     };
 
-    // Handle search term changes
+    // Handle search term changes - memoized to prevent unnecessary re-renders
     const handleSearchChange = useCallback((newSearchTerm) => {
         setSearchTerm(newSearchTerm);
         updateUrl(newSearchTerm, filters);
-    }, [filters]);
+    }, [filters, updateUrl]);
 
-    // Function to reset search and filters
+    // Function to reset search and filters - memoized to prevent unnecessary re-renders
     const resetToMainPage = useCallback(() => {
         setSearchTerm("");
         setFilters({});
         updateUrl("", {});
-    }, []);
+    }, [updateUrl]);
 
     // Count active filters
     const getActiveFilterCount = useCallback(() => {
@@ -206,6 +178,34 @@ const HomePage = () => {
         // Filters are already applied through handleFilterChange
         // This is just for closing the modal
     };
+
+    // Send mobile search data to Header
+    useEffect(() => {
+        const mobileSearchData = {
+            searchTerm,
+            onSearch: handleSearchChange,
+            onReset: resetToMainPage,
+            onFilterToggle: handleFilterToggle,
+            activeFilterCount: getActiveFilterCount(),
+            enabled: true // Enable mobile search on HomePage
+        };
+
+        // Dispatch custom event to Header
+        window.dispatchEvent(
+            new CustomEvent("update-mobile-search", {
+                detail: mobileSearchData
+            })
+        );
+
+        // Cleanup: disable mobile search when component unmounts
+        return () => {
+            window.dispatchEvent(
+                new CustomEvent("update-mobile-search", {
+                    detail: { ...mobileSearchData, enabled: false }
+                })
+            );
+        };
+    }, [searchTerm, filters, handleSearchChange, resetToMainPage, getActiveFilterCount]); // Update when search or filters change
 
     return (
         <div className="home-page">

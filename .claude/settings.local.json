@@ -13,7 +13,10 @@
       "Bash(npx tsc:*)",
       "Bash(node:*)",
       "Bash(find:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(set PORT=3002)"
     ],
     "deny": [],
     "ask": []
