@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from "react-router-do
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import LoadingSpinner from "./LoadingSpinner";
 import SearchBar from "./SearchBar";
+import toast from "react-hot-toast";
 import "../../styles/components-core.css";
 import "../../styles/components-user.css";
 
@@ -221,6 +222,7 @@ const Header = () => {
         e.preventDefault();
         try {
             await logout();
+            toast.success("Successfully logged out!");
             setIsUserDropdownOpen(false);
             closeMenu();
         } catch (error) {
