@@ -68,7 +68,7 @@ const BusinessList = ({ searchTerm, filters }) => {
     // Attach scroll listener
     useEffect(() => {
         const throttledScroll = throttle(handleScroll, 200);
-        window.addEventListener("scroll", throttledScroll);
+        window.addEventListener("scroll", throttledScroll, { passive: true });
         return () => window.removeEventListener("scroll", throttledScroll);
     }, [handleScroll]);
 

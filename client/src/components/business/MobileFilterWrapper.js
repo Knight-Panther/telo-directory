@@ -35,7 +35,7 @@ const MobileFilterWrapper = ({ filters, onFilterChange }) => {
     useEffect(() => {
         if (isMobile) {
             const throttledScroll = throttle(handleScroll, 100);
-            window.addEventListener("scroll", throttledScroll);
+            window.addEventListener("scroll", throttledScroll, { passive: true });
             return () => window.removeEventListener("scroll", throttledScroll);
         }
     }, [isMobile, handleScroll]);
