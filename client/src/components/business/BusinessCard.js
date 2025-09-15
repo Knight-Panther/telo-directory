@@ -252,22 +252,17 @@ const BusinessCard = ({ business }) => {
                         <span className="city">{city}</span>
                     </div>
 
-                    {/* Description (PRESERVED - no changes) */}
-                    {shortDescription && (
-                        <p className="description">{shortDescription}</p>
-                    )}
+                    {/* Description - always rendered to maintain consistent spacing */}
+                    <p className="description">{shortDescription || ''}</p>
 
                     {/*Contact section (PRESERVED - no changes) */}
                     <div className="business-contact">
                         <span className="mobile">{mobile}</span>
                     </div>
 
-                    {/* Social Links with Official Logos */}
-                    {(socialLinks?.facebook ||
-                        socialLinks?.instagram ||
-                        socialLinks?.tiktok) && (
-                        <div className="social-links">
-                            {socialLinks.facebook && (
+                    {/* Social Links - always rendered to maintain consistent card heights */}
+                    <div className="social-links">
+                        {socialLinks?.facebook && (
                                 <a
                                     href={socialLinks.facebook}
                                     target="_blank"
@@ -284,7 +279,7 @@ const BusinessCard = ({ business }) => {
                                     </svg>
                                 </a>
                             )}
-                            {socialLinks.instagram && (
+                        {socialLinks?.instagram && (
                                 <a
                                     href={socialLinks.instagram}
                                     target="_blank"
@@ -301,7 +296,7 @@ const BusinessCard = ({ business }) => {
                                     </svg>
                                 </a>
                             )}
-                            {socialLinks.tiktok && (
+                        {socialLinks?.tiktok && (
                                 <a
                                     href={socialLinks.tiktok}
                                     target="_blank"
@@ -318,8 +313,7 @@ const BusinessCard = ({ business }) => {
                                     </svg>
                                 </a>
                             )}
-                        </div>
-                    )}
+                    </div>
                 </div>
             </div>
 
