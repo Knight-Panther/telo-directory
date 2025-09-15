@@ -1,9 +1,10 @@
 // client/src/components/business/BusinessCard.js
-import React, { useState, useEffect, Suspense, memo, useMemo, useCallback } from "react";
+import React, { useState, useEffect, Suspense, memo, useMemo, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import LazyImage from "../common/LazyImage";
 import StarRating from "../common/StarRating";
 import LoadingSpinner from "../common/LoadingSpinner";
+import ActionButton from "./ActionButtons";
 import { useUserAuth } from "../../contexts/UserAuthContext";
 import toast from "react-hot-toast";
 // CSS loaded at page level - removed duplicate import
@@ -64,15 +65,25 @@ const BusinessCard = memo(({ business }) => {
         setIsReportModalOpen(false);
     }, []);
 
-    // ARIA label helper functions
-    const getFavoriteAriaLabel = () => {
-        if (isLoading) return "Updating favorites";
-        return isFavorited
-            ? `Remove ${businessName} from favorites`
-            : `Add ${businessName} to favorites`;
-    };
 
-    const getReportAriaLabel = () => `Report issue with ${businessName}`;
+    // Card ref for focus management
+    const cardRef = useRef(null);
+
+    // Keyboard navigation handler
+    const handleKeyDown = useCallback((e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            // Navigate to business detail page
+            window.location.href = `/business/${_id}`;
+        }
+    }, [_id]);
+
+    // Focus management helper
+    const handleFocusManagement = useCallback(() => {
+        if (cardRef.current) {
+            cardRef.current.focus();
+        }
+    }, []);
 
     // Favorite button handler with real API calls - memoized for performance
     const handleFavoriteClick = useCallback(async (e) => {
@@ -154,7 +165,14 @@ const BusinessCard = memo(({ business }) => {
 
     return (
         <>
-            <div className="business-card business-card-mobile-horizontal">
+            <div
+                className="business-card business-card-mobile-horizontal"
+                ref={cardRef}
+                role="article"
+                tabIndex="0"
+                onKeyDown={handleKeyDown}
+                aria-label={`${businessName} business listing`}
+            >
                 {/* UPDATED: New Facebook-style circular image container */}
                 <div className="business-image-circular-container">
                     <div className="business-image-circular">
@@ -183,38 +201,21 @@ const BusinessCard = memo(({ business }) => {
 
                     {/* UPDATED: Desktop overlay icons positioned near title area */}
                     <div className="desktop-overlay-icons">
-                        <button
-                            className={`favorite-btn-overlay ${
-                                isFavorited ? "favorited" : ""
-                            } ${isLoading ? "loading" : ""}`}
+                        <ActionButton
+                            type="favorite"
+                            isActive={isFavorited}
+                            isLoading={isLoading}
                             onClick={handleFavoriteClick}
-                            disabled={isLoading}
-                            title={
-                                isLoading
-                                    ? "Updating..."
-                                    : isFavorited
-                                    ? "Remove from favorites"
-                                    : "Add to favorites"
-                            }
-                            aria-label={getFavoriteAriaLabel()}
-                        >
-                            {isLoading ? (
-                                <LoadingSpinner size="small" color="white" />
-                            ) : (
-                                <span aria-hidden="true">
-                                    {isFavorited ? "❤️" : "🤍"}
-                                </span>
-                            )}
-                        </button>
+                            businessName={businessName}
+                            size="large"
+                        />
 
-                        <button
-                            className="report-btn-overlay"
+                        <ActionButton
+                            type="report"
                             onClick={handleReportIssue}
-                            title="Report an issue with this listing"
-                            aria-label={getReportAriaLabel()}
-                        >
-                            🚩
-                        </button>
+                            businessName={businessName}
+                            size="large"
+                        />
                     </div>
                 </div>
 
@@ -230,44 +231,21 @@ const BusinessCard = memo(({ business }) => {
 
                         {/* Mobile-only icon group (hidden on desktop 1024px+) */}
                         <div className="icon-group-mobile">
-                            <button
-                                className={`favorite-btn-small ${
-                                    isFavorited ? "favorited" : ""
-                                } ${isLoading ? "loading" : ""}`}
+                            <ActionButton
+                                type="favorite"
+                                isActive={isFavorited}
+                                isLoading={isLoading}
                                 onClick={handleFavoriteClick}
-                                disabled={isLoading}
-                                title={
-                                    isLoading
-                                        ? "Updating..."
-                                        : isFavorited
-                                        ? "Remove from favorites"
-                                        : "Add to favorites"
-                                }
-                                aria-label={`${
-                                    isLoading
-                                        ? "Updating"
-                                        : isFavorited ? "Remove" : "Add"
-                                } ${businessName} ${
-                                    isFavorited ? "from" : "to"
-                                } favorites`}
-                            >
-                                {isLoading ? (
-                                <LoadingSpinner size="small" color="white" />
-                            ) : (
-                                <span aria-hidden="true">
-                                    {isFavorited ? "❤️" : "🤍"}
-                                </span>
-                            )}
-                            </button>
+                                businessName={businessName}
+                                size="small"
+                            />
 
-                            <button
-                                className="report-btn-small"
+                            <ActionButton
+                                type="report"
                                 onClick={handleReportIssue}
-                                title="Report an issue with this listing"
-                                aria-label={getReportAriaLabel()}
-                            >
-                                🚩
-                            </button>
+                                businessName={businessName}
+                                size="small"
+                            />
                         </div>
                     </div>
 

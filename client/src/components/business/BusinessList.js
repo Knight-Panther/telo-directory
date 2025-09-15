@@ -155,6 +155,24 @@ const BusinessList = ({ searchTerm, filters }) => {
 
     return (
         <div className="business-list">
+            {/* Skip link for screen readers */}
+            <a href="#business-grid" className="sr-only-focusable skip-to-content">
+                Skip to business listings
+            </a>
+
+            {/* Announce results to screen readers */}
+            <div
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                className="sr-only"
+            >
+                {isLoading
+                    ? "Loading businesses..."
+                    : `${totalResults} business${totalResults === 1 ? "" : "es"} found`
+                }
+            </div>
+
             {/* Results Header */}
             <div className="results-header">
                 <div className="results-info">
@@ -203,20 +221,29 @@ const BusinessList = ({ searchTerm, filters }) => {
                 </div>
             ) : (
                 <>
-                    <div className="business-grid">
-                        {businesses.map((business) => (
-                            <BusinessCard
-                                key={business._id}
-                                business={business}
-                            />
-                        ))}
-                    </div>
+                    {/* Main content with proper landmark */}
+                    <main id="business-grid" role="main" tabIndex="-1">
+                        <div className="business-grid" role="list">
+                            {businesses.map((business) => (
+                                <div key={business._id} role="listitem">
+                                    <BusinessCard business={business} />
+                                </div>
+                            ))}
+                        </div>
+                    </main>
 
                     {/* Loading indicator for infinite scroll */}
                     {isFetchingNextPage && (
                         <div className="loading-more">
                             <LoadingSpinner />
                             <p>Loading more businesses...</p>
+                            <div
+                                role="status"
+                                aria-live="polite"
+                                className="sr-only"
+                            >
+                                Loading more business results...
+                            </div>
                         </div>
                     )}
 
