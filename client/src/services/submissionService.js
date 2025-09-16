@@ -158,8 +158,13 @@ const submissionService = {
 
         if (!formData.mobile?.trim()) {
             errors.mobile = 'Mobile number is required';
+        } else {
+            // Georgian mobile format validation: +995XXXXXXXXX (must be exactly 13 characters)
+            const georgianMobileRegex = /^\+995[0-9]{9}$/;
+            if (!georgianMobileRegex.test(formData.mobile.trim())) {
+                errors.mobile = 'Mobile number must be in Georgian format: +995XXXXXXXXX (example: +995599304009)';
+            }
         }
-        // Mobile format validation removed as requested
 
         if (!formData.submitterEmail?.trim()) {
             errors.submitterEmail = 'Email is required';
@@ -195,6 +200,15 @@ const submissionService = {
         // Social links validation
         const urlRegex = /^https?:\/\/.+/;
         const socialPlatforms = ['facebook', 'instagram', 'tiktok', 'youtube'];
+
+        // Check if at least one Facebook or Instagram link is provided
+        const hasFacebook = formData.socialLinks?.facebook?.trim();
+        const hasInstagram = formData.socialLinks?.instagram?.trim();
+
+        if (!hasFacebook && !hasInstagram) {
+            if (!errors.socialLinks) errors.socialLinks = {};
+            errors.socialLinks.required = 'At least one Facebook or Instagram link is required';
+        }
 
         socialPlatforms.forEach(platform => {
             const url = formData.socialLinks?.[platform];

@@ -540,6 +540,17 @@ const SendListingPage = () => {
                                 <span className={styles.formSectionIcon}>🌐</span>
                                 Social Media & Online Presence
                             </h3>
+                            <div style={{
+                                background: '#f0f8ff',
+                                padding: '12px',
+                                borderRadius: '6px',
+                                marginBottom: '16px',
+                                border: '1px solid #b3d7ff',
+                                fontSize: '0.9rem',
+                                color: '#0066cc'
+                            }}>
+                                <strong>📌 Required:</strong> Please provide at least one Facebook or Instagram link to help customers find your business online.
+                            </div>
 
                             <div className={styles.socialLinksGrid}>
                                 {[
@@ -575,6 +586,14 @@ const SendListingPage = () => {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Social links requirement error */}
+                            {errors.socialLinks?.required && (
+                                <div className={styles.fieldError} style={{ marginTop: '12px' }}>
+                                    <span className={styles.fieldErrorIcon}>⚠</span>
+                                    {errors.socialLinks.required}
+                                </div>
+                            )}
                         </div>
 
                         {/* Contact Information Section */}

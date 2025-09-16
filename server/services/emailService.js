@@ -881,6 +881,38 @@ const createBusinessSubmissionEmailTemplate = (submission) => {
                     </div>
                 </div>
 
+                ${submission.profileImageWebp || submission.profileImageAvif ? `
+                <div class="field">
+                    <label>📷 Business Profile Images:</label>
+                    <div class="field-value">
+                        ${submission.profileImageWebp ? `
+                            <div style="margin-bottom: 8px;">
+                                <strong>WebP:</strong>
+                                <a href="${EMAIL_CONFIG.baseUrl}/uploads/${submission.profileImageWebp}"
+                                   target="_blank"
+                                   style="color: #007bff; text-decoration: none;">
+                                    📸 View WebP Image
+                                </a>
+                            </div>
+                        ` : ''}
+                        ${submission.profileImageAvif ? `
+                            <div style="margin-bottom: 8px;">
+                                <strong>AVIF:</strong>
+                                <a href="${EMAIL_CONFIG.baseUrl}/uploads/${submission.profileImageAvif}"
+                                   target="_blank"
+                                   style="color: #007bff; text-decoration: none;">
+                                    📸 View AVIF Image
+                                </a>
+                            </div>
+                        ` : ''}
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 8px;">
+                            Original: ${submission.originalImage || 'Unknown'}
+                            ${submission.imageProcessedAt ? ` | Processed: ${new Date(submission.imageProcessedAt).toLocaleString()}` : ''}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+
                 <div class="copy-section">
                     <div class="copy-title">📋 Quick Copy for Admin Panel</div>
                     <div class="copy-content">Business Name: ${submission.businessName}

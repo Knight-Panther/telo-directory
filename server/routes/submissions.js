@@ -70,8 +70,13 @@ const validateSubmissionData = (req, res, next) => {
         errors.push('Invalid email format');
     }
 
-    // Mobile validation - no restrictions, just ensure it's not empty
-    // (Removed format validation as requested)
+    // Georgian mobile format validation: +995XXXXXXXXX (must be exactly 13 characters)
+    if (mobile && mobile.trim()) {
+        const georgianMobileRegex = /^\+995[0-9]{9}$/;
+        if (!georgianMobileRegex.test(mobile.trim())) {
+            errors.push('Mobile number must be in Georgian format: +995XXXXXXXXX (example: +995599304009)');
+        }
+    }
 
     // Cities validation
     let parsedCities = [];
@@ -108,6 +113,14 @@ const validateSubmissionData = (req, res, next) => {
             : socialLinks || {};
     } catch (e) {
         errors.push('Social links must be valid JSON');
+    }
+
+    // Check if at least one Facebook or Instagram link is provided
+    const hasFacebook = parsedSocialLinks.facebook?.trim();
+    const hasInstagram = parsedSocialLinks.instagram?.trim();
+
+    if (!hasFacebook && !hasInstagram) {
+        errors.push('At least one Facebook or Instagram link is required');
     }
 
     // URL validation for social links
