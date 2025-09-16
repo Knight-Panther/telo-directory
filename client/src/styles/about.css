@@ -21,18 +21,21 @@
    HORIZONTAL STICKY NAVIGATION - Mobile First
    ======================================== */
 .about-nav {
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 500;
+    left: 0;
+    right: 0;
+    z-index: 1020;
     background: var(--white);
-    opacity: 0;
+    box-shadow: var(--shadow-xs);
     transform: translateY(-100%);
-    transition: all 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    opacity: 0;
 }
 
 .about-nav.sticky {
-    opacity: 1;
     transform: translateY(0);
+    opacity: 1;
 }
 
 .about-nav-container {
