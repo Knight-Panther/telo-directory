@@ -1,25 +1,12 @@
 // client/src/pages/SendListingPage.js
 import React, { useState, useEffect } from 'react';
-import CityMultiSelect from '../components/forms/CityMultiSelect';
-import CategoryMultiSelect from '../components/forms/CategoryMultiSelect';
+import GenericMultiSelect from '../components/forms/GenericMultiSelect';
 import ImageUpload from '../components/forms/ImageUpload';
 import submissionService from '../services/submissionService';
+import { GEORGIAN_CITIES, BUSINESS_CATEGORIES } from '../constants/formData';
 import styles from '../styles/send-listing.module.css';
 
-// Static data arrays
-const GEORGIAN_CITIES = [
-    'Tbilisi', 'Batumi', 'Kutaisi', 'Rustavi', 'Gori', 'Zugdidi', 'Poti', 'Telavi',
-    'Ozurgeti', 'Ambrolauri', 'Kobuleti', 'Khashuri', 'Samtredia', 'Senaki',
-    'Zestaponi', 'Marneuli', 'Akhalkalaki', 'Lagodekhi', 'Bolnisi', 'Gardabani',
-    'Akhaltsikhe', 'Mtskheta', 'Kaspi', 'Kvareli', 'Sighnaghi', 'Gurjaani',
-    'Dusheti', 'Tianeti', 'Kareli', 'Khoni'
-];
-
-const BUSINESS_CATEGORIES = [
-    'General Construction', 'Kitchen Renovation', 'Bathroom Renovation', 'Painting',
-    'Electrical Work', 'Plumbing', 'Flooring', 'Roofing', 'Windows & Doors',
-    'Interior Design', 'Landscaping', 'Cleaning Services', 'Renovation'
-];
+// Static data loaded from constants
 
 const SendListingPage = () => {
     // Form state
@@ -394,12 +381,15 @@ const SendListingPage = () => {
                                     <label className={`${styles.formLabel} ${styles.required}`}>
                                         Business Categories
                                     </label>
-                                    <CategoryMultiSelect
-                                        categories={categories}
-                                        selectedCategories={formData.categories}
+                                    <GenericMultiSelect
+                                        items={categories}
+                                        selectedItems={formData.categories}
                                         onChange={handleCategoriesChange}
                                         error={errors.categories}
-                                        loading={categoriesLoading}
+                                        maxItems={5}
+                                        placeholder="Select business categories"
+                                        searchPlaceholder="Search categories..."
+                                        itemName="category"
                                         classNames={{
                                             container: styles.categoriesMultiselectContainer,
                                             trigger: styles.categoriesMultiselectTrigger,
@@ -407,17 +397,17 @@ const SendListingPage = () => {
                                             error: styles.error,
                                             selectedDisplay: styles.categoriesSelectedDisplay,
                                             empty: styles.empty,
-                                            categoryTag: styles.categoryTag,
-                                            categoryTagRemove: styles.categoryTagRemove,
+                                            itemTag: styles.categoryTag,
+                                            itemTagRemove: styles.categoryTagRemove,
                                             dropdownArrow: styles.categoriesDropdownArrow,
                                             dropdown: styles.categoriesDropdown,
                                             search: styles.categoriesSearch,
                                             searchInput: styles.categoriesSearchInput,
                                             list: styles.categoriesList,
-                                            categoryOption: styles.categoryOption,
+                                            itemOption: styles.categoryOption,
                                             selected: styles.selected,
                                             disabled: styles.disabled,
-                                            categoryCheckbox: styles.categoryCheckbox,
+                                            itemCheckbox: styles.categoryCheckbox,
                                             fieldError: styles.fieldError,
                                             fieldErrorIcon: styles.fieldErrorIcon
                                         }}
@@ -483,12 +473,15 @@ const SendListingPage = () => {
                                 <label className={`${styles.formLabel} ${styles.required}`}>
                                     Service Areas
                                 </label>
-                                <CityMultiSelect
-                                    cities={cities}
-                                    selectedCities={formData.cities}
+                                <GenericMultiSelect
+                                    items={cities}
+                                    selectedItems={formData.cities}
                                     onChange={handleCitiesChange}
                                     error={errors.cities}
-                                    loading={citiesLoading}
+                                    maxItems={10}
+                                    placeholder="Select cities where you operate"
+                                    searchPlaceholder="Search cities..."
+                                    itemName="city"
                                     classNames={{
                                         container: styles.citiesMultiselectContainer,
                                         trigger: styles.citiesMultiselectTrigger,
@@ -496,17 +489,17 @@ const SendListingPage = () => {
                                         error: styles.error,
                                         selectedDisplay: styles.citiesSelectedDisplay,
                                         empty: styles.empty,
-                                        cityTag: styles.cityTag,
-                                        cityTagRemove: styles.cityTagRemove,
+                                        itemTag: styles.cityTag,
+                                        itemTagRemove: styles.cityTagRemove,
                                         dropdownArrow: styles.citiesDropdownArrow,
                                         dropdown: styles.citiesDropdown,
                                         search: styles.citiesSearch,
                                         searchInput: styles.citiesSearchInput,
                                         list: styles.citiesList,
-                                        cityOption: styles.cityOption,
+                                        itemOption: styles.cityOption,
                                         selected: styles.selected,
                                         disabled: styles.disabled,
-                                        cityCheckbox: styles.cityCheckbox,
+                                        itemCheckbox: styles.cityCheckbox,
                                         fieldError: styles.fieldError,
                                         fieldErrorIcon: styles.fieldErrorIcon
                                     }}
