@@ -319,6 +319,152 @@
 }
 
 /* ========================================
+   CATEGORIES MULTI-SELECT - Mobile First
+   ======================================== */
+.categoriesMultiselectContainer {
+    position: relative;
+}
+
+.categoriesMultiselectTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: var(--radius-md);
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.categoriesMultiselectTrigger:hover {
+    border-color: var(--primary-blue);
+}
+
+.categoriesMultiselectTrigger.open {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.categoriesSelectedDisplay {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 24px;
+}
+
+.categoriesSelectedDisplay.empty {
+    color: var(--gray-500);
+    font-size: 0.95rem;
+}
+
+.categoryTag {
+    background: var(--primary-blue);
+    color: white;
+    padding: 4px 8px;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.categoryTagRemove {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9rem;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.categoryTagRemove:hover {
+    opacity: 1;
+}
+
+.categoriesDropdownArrow {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    transition: transform 0.3s ease;
+}
+
+.categoriesMultiselectTrigger.open .categoriesDropdownArrow {
+    transform: rotate(180deg);
+}
+
+.categoriesDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: white;
+    border: 2px solid var(--primary-blue);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.categoriesSearch {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.categoriesSearchInput {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.categoriesSearchInput:focus {
+    border-color: var(--primary-blue);
+}
+
+.categoriesList {
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+.categoryOption {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.9rem;
+}
+
+.categoryOption:hover {
+    background: #f8f9fa;
+}
+
+.categoryOption.selected {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--primary-blue);
+    font-weight: 500;
+}
+
+.categoryCheckbox {
+    margin-right: 10px;
+    accent-color: var(--primary-blue);
+}
+
+/* ========================================
    MOBILE FORMAT INPUT - Mobile First
    ======================================== */
 .mobileInputContainer {

@@ -75,7 +75,7 @@ const submissionService = {
 
             // Append all form fields
             Object.keys(formData).forEach(key => {
-                if (key === 'cities' || key === 'socialLinks') {
+                if (key === 'cities' || key === 'categories' || key === 'socialLinks') {
                     // JSON stringify arrays and objects
                     submitData.append(key, JSON.stringify(formData[key]));
                 } else if (key === 'profileImage' && formData[key]) {
@@ -90,7 +90,7 @@ const submissionService = {
             // Log form data for debugging (excluding file)
             console.log('📝 Submitting business listing:', {
                 businessName: formData.businessName,
-                category: formData.category,
+                categories: formData.categories,
                 cities: formData.cities,
                 hasImage: !!formData.profileImage
             });
@@ -144,8 +144,8 @@ const submissionService = {
             errors.businessName = 'Business name is required';
         }
 
-        if (!formData.category?.trim()) {
-            errors.category = 'Category is required';
+        if (!formData.categories || formData.categories.length === 0) {
+            errors.categories = 'At least one business category must be selected';
         }
 
         if (!formData.businessType) {

@@ -17,10 +17,11 @@ const businessSubmissionSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-        category: {
+        categories: [{
             type: String,
             required: true,
-        },
+            trim: true,
+        }], // Changed from single category to categories array
         businessType: {
             type: String,
             enum: ["individual", "company"],

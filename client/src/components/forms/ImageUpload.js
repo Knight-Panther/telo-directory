@@ -1,5 +1,5 @@
 // client/src/components/forms/ImageUpload.js
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import submissionService from '../../services/submissionService';
 
 const ImageUpload = ({
@@ -8,13 +8,27 @@ const ImageUpload = ({
     required = true,
     maxSize = 10, // MB
     acceptedFormats = ['JPEG', 'JPG', 'PNG', 'WebP', 'AVIF', 'TIFF', 'GIF'],
-    classNames = {}
+    classNames = {},
+    clearTrigger = null // When this value changes, clear the image
 }) => {
     const [dragOver, setDragOver] = useState(false);
     const [preview, setPreview] = useState(null);
     const [fileInfo, setFileInfo] = useState(null);
     const [validationError, setValidationError] = useState('');
     const fileInputRef = useRef(null);
+
+    // Handle external clear trigger
+    useEffect(() => {
+        if (clearTrigger !== null && clearTrigger > 0) {
+            setPreview(null);
+            setFileInfo(null);
+            setValidationError('');
+            onImageChange(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    }, [clearTrigger, onImageChange]);
 
     // Handle file selection
     const handleFileSelect = useCallback((file) => {
@@ -59,7 +73,7 @@ const ImageUpload = ({
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
-    }, [onImageChange]);
+    }, []);
 
     // Handle file input change
     const handleInputChange = (e) => {

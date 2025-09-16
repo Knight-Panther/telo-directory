@@ -40,7 +40,7 @@ const upload = multer({
 const validateSubmissionData = (req, res, next) => {
     const {
         businessName,
-        category,
+        categories, // Changed from category to categories
         businessType,
         cities,
         mobile,
@@ -56,7 +56,18 @@ const validateSubmissionData = (req, res, next) => {
 
     // Required fields validation
     if (!businessName?.trim()) errors.push('Business name is required');
-    if (!category?.trim()) errors.push('Category is required');
+
+    // Categories validation
+    let parsedCategories = [];
+    try {
+        parsedCategories = Array.isArray(categories) ? categories : JSON.parse(categories || '[]');
+    } catch (e) {
+        errors.push('Categories must be a valid array');
+    }
+
+    if (parsedCategories.length === 0) {
+        errors.push('At least one business category must be selected');
+    }
     if (!businessType || !['individual', 'company'].includes(businessType)) {
         errors.push('Business type must be either "individual" or "company"');
     }
@@ -143,7 +154,7 @@ const validateSubmissionData = (req, res, next) => {
     // Add validated data to request
     req.validatedData = {
         businessName: businessName.trim(),
-        category: category.trim(),
+        categories: parsedCategories, // Changed from category to categories array
         businessType,
         cities: cityValidation.cities,
         mobile: mobile.trim(),
@@ -291,7 +302,7 @@ router.post('/create', upload.single('profileImage'), validateSubmissionData, as
             submission: {
                 id: submission.submissionId,
                 businessName: submission.businessName,
-                category: submission.category,
+                categories: submission.categories,
                 cities: submission.cities,
                 status: submission.status,
                 submittedAt: submission.submittedAt,

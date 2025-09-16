@@ -1,6 +1,7 @@
 // client/src/pages/SendListingPage.js
 import React, { useState } from 'react';
 import CityMultiSelect from '../components/forms/CityMultiSelect';
+import CategoryMultiSelect from '../components/forms/CategoryMultiSelect';
 import ImageUpload from '../components/forms/ImageUpload';
 import submissionService from '../services/submissionService';
 import styles from '../styles/send-listing.module.css';
@@ -24,7 +25,7 @@ const SendListingPage = () => {
     // Form state
     const [formData, setFormData] = useState({
         businessName: '',
-        category: '',
+        categories: [], // Changed from category to categories array
         businessType: 'individual',
         cities: [],
         mobile: '+995',
@@ -47,6 +48,7 @@ const SendListingPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error'
     const [submitMessage, setSubmitMessage] = useState('');
+    const [imageClearTrigger, setImageClearTrigger] = useState(0);
 
     // Use static data arrays
     const cities = GEORGIAN_CITIES;
@@ -107,6 +109,15 @@ const SendListingPage = () => {
 
         if (errors.cities) {
             setErrors(prev => ({ ...prev, cities: '' }));
+        }
+    };
+
+    // Handle categories change
+    const handleCategoriesChange = (selectedCategories) => {
+        setFormData(prev => ({ ...prev, categories: selectedCategories }));
+
+        if (errors.categories) {
+            setErrors(prev => ({ ...prev, categories: '' }));
         }
     };
 
@@ -182,7 +193,7 @@ const SendListingPage = () => {
             // Reset form
             setFormData({
                 businessName: '',
-                category: '',
+                categories: [], // Changed from category to categories array
                 businessType: 'individual',
                 cities: [],
                 mobile: '+995',
@@ -200,6 +211,9 @@ const SendListingPage = () => {
                 submitterName: ''
             });
             setErrors({});
+
+            // Clear image by triggering clearTrigger
+            setImageClearTrigger(Date.now());
 
             // Scroll to success message
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -219,7 +233,7 @@ const SendListingPage = () => {
         if (window.confirm('Are you sure you want to clear all form data?')) {
             setFormData({
                 businessName: '',
-                category: '',
+                categories: [], // Changed from category to categories array
                 businessType: 'individual',
                 cities: [],
                 mobile: '+995',
@@ -239,6 +253,9 @@ const SendListingPage = () => {
             setErrors({});
             setSubmitStatus(null);
             setSubmitMessage('');
+
+            // Clear image by triggering clearTrigger
+            setImageClearTrigger(Date.now());
         }
     };
 
@@ -302,33 +319,37 @@ const SendListingPage = () => {
                                 </div>
 
                                 <div className={`${styles.formGroup} ${styles.half}`}>
-                                    <label htmlFor="category" className={`${styles.formLabel} ${styles.required}`}>
-                                        Category
+                                    <label className={`${styles.formLabel} ${styles.required}`}>
+                                        Business Categories
                                     </label>
-                                    <select
-                                        id="category"
-                                        name="category"
-                                        className={`${styles.formSelect} ${errors.category ? styles.error : ''}`}
-                                        value={formData.category}
-                                        onChange={handleInputChange}
-                                        disabled={categoriesLoading}
-                                        aria-describedby={errors.category ? 'category-error' : undefined}
-                                    >
-                                        <option value="">
-                                            {categoriesLoading ? 'Loading categories...' : 'Select category'}
-                                        </option>
-                                        {categories.map((category) => (
-                                            <option key={category} value={category}>
-                                                {category}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.category && (
-                                        <div id="category-error" className={styles.fieldError}>
-                                            <span className={styles.fieldErrorIcon}>⚠</span>
-                                            {errors.category}
-                                        </div>
-                                    )}
+                                    <CategoryMultiSelect
+                                        categories={categories}
+                                        selectedCategories={formData.categories}
+                                        onChange={handleCategoriesChange}
+                                        error={errors.categories}
+                                        loading={categoriesLoading}
+                                        classNames={{
+                                            container: styles.categoriesMultiselectContainer,
+                                            trigger: styles.categoriesMultiselectTrigger,
+                                            open: styles.open,
+                                            error: styles.error,
+                                            selectedDisplay: styles.categoriesSelectedDisplay,
+                                            empty: styles.empty,
+                                            categoryTag: styles.categoryTag,
+                                            categoryTagRemove: styles.categoryTagRemove,
+                                            dropdownArrow: styles.categoriesDropdownArrow,
+                                            dropdown: styles.categoriesDropdown,
+                                            search: styles.categoriesSearch,
+                                            searchInput: styles.categoriesSearchInput,
+                                            list: styles.categoriesList,
+                                            categoryOption: styles.categoryOption,
+                                            selected: styles.selected,
+                                            disabled: styles.disabled,
+                                            categoryCheckbox: styles.categoryCheckbox,
+                                            fieldError: styles.fieldError,
+                                            fieldErrorIcon: styles.fieldErrorIcon
+                                        }}
+                                    />
                                 </div>
                             </div>
 
@@ -515,6 +536,7 @@ const SendListingPage = () => {
                                 error={errors.profileImage}
                                 required={true}
                                 maxSize={10}
+                                clearTrigger={imageClearTrigger}
                                 classNames={{
                                     container: styles.imageUploadContainer,
                                     dragover: styles.dragover,

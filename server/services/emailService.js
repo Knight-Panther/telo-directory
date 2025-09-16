@@ -771,6 +771,10 @@ const createBusinessSubmissionEmailTemplate = (submission) => {
         `<span class="city-tag">${city}</span>`
     ).join('');
 
+    const categoriesTags = submission.categories.map(category =>
+        `<span class="city-tag">${category}</span>`
+    ).join('');
+
     const socialLinksHtml = Object.entries(submission.socialLinks || {})
         .filter(([key, value]) => value && value.trim())
         .map(([platform, url]) =>
@@ -827,8 +831,10 @@ const createBusinessSubmissionEmailTemplate = (submission) => {
                 </div>
 
                 <div class="field">
-                    <label>Category:</label>
-                    <div class="field-value">${submission.category}</div>
+                    <label>Categories (${submission.categories.length}):</label>
+                    <div class="field-value">
+                        <div class="cities-list">${categoriesTags}</div>
+                    </div>
                 </div>
 
                 <div class="field">
@@ -916,7 +922,7 @@ const createBusinessSubmissionEmailTemplate = (submission) => {
                 <div class="copy-section">
                     <div class="copy-title">📋 Quick Copy for Admin Panel</div>
                     <div class="copy-content">Business Name: ${submission.businessName}
-Category: ${submission.category}
+Categories: ${submission.categories.join(', ')}
 Business Type: ${submission.businessType}
 City: ${submission.cities[0]}${submission.cities.length > 1 ? ` (+ ${submission.cities.length - 1} more)` : ''}
 Mobile: ${submission.mobile}
@@ -976,7 +982,7 @@ const createSubmissionConfirmationTemplate = (submission) => {
                     <h3>📋 Submission Details</h3>
                     <p><strong>Submission ID:</strong> ${submission.submissionId}</p>
                     <p><strong>Business Name:</strong> ${submission.businessName}</p>
-                    <p><strong>Category:</strong> ${submission.category}</p>
+                    <p><strong>Categories:</strong> ${submission.categories.join(', ')}</p>
                     <p><strong>Cities:</strong> ${submission.cities.join(', ')}</p>
                     <p><strong>Status:</strong> <span style="color: #ffc107; font-weight: bold;">Pending Review</span></p>
                 </div>
@@ -1027,7 +1033,7 @@ New Business Submission Received
 
 Submission ID: ${submission.submissionId}
 Business Name: ${submission.businessName}
-Category: ${submission.category}
+Categories: ${submission.categories.join(', ')}
 Business Type: ${submission.businessType}
 Cities: ${submission.cities.join(', ')}
 Mobile: ${submission.mobile}
@@ -1071,7 +1077,7 @@ Your business listing submission has been received!
 Submission Details:
 - Submission ID: ${submission.submissionId}
 - Business Name: ${submission.businessName}
-- Category: ${submission.category}
+- Categories: ${submission.categories.join(', ')}
 - Cities: ${submission.cities.join(', ')}
 - Status: Pending Review
 
