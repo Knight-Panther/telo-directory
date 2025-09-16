@@ -4,29 +4,32 @@
    ======================================== */
 
 /* ========================================
-   CONSTRUCTION HERO BACKGROUND - OPTIMIZED
+   CONSTRUCTION HERO BACKGROUND - RESPONSIVE OPTIMIZED
    ======================================== */
 .hero-construction-bg {
-    background-image: url("../assets/images/hero/construction-hero.jpg");
+    /* Use CSS custom property set by React hook */
+    background-image: var(--hero-bg-image);
     background-size: 150%;
-    background-position: center left;
+    background-position: center center;
     background-repeat: no-repeat;
     position: relative;
-    min-height: 350px; /* REDUCED from 500px */
+    min-height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
+    padding: var(--spacing-lg, 1.5rem);
+    /* Smooth transition when image changes */
+    transition: opacity 0.3s ease-in-out;
 }
 
-/* Performance optimization - preload hint */
-.hero-construction-bg::after {
-    content: "";
-    position: absolute;
-    background-image: url("../assets/images/hero/construction-hero.jpg");
-    background-size: 1px 1px;
-    opacity: 0;
-    z-index: -1;
+/* Loading state styling */
+.hero-construction-bg[style*="--hero-image-loaded: 0"] {
+    opacity: 0.8;
+}
+
+.hero-construction-bg[style*="--hero-image-loaded: 1"] {
+    opacity: 1;
 }
 
 /* ========================================
@@ -50,62 +53,40 @@
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-/* Mobile First - Base (up to 480px) */
-.hero-construction-bg {
-    background-position: center center;
-    min-height: 300px; /* REDUCED from 400px */
-    padding: var(--spacing-lg);
-}
+/* ========================================
+   RESPONSIVE MEDIA QUERIES - OPTIMIZED FOR NEW IMAGE SYSTEM
+   ======================================== */
 
-/* iPhone Standard (375px+) */
-@media (min-width: 375px) {
-    .hero-section {
-        min-height: 420px;
-    }
-    
-    .hero-title {
-        font-size: 1.8rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1rem;
-    }
-}
+/* Mobile First - Base styles are defined above */
 
-/* iPhone Plus/Max (414px+) */
-@media (min-width: 414px) {
-    .hero-section {
-        min-height: 450px;
-    }
-    
-    .hero-title {
-        font-size: 2rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
-}
-
-/* Small Mobile to Large Mobile (480px+) */
+/* Small Mobile improvements */
 @media (min-width: 480px) {
     .hero-construction-bg {
-        min-height: 350px; /* REDUCED from 450px */
+        min-height: 350px;
     }
 }
 
-/* Tablet Portrait (768px+) */
+/* Tablet Portrait (768px+) - Uses 1600px images */
 @media (min-width: 768px) {
     .hero-construction-bg {
-        min-height: 400px; /* REDUCED from 500px */
+        min-height: 400px;
+        background-position: center left;
     }
 }
 
-/* Desktop (1024px+) */
+/* Desktop (1024px+) - Uses 2400px images */
 @media (min-width: 1024px) {
     .hero-construction-bg {
         background-size: 100%;
-        min-height: 450px; /* REDUCED from 600px */
-        background-attachment: scroll; /* CHANGED from fixed for better performance */
+        min-height: 450px;
+        background-attachment: scroll; /* Better performance than fixed */
+    }
+}
+
+/* Large Desktop (1440px+) - Optimized for larger screens */
+@media (min-width: 1440px) {
+    .hero-construction-bg {
+        background-size: cover;
+        min-height: 500px;
     }
 }

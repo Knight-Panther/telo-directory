@@ -16,7 +16,8 @@
       "Bash(npx eslint:*)",
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
-      "Bash(set PORT=3002)"
+      "Bash(set PORT=3002)",
+      "Bash(cmd /c:*)"
     ],
     "deny": [],
     "ask": []
