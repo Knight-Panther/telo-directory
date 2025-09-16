@@ -56,6 +56,9 @@ const adminReportsRoutes = require("./routes/admin/reports");
 // NEW: Import user cleanup service for delayed deletion
 const userCleanupService = require("./services/userCleanupService");
 
+// NEW: Import submission routes
+const submissionRoutes = require("./routes/submissions");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -86,6 +89,10 @@ const startServer = async () => {
 
         // NEW: Public reports routes (for user submissions)
         app.use("/api/reports", reportsRoutes);
+
+        // NEW: Business submission routes
+        app.use("/api/submissions", submissionRoutes);
+
         // Add this line with your other route registrations
         app.use("/api/auth", emailVerificationRoutes);
 

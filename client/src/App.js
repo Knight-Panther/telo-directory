@@ -27,6 +27,8 @@ const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
 // Secondary pages - lazy loaded
 const AboutPage = React.lazy(() => import("./pages/AboutPage"));
 const ContactPage = React.lazy(() => import("./pages/ContactPage"));
+// NEW: Business listing page - lazy loaded
+const SendListingPage = React.lazy(() => import("./pages/SendListingPage"));
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -54,6 +56,10 @@ function App() {
                                 <Route
                                     path="/contact"
                                     element={<ContactPage />}
+                                />
+                                <Route
+                                    path="/send-listing"
+                                    element={<SendListingPage />}
                                 />
                                 <Route
                                     path="/business/:id"

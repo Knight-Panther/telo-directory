@@ -12,6 +12,7 @@ require("dotenv").config();
  * - Email verification for new registrations
  * - Email change verification for existing users
  * - Password reset emails (future enhancement)
+ * - Business submission notifications (admin + user confirmations)
  *
  * Features:
  * - Retry logic with exponential backoff
@@ -762,12 +763,319 @@ const isValidEmail = (email) => {
     return emailRegex.test(email);
 };
 
+/**
+ * HTML Email Template for Business Submission (Admin Notification)
+ */
+const createBusinessSubmissionEmailTemplate = (submission) => {
+    const citiesTags = submission.cities.map(city =>
+        `<span class="city-tag">${city}</span>`
+    ).join('');
+
+    const socialLinksHtml = Object.entries(submission.socialLinks || {})
+        .filter(([key, value]) => value && value.trim())
+        .map(([platform, url]) =>
+            `<div><strong>${platform.charAt(0).toUpperCase() + platform.slice(1)}:</strong> ${url}</div>`
+        ).join('');
+
+    return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Business Submission - TELO Directory</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f8f9fa; margin: 0; padding: 20px; }
+            .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+            .header h1 { font-size: 28px; margin: 0 0 10px 0; font-weight: 600; }
+            .content { padding: 30px; }
+            .field { margin-bottom: 20px; }
+            .field label { font-weight: bold; color: #495057; display: block; margin-bottom: 5px; }
+            .field-value { padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #007bff; }
+            .cities-list { display: flex; flex-wrap: wrap; gap: 8px; }
+            .city-tag { background: #007bff; color: white; padding: 6px 12px; border-radius: 15px; font-size: 14px; font-weight: 500; }
+            .certificate-yes { color: #28a745; font-weight: bold; }
+            .certificate-no { color: #6c757d; }
+            .copy-section { background: #e9ecef; padding: 20px; border-radius: 8px; margin-top: 30px; }
+            .copy-title { font-weight: bold; margin-bottom: 15px; color: #495057; font-size: 16px; }
+            .copy-content { background: white; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 14px; line-height: 1.4; white-space: pre-line; border: 1px solid #dee2e6; }
+            .submission-id { background: #fff3cd; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-weight: bold; display: inline-block; }
+            @media (max-width: 600px) {
+                .container { margin: 10px; border-radius: 8px; }
+                .header, .content { padding: 20px; }
+                .cities-list { gap: 6px; }
+                .city-tag { padding: 4px 8px; font-size: 12px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎯 New Business Submission</h1>
+                <p>Submission ID: <span class="submission-id">${submission.submissionId}</span></p>
+                <p>Submitted: ${new Date(submission.submittedAt).toLocaleString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                })}</p>
+            </div>
+
+            <div class="content">
+                <div class="field">
+                    <label>Business Name:</label>
+                    <div class="field-value">${submission.businessName}</div>
+                </div>
+
+                <div class="field">
+                    <label>Category:</label>
+                    <div class="field-value">${submission.category}</div>
+                </div>
+
+                <div class="field">
+                    <label>Business Type:</label>
+                    <div class="field-value">${submission.businessType}</div>
+                </div>
+
+                <div class="field">
+                    <label>Cities (${submission.cities.length}):</label>
+                    <div class="field-value">
+                        <div class="cities-list">${citiesTags}</div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Mobile:</label>
+                    <div class="field-value">${submission.mobile}</div>
+                </div>
+
+                ${submission.shortDescription ? `
+                <div class="field">
+                    <label>Description:</label>
+                    <div class="field-value">${submission.shortDescription}</div>
+                </div>
+                ` : ''}
+
+                <div class="field">
+                    <label>Certificate:</label>
+                    <div class="field-value">
+                        <span class="${submission.hasCertificate ? 'certificate-yes' : 'certificate-no'}">
+                            ${submission.hasCertificate ? 'YES' : 'NO'}
+                        </span>
+                        ${submission.hasCertificate && submission.certificateDescription ?
+                            `<br><small><em>${submission.certificateDescription}</em></small>` : ''}
+                    </div>
+                </div>
+
+                ${socialLinksHtml ? `
+                <div class="field">
+                    <label>Social Links:</label>
+                    <div class="field-value">${socialLinksHtml}</div>
+                </div>
+                ` : ''}
+
+                <div class="field">
+                    <label>Submitter:</label>
+                    <div class="field-value">
+                        <strong>${submission.submitterName}</strong><br>
+                        <a href="mailto:${submission.submitterEmail}">${submission.submitterEmail}</a>
+                    </div>
+                </div>
+
+                <div class="copy-section">
+                    <div class="copy-title">📋 Quick Copy for Admin Panel</div>
+                    <div class="copy-content">Business Name: ${submission.businessName}
+Category: ${submission.category}
+Business Type: ${submission.businessType}
+City: ${submission.cities[0]}${submission.cities.length > 1 ? ` (+ ${submission.cities.length - 1} more)` : ''}
+Mobile: ${submission.mobile}
+Description: ${submission.shortDescription || ''}${submission.socialLinks?.facebook ? `
+Facebook: ${submission.socialLinks.facebook}` : ''}${submission.socialLinks?.instagram ? `
+Instagram: ${submission.socialLinks.instagram}` : ''}${submission.socialLinks?.tiktok ? `
+TikTok: ${submission.socialLinks.tiktok}` : ''}${submission.socialLinks?.youtube ? `
+YouTube: ${submission.socialLinks.youtube}` : ''}</div>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+};
+
+/**
+ * HTML Email Template for Business Submission Confirmation (User)
+ */
+const createSubmissionConfirmationTemplate = (submission) => {
+    return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Submission Received - TELO Directory</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f8f9fa; margin: 0; padding: 20px; }
+            .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden; }
+            .header { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 40px 30px; text-align: center; }
+            .header h1 { font-size: 28px; margin: 0 0 10px 0; font-weight: 600; }
+            .content { padding: 40px 30px; }
+            .submission-details { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .next-steps { background: #d1ecf1; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #17a2b8; }
+            .next-steps h3 { margin: 0 0 15px 0; color: #0c5460; }
+            .next-steps ol { margin: 10px 0; padding-left: 20px; }
+            .next-steps li { margin-bottom: 8px; color: #0c5460; }
+            .footer { background: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; border-top: 1px solid #e2e8f0; }
+            @media (max-width: 600px) {
+                .container { margin: 10px; border-radius: 8px; }
+                .header, .content { padding: 30px 20px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>✅ Submission Received!</h1>
+                <p>Thank you, ${submission.submitterName}</p>
+            </div>
+
+            <div class="content">
+                <p>Your business listing submission has been successfully received and is now under review by our team.</p>
+
+                <div class="submission-details">
+                    <h3>📋 Submission Details</h3>
+                    <p><strong>Submission ID:</strong> ${submission.submissionId}</p>
+                    <p><strong>Business Name:</strong> ${submission.businessName}</p>
+                    <p><strong>Category:</strong> ${submission.category}</p>
+                    <p><strong>Cities:</strong> ${submission.cities.join(', ')}</p>
+                    <p><strong>Status:</strong> <span style="color: #ffc107; font-weight: bold;">Pending Review</span></p>
+                </div>
+
+                <div class="next-steps">
+                    <h3>🔄 What happens next?</h3>
+                    <ol>
+                        <li>Our team will review your submission within <strong>2-3 business days</strong></li>
+                        <li>We may contact you if additional information is needed</li>
+                        <li>Once approved, your business will appear in our directory</li>
+                        <li>You'll receive a confirmation email when your listing goes live</li>
+                    </ol>
+                </div>
+
+                <p><strong>Important:</strong> Please save this email for your records. Your submission ID is <code>${submission.submissionId}</code>.</p>
+
+                <p>If you have any questions about your submission, please reply to this email and include your submission ID.</p>
+            </div>
+
+            <div class="footer">
+                <p><strong>TELO Directory Team</strong></p>
+                <p>Connecting businesses across Georgia 🇬🇪</p>
+                <p style="margin-top: 15px; font-size: 12px;">
+                    This is an automated confirmation. Please do not reply unless you have questions.
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+};
+
+/**
+ * Send business submission notification to admin
+ */
+const sendBusinessSubmissionNotification = async (submission, ipAddress = null) => {
+    console.log(`📧 Sending business submission notification for: ${submission.submissionId}`);
+
+    // Admin notification email
+    const adminMailOptions = {
+        from: `"${EMAIL_CONFIG.fromName}" <${EMAIL_CONFIG.fromAddress}>`,
+        to: EMAIL_CONFIG.fromAddress, // Send to admin email
+        subject: `🎯 New Business Submission - ${submission.businessName} (${submission.submissionId})`,
+        html: createBusinessSubmissionEmailTemplate(submission),
+        // Text fallback
+        text: `
+New Business Submission Received
+
+Submission ID: ${submission.submissionId}
+Business Name: ${submission.businessName}
+Category: ${submission.category}
+Business Type: ${submission.businessType}
+Cities: ${submission.cities.join(', ')}
+Mobile: ${submission.mobile}
+${submission.shortDescription ? `Description: ${submission.shortDescription}` : ''}
+Certificate: ${submission.hasCertificate ? 'YES' : 'NO'}${submission.certificateDescription ? ` (${submission.certificateDescription})` : ''}
+
+Submitter: ${submission.submitterName} (${submission.submitterEmail})
+Submitted: ${new Date(submission.submittedAt).toLocaleString()}
+
+Review at: ${EMAIL_CONFIG.baseUrl}/admin/submissions
+        `.trim(),
+    };
+
+    try {
+        const result = await sendEmailWithRetry(adminMailOptions);
+        console.log(`✅ Admin notification sent successfully for submission: ${submission.submissionId}`);
+        return result;
+    } catch (error) {
+        console.error(`❌ Failed to send admin notification for submission ${submission.submissionId}:`, error);
+        throw error;
+    }
+};
+
+/**
+ * Send submission confirmation to user
+ */
+const sendSubmissionConfirmation = async (submission) => {
+    console.log(`📧 Sending submission confirmation to: ${submission.submitterEmail}`);
+
+    const userMailOptions = {
+        from: `"${EMAIL_CONFIG.fromName}" <${EMAIL_CONFIG.fromAddress}>`,
+        to: submission.submitterEmail,
+        subject: `✅ Business Submission Received - ${submission.businessName}`,
+        html: createSubmissionConfirmationTemplate(submission),
+        // Text fallback
+        text: `
+Hello ${submission.submitterName},
+
+Your business listing submission has been received!
+
+Submission Details:
+- Submission ID: ${submission.submissionId}
+- Business Name: ${submission.businessName}
+- Category: ${submission.category}
+- Cities: ${submission.cities.join(', ')}
+- Status: Pending Review
+
+What happens next:
+1. Our team will review your submission within 2-3 business days
+2. We may contact you if additional information is needed
+3. Once approved, your business will appear in our directory
+4. You'll receive a confirmation email when your listing goes live
+
+Please save this email for your records.
+
+If you have questions, reply to this email and include your submission ID: ${submission.submissionId}
+
+Best regards,
+TELO Directory Team
+        `.trim(),
+    };
+
+    try {
+        const result = await sendEmailWithRetry(userMailOptions);
+        console.log(`✅ Confirmation sent successfully to: ${submission.submitterEmail}`);
+        return result;
+    } catch (error) {
+        console.error(`❌ Failed to send confirmation to ${submission.submitterEmail}:`, error);
+        throw error;
+    }
+};
+
 // Export all functions
 module.exports = {
     sendVerificationEmail,
     sendEmailChangeVerification,
     sendEmailChangeCode,
     sendPasswordResetEmail,
+    sendBusinessSubmissionNotification,
+    sendSubmissionConfirmation,
     generateVerificationToken,
     getTokenExpiration,
     isValidEmail,
@@ -775,5 +1083,7 @@ module.exports = {
     // Export for testing
     createVerificationEmailTemplate,
     createPasswordResetEmailTemplate,
+    createBusinessSubmissionEmailTemplate,
+    createSubmissionConfirmationTemplate,
     EMAIL_CONFIG,
 };
