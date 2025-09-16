@@ -1,5 +1,5 @@
 // client/src/pages/SendListingPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CityMultiSelect from '../components/forms/CityMultiSelect';
 import CategoryMultiSelect from '../components/forms/CategoryMultiSelect';
 import ImageUpload from '../components/forms/ImageUpload';
@@ -49,12 +49,64 @@ const SendListingPage = () => {
     const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error'
     const [submitMessage, setSubmitMessage] = useState('');
     const [imageClearTrigger, setImageClearTrigger] = useState(0);
+    const [hasError, setHasError] = useState(false);
+    const [lastSubmissionTime, setLastSubmissionTime] = useState(0);
 
     // Use static data arrays
     const cities = GEORGIAN_CITIES;
     const categories = BUSINESS_CATEGORIES;
     const citiesLoading = false;
     const categoriesLoading = false;
+
+    // Error boundary effect
+    useEffect(() => {
+        const handleError = (error) => {
+            if (process.env.NODE_ENV === 'development') {
+                console.error('SendListing Error:', error);
+            }
+            setHasError(true);
+        };
+
+        const handleUnhandledRejection = (event) => {
+            handleError(event.reason);
+        };
+
+        window.addEventListener('error', handleError);
+        window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+        return () => {
+            window.removeEventListener('error', handleError);
+            window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+        };
+    }, []);
+
+    // Error boundary render
+    if (hasError) {
+        return (
+            <div className={styles.sendListingPage}>
+                <div className={styles.sendListingContainer}>
+                    <div className={styles.errorMessage}>
+                        <h2>⚠️ Something went wrong</h2>
+                        <p>We're sorry, but there was an error loading the form. Please try refreshing the page.</p>
+                        <div style={{ marginTop: '16px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => setHasError(false)}
+                                className={`${styles.btn} ${styles.btnSecondary}`}
+                            >
+                                🔄 Try Again
+                            </button>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className={`${styles.btn} ${styles.btnPrimary}`}
+                            >
+                                🔄 Refresh Page
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Handle form field changes
     const handleInputChange = (e) => {
@@ -159,6 +211,18 @@ const SendListingPage = () => {
         setSubmitStatus(null);
         setSubmitMessage('');
 
+        // Rate limiting - 30 seconds between submissions
+        const now = Date.now();
+        const timeSinceLastSubmission = now - lastSubmissionTime;
+        const SUBMISSION_COOLDOWN = 30000; // 30 seconds
+
+        if (timeSinceLastSubmission < SUBMISSION_COOLDOWN) {
+            const remainingTime = Math.ceil((SUBMISSION_COOLDOWN - timeSinceLastSubmission) / 1000);
+            setSubmitStatus('error');
+            setSubmitMessage(`Please wait ${remainingTime} seconds before submitting again.`);
+            return;
+        }
+
         // Validate form
         if (!validateForm()) {
             setSubmitStatus('error');
@@ -175,13 +239,19 @@ const SendListingPage = () => {
             return;
         }
 
+        // Update submission timestamp
+        setLastSubmissionTime(now);
         setIsSubmitting(true);
 
         try {
-            console.log('🚀 Submitting business listing...');
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🚀 Submitting business listing...');
+            }
             const response = await submissionService.submitBusiness(formData);
 
-            console.log('✅ Submission successful:', response);
+            if (process.env.NODE_ENV === 'development') {
+                console.log('✅ Submission successful:', response);
+            }
 
             setSubmitStatus('success');
             setSubmitMessage(
@@ -219,7 +289,9 @@ const SendListingPage = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
         } catch (error) {
-            console.error('❌ Submission failed:', error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('❌ Submission failed:', error);
+            }
 
             setSubmitStatus('error');
             setSubmitMessage(error.message || 'Failed to submit business listing. Please try again.');
