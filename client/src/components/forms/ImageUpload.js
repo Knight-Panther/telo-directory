@@ -15,6 +15,7 @@ const ImageUpload = ({
     const [preview, setPreview] = useState(null);
     const [fileInfo, setFileInfo] = useState(null);
     const [validationError, setValidationError] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
     const fileInputRef = useRef(null);
 
     // Handle external clear trigger
@@ -23,6 +24,7 @@ const ImageUpload = ({
             setPreview(null);
             setFileInfo(null);
             setValidationError('');
+            setIsProcessing(false);
             onImageChange(null);
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
@@ -37,27 +39,35 @@ const ImageUpload = ({
             return;
         }
 
+        setIsProcessing(true);
+
         // Validate file
         const validation = submissionService.validateImageFile(file);
 
         if (!validation.isValid) {
             setValidationError(validation.errors.join(', '));
+            setIsProcessing(false);
             clearImage();
             return;
         }
 
         setValidationError('');
 
-        // Create preview
+        // Create preview with processing feedback
         const reader = new FileReader();
         reader.onload = (e) => {
-            setPreview(e.target.result);
-            setFileInfo(validation.fileInfo);
-            onImageChange(file);
+            // Add slight delay to show processing state
+            setTimeout(() => {
+                setPreview(e.target.result);
+                setFileInfo(validation.fileInfo);
+                setIsProcessing(false);
+                onImageChange(file);
+            }, 500); // Half second delay for better UX
         };
 
         reader.onerror = () => {
             setValidationError('Failed to read image file');
+            setIsProcessing(false);
             clearImage();
         };
 
@@ -69,6 +79,7 @@ const ImageUpload = ({
         setPreview(null);
         setFileInfo(null);
         setValidationError('');
+        setIsProcessing(false);
         onImageChange(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -129,21 +140,35 @@ const ImageUpload = ({
 
     const displayError = error || validationError;
 
+    // Add pulse animation styles
+    React.useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.7; transform: scale(1.1); }
+            }
+        `;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
+
     return (
         <div className={classNames.wrapper || "image-upload-wrapper"}>
             {!preview ? (
                 /* Upload Area */
                 <div
-                    className={`${classNames.container || "image-upload-container"} ${dragOver ? (classNames.dragover || 'dragover') : ''} ${displayError ? (classNames.error || 'error') : ''}`}
-                    onDragEnter={handleDragEnter}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    onClick={handleClick}
-                    onKeyDown={handleKeyDown}
-                    tabIndex={0}
+                    className={`${classNames.container || "image-upload-container"} ${dragOver ? (classNames.dragover || 'dragover') : ''} ${displayError ? (classNames.error || 'error') : ''} ${isProcessing ? 'processing' : ''}`}
+                    onDragEnter={!isProcessing ? handleDragEnter : undefined}
+                    onDragLeave={!isProcessing ? handleDragLeave : undefined}
+                    onDragOver={!isProcessing ? handleDragOver : undefined}
+                    onDrop={!isProcessing ? handleDrop : undefined}
+                    onClick={!isProcessing ? handleClick : undefined}
+                    onKeyDown={!isProcessing ? handleKeyDown : undefined}
+                    tabIndex={isProcessing ? -1 : 0}
                     role="button"
-                    aria-label="Upload profile image"
+                    aria-label={isProcessing ? "Processing image..." : "Upload profile image"}
+                    style={isProcessing ? { cursor: 'not-allowed', opacity: 0.7 } : {}}
                 >
                     <input
                         ref={fileInputRef}
@@ -155,22 +180,38 @@ const ImageUpload = ({
                     />
 
                     <div className={classNames.content || "image-upload-content"}>
-                        <div className={classNames.icon || "image-upload-icon"}>
-                            📷
-                        </div>
-
-                        <div className={classNames.text || "image-upload-text"}>
-                            <strong>Click to upload</strong> or drag and drop
-                        </div>
-
-                        <div className={classNames.hint || "image-upload-hint"}>
-                            {acceptedFormats.join(', ')} up to {maxSize}MB
-                            {required && (
-                                <div style={{ marginTop: '4px', color: 'var(--danger-red)' }}>
-                                    * Required
+                        {isProcessing ? (
+                            // Processing state
+                            <>
+                                <div className={classNames.icon || "image-upload-icon"} style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
+                                    ⚡
                                 </div>
-                            )}
-                        </div>
+                                <div className={classNames.text || "image-upload-text"}>
+                                    <strong>Processing image...</strong>
+                                </div>
+                                <div className={classNames.hint || "image-upload-hint"}>
+                                    Please wait while we optimize your image
+                                </div>
+                            </>
+                        ) : (
+                            // Normal upload state
+                            <>
+                                <div className={classNames.icon || "image-upload-icon"}>
+                                    📷
+                                </div>
+                                <div className={classNames.text || "image-upload-text"}>
+                                    <strong>Click to upload</strong> or drag and drop
+                                </div>
+                                <div className={classNames.hint || "image-upload-hint"}>
+                                    {acceptedFormats.join(', ')} up to {maxSize}MB
+                                    {required && (
+                                        <div style={{ marginTop: '4px', color: 'var(--danger-red, #dc3545)' }}>
+                                            * Required
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             ) : (

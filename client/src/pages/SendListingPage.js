@@ -1,5 +1,5 @@
 // client/src/pages/SendListingPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import GenericMultiSelect from '../components/forms/GenericMultiSelect';
 import ImageUpload from '../components/forms/ImageUpload';
 import submissionService from '../services/submissionService';
@@ -44,6 +44,27 @@ const SendListingPage = () => {
     const categories = BUSINESS_CATEGORIES;
     const citiesLoading = false;
     const categoriesLoading = false;
+
+    // Debounce utility function
+    const debounce = useCallback((func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }, []);
+
+    // Debounced error clearing function
+    const debouncedClearError = useCallback(
+        debounce((fieldName) => {
+            setErrors(prev => ({ ...prev, [fieldName]: '' }));
+        }, 300),
+        [debounce]
+    );
 
     // Error boundary effect
     useEffect(() => {
@@ -114,9 +135,9 @@ const SendListingPage = () => {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
 
-        // Clear field error when user starts typing
+        // Debounced error clearing when user starts typing
         if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
+            debouncedClearError(name);
         }
     };
 
