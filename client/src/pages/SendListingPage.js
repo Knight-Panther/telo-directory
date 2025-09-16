@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import CityMultiSelect from '../components/forms/CityMultiSelect';
 import ImageUpload from '../components/forms/ImageUpload';
 import submissionService from '../services/submissionService';
-import '../styles/send-listing.css';
+import styles from '../styles/send-listing.module.css';
 
 // Static data arrays
 const GEORGIAN_CITIES = [
@@ -243,17 +243,17 @@ const SendListingPage = () => {
     };
 
     return (
-        <div className="send-listing-page">
-            <div className="send-listing-container">
+        <div className={styles.sendListingPage}>
+            <div className={styles.sendListingContainer}>
                 {/* Header */}
-                <div className="send-listing-header">
+                <div className={styles.sendListingHeader}>
                     <h1>📋 Submit Your Business Listing</h1>
                     <p>Join Georgia's premier business directory and connect with customers across the country</p>
                 </div>
 
                 {/* Status Messages */}
                 {submitStatus === 'success' && (
-                    <div className="success-message">
+                    <div className={styles.successMessage}>
                         {submitMessage.split('\n').map((line, index) => (
                             <div key={index}>{line}</div>
                         ))}
@@ -261,32 +261,32 @@ const SendListingPage = () => {
                 )}
 
                 {submitStatus === 'error' && (
-                    <div className="error-message">
+                    <div className={styles.errorMessage}>
                         {submitMessage}
                     </div>
                 )}
 
                 {/* Form */}
-                <div className="submission-form-container">
-                    <form onSubmit={handleSubmit} className="submission-form" noValidate>
+                <div className={styles.submissionFormContainer}>
+                    <form onSubmit={handleSubmit} className={styles.submissionForm} noValidate>
 
                         {/* Business Information Section */}
-                        <div className="form-section">
-                            <h3 className="form-section-title">
-                                <span className="form-section-icon">🏢</span>
+                        <div className={styles.formSection}>
+                            <h3 className={styles.formSectionTitle}>
+                                <span className={styles.formSectionIcon}>🏢</span>
                                 Business Information
                             </h3>
 
-                            <div className="form-row">
-                                <div className="form-group half">
-                                    <label htmlFor="businessName" className="form-label required">
+                            <div className={styles.formRow}>
+                                <div className={`${styles.formGroup} ${styles.half}`}>
+                                    <label htmlFor="businessName" className={`${styles.formLabel} ${styles.required}`}>
                                         Business Name
                                     </label>
                                     <input
                                         type="text"
                                         id="businessName"
                                         name="businessName"
-                                        className={`form-input ${errors.businessName ? 'error' : ''}`}
+                                        className={`${styles.formInput} ${errors.businessName ? styles.error : ''}`}
                                         value={formData.businessName}
                                         onChange={handleInputChange}
                                         placeholder="Enter your business name"
@@ -294,21 +294,21 @@ const SendListingPage = () => {
                                         aria-describedby={errors.businessName ? 'businessName-error' : undefined}
                                     />
                                     {errors.businessName && (
-                                        <div id="businessName-error" className="field-error">
-                                            <span className="field-error-icon">⚠</span>
+                                        <div id="businessName-error" className={styles.fieldError}>
+                                            <span className={styles.fieldErrorIcon}>⚠</span>
                                             {errors.businessName}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="form-group half">
-                                    <label htmlFor="category" className="form-label required">
+                                <div className={`${styles.formGroup} ${styles.half}`}>
+                                    <label htmlFor="category" className={`${styles.formLabel} ${styles.required}`}>
                                         Category
                                     </label>
                                     <select
                                         id="category"
                                         name="category"
-                                        className={`form-select ${errors.category ? 'error' : ''}`}
+                                        className={`${styles.formSelect} ${errors.category ? styles.error : ''}`}
                                         value={formData.category}
                                         onChange={handleInputChange}
                                         disabled={categoriesLoading}
@@ -324,23 +324,23 @@ const SendListingPage = () => {
                                         ))}
                                     </select>
                                     {errors.category && (
-                                        <div id="category-error" className="field-error">
-                                            <span className="field-error-icon">⚠</span>
+                                        <div id="category-error" className={styles.fieldError}>
+                                            <span className={styles.fieldErrorIcon}>⚠</span>
                                             {errors.category}
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="form-row">
-                                <div className="form-group half">
-                                    <label htmlFor="businessType" className="form-label required">
+                            <div className={styles.formRow}>
+                                <div className={`${styles.formGroup} ${styles.half}`}>
+                                    <label htmlFor="businessType" className={`${styles.formLabel} ${styles.required}`}>
                                         Business Type
                                     </label>
                                     <select
                                         id="businessType"
                                         name="businessType"
-                                        className={`form-select ${errors.businessType ? 'error' : ''}`}
+                                        className={`${styles.formSelect} ${errors.businessType ? styles.error : ''}`}
                                         value={formData.businessType}
                                         onChange={handleInputChange}
                                         aria-describedby={errors.businessType ? 'businessType-error' : undefined}
@@ -349,23 +349,23 @@ const SendListingPage = () => {
                                         <option value="company">Company</option>
                                     </select>
                                     {errors.businessType && (
-                                        <div id="businessType-error" className="field-error">
-                                            <span className="field-error-icon">⚠</span>
+                                        <div id="businessType-error" className={styles.fieldError}>
+                                            <span className={styles.fieldErrorIcon}>⚠</span>
                                             {errors.businessType}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="form-group half">
-                                    <label htmlFor="mobile" className="form-label required">
+                                <div className={`${styles.formGroup} ${styles.half}`}>
+                                    <label htmlFor="mobile" className={`${styles.formLabel} ${styles.required}`}>
                                         Mobile Number
                                     </label>
-                                    <div className="mobile-input-container">
+                                    <div className={styles.mobileInputContainer}>
                                         <input
                                             type="tel"
                                             id="mobile"
                                             name="mobile"
-                                            className={`form-input mobile-input ${errors.mobile ? 'error' : ''}`}
+                                            className={`${styles.formInput} ${styles.mobileInput} ${errors.mobile ? styles.error : ''}`}
                                             value={formData.mobile}
                                             onChange={handleInputChange}
                                             placeholder="+995XXXXXXXXX"
@@ -373,12 +373,12 @@ const SendListingPage = () => {
                                             aria-describedby={errors.mobile ? 'mobile-error' : 'mobile-hint'}
                                         />
                                     </div>
-                                    <div id="mobile-hint" className="mobile-format-hint">
+                                    <div id="mobile-hint" className={styles.mobileFormatHint}>
                                         Format: +995XXXXXXXXX
                                     </div>
                                     {errors.mobile && (
-                                        <div id="mobile-error" className="field-error">
-                                            <span className="field-error-icon">⚠</span>
+                                        <div id="mobile-error" className={styles.fieldError}>
+                                            <span className={styles.fieldErrorIcon}>⚠</span>
                                             {errors.mobile}
                                         </div>
                                     )}
@@ -386,8 +386,8 @@ const SendListingPage = () => {
                             </div>
 
                             {/* Cities Selection */}
-                            <div className="form-group">
-                                <label className="form-label required">
+                            <div className={styles.formGroup}>
+                                <label className={`${styles.formLabel} ${styles.required}`}>
                                     Service Areas
                                 </label>
                                 <CityMultiSelect
@@ -396,18 +396,39 @@ const SendListingPage = () => {
                                     onChange={handleCitiesChange}
                                     error={errors.cities}
                                     loading={citiesLoading}
+                                    classNames={{
+                                        container: styles.citiesMultiselectContainer,
+                                        trigger: styles.citiesMultiselectTrigger,
+                                        open: styles.open,
+                                        error: styles.error,
+                                        selectedDisplay: styles.citiesSelectedDisplay,
+                                        empty: styles.empty,
+                                        cityTag: styles.cityTag,
+                                        cityTagRemove: styles.cityTagRemove,
+                                        dropdownArrow: styles.citiesDropdownArrow,
+                                        dropdown: styles.citiesDropdown,
+                                        search: styles.citiesSearch,
+                                        searchInput: styles.citiesSearchInput,
+                                        list: styles.citiesList,
+                                        cityOption: styles.cityOption,
+                                        selected: styles.selected,
+                                        disabled: styles.disabled,
+                                        cityCheckbox: styles.cityCheckbox,
+                                        fieldError: styles.fieldError,
+                                        fieldErrorIcon: styles.fieldErrorIcon
+                                    }}
                                 />
                             </div>
 
                             {/* Description */}
-                            <div className="form-group">
-                                <label htmlFor="shortDescription" className="form-label">
+                            <div className={styles.formGroup}>
+                                <label htmlFor="shortDescription" className={styles.formLabel}>
                                     Business Description
                                 </label>
                                 <textarea
                                     id="shortDescription"
                                     name="shortDescription"
-                                    className={`form-textarea ${errors.shortDescription ? 'error' : ''}`}
+                                    className={`${styles.formTextarea} ${errors.shortDescription ? styles.error : ''}`}
                                     value={formData.shortDescription}
                                     onChange={handleInputChange}
                                     placeholder="Briefly describe your business, services, and what makes you unique..."
@@ -417,13 +438,13 @@ const SendListingPage = () => {
                                 />
                                 <div
                                     id="shortDescription-count"
-                                    className={`character-counter ${descriptionCount.isError ? 'error' : descriptionCount.isWarning ? 'warning' : ''}`}
+                                    className={`${styles.characterCounter} ${descriptionCount.isError ? styles.error : descriptionCount.isWarning ? styles.warning : ''}`}
                                 >
                                     {descriptionCount.current}/200 characters
                                 </div>
                                 {errors.shortDescription && (
-                                    <div id="shortDescription-error" className="field-error">
-                                        <span className="field-error-icon">⚠</span>
+                                    <div id="shortDescription-error" className={styles.fieldError}>
+                                        <span className={styles.fieldErrorIcon}>⚠</span>
                                         {errors.shortDescription}
                                     </div>
                                 )}
@@ -431,34 +452,34 @@ const SendListingPage = () => {
                         </div>
 
                         {/* Certificate Section */}
-                        <div className="form-section">
-                            <h3 className="form-section-title">
-                                <span className="form-section-icon">🏅</span>
+                        <div className={styles.formSection}>
+                            <h3 className={styles.formSectionTitle}>
+                                <span className={styles.formSectionIcon}>🏅</span>
                                 Professional Certification
                             </h3>
 
-                            <div className="certificate-toggle">
+                            <div className={styles.certificateToggle}>
                                 <input
                                     type="checkbox"
                                     id="hasCertificate"
                                     name="hasCertificate"
-                                    className="certificate-checkbox"
+                                    className={styles.certificateCheckbox}
                                     checked={formData.hasCertificate}
                                     onChange={handleInputChange}
                                 />
-                                <label htmlFor="hasCertificate" className="certificate-label">
+                                <label htmlFor="hasCertificate" className={styles.certificateLabel}>
                                     My business has professional certifications or licenses
                                 </label>
                             </div>
 
-                            <div className={`certificate-description-group ${formData.hasCertificate ? 'visible' : ''}`}>
-                                <label htmlFor="certificateDescription" className="form-label required">
+                            <div className={`${styles.certificateDescriptionGroup} ${formData.hasCertificate ? styles.visible : ''}`}>
+                                <label htmlFor="certificateDescription" className={`${styles.formLabel} ${styles.required}`}>
                                     Certificate Details
                                 </label>
                                 <textarea
                                     id="certificateDescription"
                                     name="certificateDescription"
-                                    className={`form-textarea ${errors.certificateDescription ? 'error' : ''}`}
+                                    className={`${styles.formTextarea} ${errors.certificateDescription ? styles.error : ''}`}
                                     value={formData.certificateDescription}
                                     onChange={handleInputChange}
                                     placeholder="Briefly describe your certifications, licenses, or professional qualifications..."
@@ -469,13 +490,13 @@ const SendListingPage = () => {
                                 />
                                 <div
                                     id="certificateDescription-count"
-                                    className={`character-counter ${certificateCount.isError ? 'error' : certificateCount.isWarning ? 'warning' : ''}`}
+                                    className={`${styles.characterCounter} ${certificateCount.isError ? styles.error : certificateCount.isWarning ? styles.warning : ''}`}
                                 >
                                     {certificateCount.current}/50 characters
                                 </div>
                                 {errors.certificateDescription && (
-                                    <div id="certificateDescription-error" className="field-error">
-                                        <span className="field-error-icon">⚠</span>
+                                    <div id="certificateDescription-error" className={styles.fieldError}>
+                                        <span className={styles.fieldErrorIcon}>⚠</span>
                                         {errors.certificateDescription}
                                     </div>
                                 )}
@@ -483,9 +504,9 @@ const SendListingPage = () => {
                         </div>
 
                         {/* Image Upload Section */}
-                        <div className="form-section">
-                            <h3 className="form-section-title">
-                                <span className="form-section-icon">📷</span>
+                        <div className={styles.formSection}>
+                            <h3 className={styles.formSectionTitle}>
+                                <span className={styles.formSectionIcon}>📷</span>
                                 Business Profile Image
                             </h3>
 
@@ -494,35 +515,51 @@ const SendListingPage = () => {
                                 error={errors.profileImage}
                                 required={true}
                                 maxSize={10}
+                                classNames={{
+                                    container: styles.imageUploadContainer,
+                                    dragover: styles.dragover,
+                                    error: styles.error,
+                                    input: styles.imageUploadInput,
+                                    content: styles.imageUploadContent,
+                                    icon: styles.imageUploadIcon,
+                                    text: styles.imageUploadText,
+                                    hint: styles.imageUploadHint,
+                                    preview: styles.imagePreview,
+                                    previewImg: styles.imagePreviewImg,
+                                    previewInfo: styles.imagePreviewInfo,
+                                    previewRemove: styles.imagePreviewRemove,
+                                    fieldError: styles.fieldError,
+                                    fieldErrorIcon: styles.fieldErrorIcon
+                                }}
                             />
                         </div>
 
                         {/* Social Links Section */}
-                        <div className="form-section">
-                            <h3 className="form-section-title">
-                                <span className="form-section-icon">🌐</span>
+                        <div className={styles.formSection}>
+                            <h3 className={styles.formSectionTitle}>
+                                <span className={styles.formSectionIcon}>🌐</span>
                                 Social Media & Online Presence
                             </h3>
 
-                            <div className="social-links-grid">
+                            <div className={styles.socialLinksGrid}>
                                 {[
                                     { platform: 'facebook', icon: '📘', placeholder: 'https://facebook.com/your-business' },
                                     { platform: 'instagram', icon: '📸', placeholder: 'https://instagram.com/your-business' },
                                     { platform: 'tiktok', icon: '🎵', placeholder: 'https://tiktok.com/@your-business' },
                                     { platform: 'youtube', icon: '📺', placeholder: 'https://youtube.com/your-channel' }
                                 ].map(({ platform, icon, placeholder }) => (
-                                    <div key={platform} className="social-input-group">
-                                        <label htmlFor={`social-${platform}`} className="form-label">
+                                    <div key={platform} className={styles.socialInputGroup}>
+                                        <label htmlFor={`social-${platform}`} className={styles.formLabel}>
                                             {platform.charAt(0).toUpperCase() + platform.slice(1)}
                                         </label>
                                         <div style={{ position: 'relative' }}>
-                                            <span className={`social-icon ${platform}`}>
+                                            <span className={`${styles.socialIcon} ${styles[platform]}`}>
                                                 {icon}
                                             </span>
                                             <input
                                                 type="url"
                                                 id={`social-${platform}`}
-                                                className={`form-input social-input ${errors.socialLinks?.[platform] ? 'error' : ''}`}
+                                                className={`${styles.formInput} ${styles.socialInput} ${errors.socialLinks?.[platform] ? styles.error : ''}`}
                                                 value={formData.socialLinks[platform]}
                                                 onChange={(e) => handleSocialLinkChange(platform, e.target.value)}
                                                 placeholder={placeholder}
@@ -530,8 +567,8 @@ const SendListingPage = () => {
                                             />
                                         </div>
                                         {errors.socialLinks?.[platform] && (
-                                            <div id={`social-${platform}-error`} className="field-error">
-                                                <span className="field-error-icon">⚠</span>
+                                            <div id={`social-${platform}-error`} className={styles.fieldError}>
+                                                <span className={styles.fieldErrorIcon}>⚠</span>
                                                 {errors.socialLinks[platform]}
                                             </div>
                                         )}
@@ -541,22 +578,22 @@ const SendListingPage = () => {
                         </div>
 
                         {/* Contact Information Section */}
-                        <div className="form-section">
-                            <h3 className="form-section-title">
-                                <span className="form-section-icon">📞</span>
+                        <div className={styles.formSection}>
+                            <h3 className={styles.formSectionTitle}>
+                                <span className={styles.formSectionIcon}>📞</span>
                                 Contact Information
                             </h3>
 
-                            <div className="form-row">
-                                <div className="form-group half">
-                                    <label htmlFor="submitterName" className="form-label required">
+                            <div className={styles.formRow}>
+                                <div className={`${styles.formGroup} ${styles.half}`}>
+                                    <label htmlFor="submitterName" className={`${styles.formLabel} ${styles.required}`}>
                                         Your Name
                                     </label>
                                     <input
                                         type="text"
                                         id="submitterName"
                                         name="submitterName"
-                                        className={`form-input ${errors.submitterName ? 'error' : ''}`}
+                                        className={`${styles.formInput} ${errors.submitterName ? styles.error : ''}`}
                                         value={formData.submitterName}
                                         onChange={handleInputChange}
                                         placeholder="Enter your full name"
@@ -564,22 +601,22 @@ const SendListingPage = () => {
                                         aria-describedby={errors.submitterName ? 'submitterName-error' : undefined}
                                     />
                                     {errors.submitterName && (
-                                        <div id="submitterName-error" className="field-error">
-                                            <span className="field-error-icon">⚠</span>
+                                        <div id="submitterName-error" className={styles.fieldError}>
+                                            <span className={styles.fieldErrorIcon}>⚠</span>
                                             {errors.submitterName}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="form-group half">
-                                    <label htmlFor="submitterEmail" className="form-label required">
+                                <div className={`${styles.formGroup} ${styles.half}`}>
+                                    <label htmlFor="submitterEmail" className={`${styles.formLabel} ${styles.required}`}>
                                         Your Email
                                     </label>
                                     <input
                                         type="email"
                                         id="submitterEmail"
                                         name="submitterEmail"
-                                        className={`form-input ${errors.submitterEmail ? 'error' : ''}`}
+                                        className={`${styles.formInput} ${errors.submitterEmail ? styles.error : ''}`}
                                         value={formData.submitterEmail}
                                         onChange={handleInputChange}
                                         placeholder="your.email@example.com"
@@ -587,8 +624,8 @@ const SendListingPage = () => {
                                         aria-describedby={errors.submitterEmail ? 'submitterEmail-error' : undefined}
                                     />
                                     {errors.submitterEmail && (
-                                        <div id="submitterEmail-error" className="field-error">
-                                            <span className="field-error-icon">⚠</span>
+                                        <div id="submitterEmail-error" className={styles.fieldError}>
+                                            <span className={styles.fieldErrorIcon}>⚠</span>
                                             {errors.submitterEmail}
                                         </div>
                                     )}
@@ -608,11 +645,11 @@ const SendListingPage = () => {
                         </div>
 
                         {/* Form Actions */}
-                        <div className="form-actions">
+                        <div className={styles.formActions}>
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="btn btn-secondary"
+                                className={`${styles.btn} ${styles.btnSecondary}`}
                                 disabled={isSubmitting}
                             >
                                 🔄 Clear Form
@@ -620,12 +657,12 @@ const SendListingPage = () => {
 
                             <button
                                 type="submit"
-                                className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
+                                className={`${styles.btn} ${styles.btnPrimary} ${isSubmitting ? styles.btnLoading : ''}`}
                                 disabled={isSubmitting || citiesLoading || categoriesLoading}
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <span className="spinner"></span>
+                                        <span className={styles.spinner}></span>
                                         Submitting...
                                     </>
                                 ) : (

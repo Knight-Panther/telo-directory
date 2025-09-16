@@ -6,7 +6,8 @@ const CityMultiSelect = ({
     selectedCities = [],
     onChange,
     error,
-    required = true
+    required = true,
+    classNames = {}
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -85,10 +86,10 @@ const CityMultiSelect = ({
     }, [isOpen]);
 
     return (
-        <div className="cities-multiselect-container" ref={containerRef}>
+        <div className={classNames.container || "cities-multiselect-container"} ref={containerRef}>
             {/* Trigger */}
             <div
-                className={`cities-multiselect-trigger ${isOpen ? 'open' : ''} ${error ? 'error' : ''}`}
+                className={`${classNames.trigger || "cities-multiselect-trigger"} ${isOpen ? (classNames.open || 'open') : ''} ${error ? (classNames.error || 'error') : ''}`}
                 onClick={handleToggleDropdown}
                 onKeyDown={handleKeyDown}
                 tabIndex={0}
@@ -97,18 +98,18 @@ const CityMultiSelect = ({
                 aria-haspopup="listbox"
                 aria-label={`Select cities. ${selectedCities.length} selected`}
             >
-                <div className={`cities-selected-display ${selectedCities.length === 0 ? 'empty' : ''}`}>
+                <div className={`${classNames.selectedDisplay || "cities-selected-display"} ${selectedCities.length === 0 ? (classNames.empty || 'empty') : ''}`}>
                     {selectedCities.length === 0 ? (
                         <span>
                             Select cities where you operate{required && ' *'}
                         </span>
                     ) : (
                         selectedCities.map(city => (
-                            <div key={city} className="city-tag">
+                            <div key={city} className={classNames.cityTag || "city-tag"}>
                                 <span>{city}</span>
                                 <button
                                     type="button"
-                                    className="city-tag-remove"
+                                    className={classNames.cityTagRemove || "city-tag-remove"}
                                     onClick={(e) => handleRemoveCity(city, e)}
                                     aria-label={`Remove ${city}`}
                                     tabIndex={-1}
@@ -120,7 +121,7 @@ const CityMultiSelect = ({
                     )}
                 </div>
 
-                <div className="cities-dropdown-arrow">
+                <div className={classNames.dropdownArrow || "cities-dropdown-arrow"}>
                     ▼
                 </div>
             </div>
@@ -128,16 +129,16 @@ const CityMultiSelect = ({
             {/* Dropdown */}
             {isOpen && (
                 <div
-                    className="cities-dropdown"
+                    className={classNames.dropdown || "cities-dropdown"}
                     role="listbox"
                     aria-label="City options"
                 >
                     {/* Search */}
-                    <div className="cities-search">
+                    <div className={classNames.search || "cities-search"}>
                         <input
                             ref={searchInputRef}
                             type="text"
-                            className="cities-search-input"
+                            className={classNames.searchInput || "cities-search-input"}
                             placeholder="Search cities..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -147,9 +148,9 @@ const CityMultiSelect = ({
                     </div>
 
                     {/* Cities list */}
-                    <div className="cities-list">
+                    <div className={classNames.list || "cities-list"}>
                         {filteredCities.length === 0 ? (
-                            <div className="city-option" style={{ color: '#999', fontStyle: 'italic' }}>
+                            <div className={classNames.cityOption || "city-option"} style={{ color: '#999', fontStyle: 'italic' }}>
                                 {searchTerm ? 'No cities found' : 'No cities available'}
                             </div>
                         ) : (
@@ -160,7 +161,7 @@ const CityMultiSelect = ({
                                 return (
                                     <div
                                         key={city}
-                                        className={`city-option ${isSelected ? 'selected' : ''} ${isMaxReached ? 'disabled' : ''}`}
+                                        className={`${classNames.cityOption || "city-option"} ${isSelected ? (classNames.selected || 'selected') : ''} ${isMaxReached ? (classNames.disabled || 'disabled') : ''}`}
                                         onClick={() => !isMaxReached && handleCityToggle(city)}
                                         role="option"
                                         aria-selected={isSelected}
@@ -172,7 +173,7 @@ const CityMultiSelect = ({
                                     >
                                         <input
                                             type="checkbox"
-                                            className="city-checkbox"
+                                            className={classNames.cityCheckbox || "city-checkbox"}
                                             checked={isSelected}
                                             onChange={() => {}} // Handled by parent onClick
                                             tabIndex={-1}
@@ -211,8 +212,8 @@ const CityMultiSelect = ({
 
             {/* Error message */}
             {error && (
-                <div className="field-error">
-                    <span className="field-error-icon">⚠</span>
+                <div className={classNames.fieldError || "field-error"}>
+                    <span className={classNames.fieldErrorIcon || "field-error-icon"}>⚠</span>
                     {error}
                 </div>
             )}

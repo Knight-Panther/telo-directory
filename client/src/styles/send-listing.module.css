@@ -1,6 +1,6 @@
-/* client/src/styles/send-listing.css */
+/* client/src/styles/send-listing.module.css */
 /*
-   SEND LISTING PAGE STYLES - Mobile First Responsive Design
+   SEND LISTING PAGE STYLES - Mobile First Responsive Design (CSS Modules)
 
    Responsive Breakpoints (following existing system):
    - Base style up to 375px (Mobile First)
@@ -16,19 +16,19 @@
 /* ========================================
    SEND LISTING PAGE LAYOUT - Mobile First
    ======================================== */
-.send-listing-page {
+.sendListingPage {
     min-height: 100vh;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     padding: var(--spacing-lg) 0;
 }
 
-.send-listing-container {
+.sendListingContainer {
     max-width: 800px;
     margin: 0 auto;
     padding: 0 var(--padding-mobile);
 }
 
-.send-listing-header {
+.sendListingHeader {
     text-align: center;
     margin-bottom: var(--spacing-2xl);
     padding: var(--spacing-xl) var(--spacing-lg);
@@ -38,14 +38,14 @@
     box-shadow: var(--shadow-lg);
 }
 
-.send-listing-header h1 {
+.sendListingHeader h1 {
     font-size: 1.8rem;
     font-weight: 700;
     margin: 0 0 var(--spacing-md) 0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.send-listing-header p {
+.sendListingHeader p {
     font-size: 1rem;
     opacity: 0.9;
     margin: 0;
@@ -55,7 +55,7 @@
 /* ========================================
    FORM CONTAINER - Mobile First
    ======================================== */
-.submission-form-container {
+.submissionFormContainer {
     background: white;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
@@ -63,23 +63,23 @@
     border: 1px solid #e9ecef;
 }
 
-.submission-form {
+.submissionForm {
     padding: var(--spacing-xl) var(--spacing-lg);
 }
 
 /* ========================================
    FORM SECTIONS - Mobile First
    ======================================== */
-.form-section {
+.formSection {
     margin-bottom: var(--spacing-2xl);
     position: relative;
 }
 
-.form-section:last-child {
+.formSection:last-child {
     margin-bottom: 0;
 }
 
-.form-section-title {
+.formSectionTitle {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--gray-700);
@@ -91,7 +91,7 @@
     gap: var(--spacing-sm);
 }
 
-.form-section-icon {
+.formSectionIcon {
     font-size: 1.1rem;
     color: var(--primary-blue);
 }
@@ -99,21 +99,21 @@
 /* ========================================
    FORM FIELDS - Mobile First
    ======================================== */
-.form-group {
+.formGroup {
     margin-bottom: var(--spacing-lg);
 }
 
-.form-group.half {
+.formGroup.half {
     width: 100%;
 }
 
-.form-row {
+.formRow {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
 }
 
-.form-label {
+.formLabel {
     display: block;
     font-weight: 600;
     color: var(--gray-700);
@@ -121,15 +121,16 @@
     font-size: 0.9rem;
 }
 
-.form-label.required::after {
+.formLabel:global(.required)::after,
+.required::after {
     content: "*";
     color: var(--danger-red);
     margin-left: 4px;
 }
 
-.form-input,
-.form-select,
-.form-textarea {
+.formInput,
+.formSelect,
+.formTextarea {
     width: 100%;
     padding: 12px 16px;
     border: 2px solid #e9ecef;
@@ -141,27 +142,27 @@
     box-sizing: border-box;
 }
 
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
     outline: none;
     border-color: var(--primary-blue);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-input::placeholder,
-.form-textarea::placeholder {
+.formInput::placeholder,
+.formTextarea::placeholder {
     color: var(--gray-500);
 }
 
-.form-textarea {
+.formTextarea {
     min-height: 80px;
     resize: vertical;
     font-family: inherit;
     line-height: 1.5;
 }
 
-.form-select {
+.formSelect {
     cursor: pointer;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 12px center;
@@ -174,11 +175,11 @@
 /* ========================================
    CITIES MULTI-SELECT - Mobile First
    ======================================== */
-.cities-multiselect-container {
+.citiesMultiselectContainer {
     position: relative;
 }
 
-.cities-multiselect-trigger {
+.citiesMultiselectTrigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -191,16 +192,16 @@
     transition: all 0.3s ease;
 }
 
-.cities-multiselect-trigger:hover {
+.citiesMultiselectTrigger:hover {
     border-color: var(--primary-blue);
 }
 
-.cities-multiselect-trigger.open {
+.citiesMultiselectTrigger.open {
     border-color: var(--primary-blue);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.cities-selected-display {
+.citiesSelectedDisplay {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
@@ -208,12 +209,12 @@
     min-height: 24px;
 }
 
-.cities-selected-display.empty {
+.citiesSelectedDisplay.empty {
     color: var(--gray-500);
     font-size: 0.95rem;
 }
 
-.city-tag {
+.cityTag {
     background: var(--primary-blue);
     color: white;
     padding: 4px 8px;
@@ -225,7 +226,7 @@
     gap: 6px;
 }
 
-.city-tag-remove {
+.cityTagRemove {
     background: none;
     border: none;
     color: white;
@@ -237,21 +238,21 @@
     transition: opacity 0.2s;
 }
 
-.city-tag-remove:hover {
+.cityTagRemove:hover {
     opacity: 1;
 }
 
-.cities-dropdown-arrow {
+.citiesDropdownArrow {
     font-size: 0.8rem;
     color: var(--gray-500);
     transition: transform 0.3s ease;
 }
 
-.cities-multiselect-trigger.open .cities-dropdown-arrow {
+.citiesMultiselectTrigger.open .citiesDropdownArrow {
     transform: rotate(180deg);
 }
 
-.cities-dropdown {
+.citiesDropdown {
     position: absolute;
     top: 100%;
     left: 0;
@@ -266,7 +267,7 @@
     overflow-y: auto;
 }
 
-.cities-search {
+.citiesSearch {
     padding: 12px;
     border-bottom: 1px solid #e9ecef;
     position: sticky;
@@ -275,7 +276,7 @@
     z-index: 10;
 }
 
-.cities-search-input {
+.citiesSearchInput {
     width: 100%;
     padding: 8px 12px;
     border: 1px solid #e9ecef;
@@ -284,16 +285,16 @@
     outline: none;
 }
 
-.cities-search-input:focus {
+.citiesSearchInput:focus {
     border-color: var(--primary-blue);
 }
 
-.cities-list {
+.citiesList {
     max-height: 160px;
     overflow-y: auto;
 }
 
-.city-option {
+.cityOption {
     display: flex;
     align-items: center;
     padding: 10px 12px;
@@ -302,17 +303,17 @@
     font-size: 0.9rem;
 }
 
-.city-option:hover {
+.cityOption:hover {
     background: #f8f9fa;
 }
 
-.city-option.selected {
+.cityOption.selected {
     background: rgba(102, 126, 234, 0.1);
     color: var(--primary-blue);
     font-weight: 500;
 }
 
-.city-checkbox {
+.cityCheckbox {
     margin-right: 10px;
     accent-color: var(--primary-blue);
 }
@@ -320,11 +321,11 @@
 /* ========================================
    MOBILE FORMAT INPUT - Mobile First
    ======================================== */
-.mobile-input-container {
+.mobileInputContainer {
     position: relative;
 }
 
-.mobile-prefix {
+.mobilePrefix {
     position: absolute;
     left: 16px;
     top: 50%;
@@ -335,11 +336,11 @@
     font-size: 0.95rem;
 }
 
-.mobile-input {
+.mobileInput {
     padding-left: 80px;
 }
 
-.mobile-format-hint {
+.mobileFormatHint {
     font-size: 0.8rem;
     color: var(--gray-500);
     margin-top: var(--spacing-xs);
@@ -349,28 +350,28 @@
 /* ========================================
    CERTIFICATE FIELDS - Mobile First
    ======================================== */
-.certificate-toggle {
+.certificateToggle {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
 }
 
-.certificate-checkbox {
+.certificateCheckbox {
     width: 18px;
     height: 18px;
     accent-color: var(--primary-blue);
     cursor: pointer;
 }
 
-.certificate-label {
+.certificateLabel {
     font-weight: 600;
     color: var(--gray-700);
     cursor: pointer;
     font-size: 0.95rem;
 }
 
-.certificate-description-group {
+.certificateDescriptionGroup {
     opacity: 0;
     max-height: 0;
     overflow: hidden;
@@ -378,7 +379,7 @@
     transform: translateY(-10px);
 }
 
-.certificate-description-group.visible {
+.certificateDescriptionGroup.visible {
     opacity: 1;
     max-height: 200px;
     transform: translateY(0);
@@ -388,7 +389,7 @@
 /* ========================================
    IMAGE UPLOAD - Mobile First
    ======================================== */
-.image-upload-container {
+.imageUploadContainer {
     border: 2px dashed #e9ecef;
     border-radius: var(--radius-md);
     padding: var(--spacing-xl);
@@ -398,43 +399,43 @@
     position: relative;
 }
 
-.image-upload-container:hover {
+.imageUploadContainer:hover {
     border-color: var(--primary-blue);
     background: #f8f9ff;
 }
 
-.image-upload-container.dragover {
+.imageUploadContainer.dragover {
     border-color: var(--primary-blue);
     background: #f0f4ff;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.image-upload-input {
+.imageUploadInput {
     display: none;
 }
 
-.image-upload-content {
+.imageUploadContent {
     cursor: pointer;
 }
 
-.image-upload-icon {
+.imageUploadIcon {
     font-size: 2.5rem;
     color: var(--gray-400);
     margin-bottom: var(--spacing-md);
 }
 
-.image-upload-text {
+.imageUploadText {
     font-size: 1rem;
     color: var(--gray-600);
     margin-bottom: var(--spacing-sm);
 }
 
-.image-upload-hint {
+.imageUploadHint {
     font-size: 0.85rem;
     color: var(--gray-500);
 }
 
-.image-preview {
+.imagePreview {
     margin-top: var(--spacing-lg);
     padding: var(--spacing-lg);
     border: 2px solid var(--primary-blue);
@@ -442,7 +443,7 @@
     background: white;
 }
 
-.image-preview-img {
+.imagePreviewImg {
     width: 100%;
     max-width: 300px;
     height: auto;
@@ -451,13 +452,13 @@
     margin-bottom: var(--spacing-md);
 }
 
-.image-preview-info {
+.imagePreviewInfo {
     font-size: 0.85rem;
     color: var(--gray-600);
     text-align: left;
 }
 
-.image-preview-remove {
+.imagePreviewRemove {
     background: var(--danger-red);
     color: white;
     border: none;
@@ -470,7 +471,7 @@
     margin-top: var(--spacing-md);
 }
 
-.image-preview-remove:hover {
+.imagePreviewRemove:hover {
     background: var(--danger-red-dark);
     transform: translateY(-1px);
 }
@@ -478,17 +479,17 @@
 /* ========================================
    SOCIAL LINKS - Mobile First
    ======================================== */
-.social-links-grid {
+.socialLinksGrid {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
 }
 
-.social-input-group {
+.socialInputGroup {
     position: relative;
 }
 
-.social-icon {
+.socialIcon {
     position: absolute;
     left: 16px;
     top: 50%;
@@ -499,19 +500,19 @@
     justify-content: center;
 }
 
-.social-icon.facebook { color: #1877f2; }
-.social-icon.instagram { color: #E4405F; }
-.social-icon.tiktok { color: #000000; }
-.social-icon.youtube { color: #FF0000; }
+.socialIcon.facebook { color: #1877f2; }
+.socialIcon.instagram { color: #E4405F; }
+.socialIcon.tiktok { color: #000000; }
+.socialIcon.youtube { color: #FF0000; }
 
-.social-input {
+.socialInput {
     padding-left: 50px;
 }
 
 /* ========================================
    FORM ACTIONS - Mobile First
    ======================================== */
-.form-actions {
+.formActions {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
@@ -537,36 +538,36 @@
     gap: var(--spacing-sm);
 }
 
-.btn-primary {
+.btnPrimary {
     background: linear-gradient(135deg, var(--primary-blue) 0%, #5a6acf 100%);
     color: white;
     box-shadow: var(--shadow-lg);
 }
 
-.btn-primary:hover {
+.btnPrimary:hover {
     background: linear-gradient(135deg, #5a6acf 0%, var(--primary-blue-dark) 100%);
     transform: translateY(-2px);
     box-shadow: var(--shadow-xl);
 }
 
-.btn-primary:disabled {
+.btnPrimary:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
 
-.btn-secondary {
+.btnSecondary {
     background: white;
     color: var(--gray-700);
     border-color: #e9ecef;
 }
 
-.btn-secondary:hover {
+.btnSecondary:hover {
     background: #f8f9fa;
     border-color: var(--gray-400);
 }
 
-.btn-loading .spinner {
+.btnLoading .spinner {
     display: inline-block;
     width: 16px;
     height: 16px;
@@ -583,7 +584,7 @@
 /* ========================================
    VALIDATION MESSAGES - Mobile First
    ======================================== */
-.field-error {
+.fieldError {
     color: var(--danger-red);
     font-size: 0.8rem;
     margin-top: var(--spacing-xs);
@@ -592,32 +593,32 @@
     gap: 4px;
 }
 
-.field-error-icon {
+.fieldErrorIcon {
     font-size: 0.7rem;
 }
 
-.form-input.error,
-.form-select.error,
-.form-textarea.error {
+.formInput.error,
+.formSelect.error,
+.formTextarea.error {
     border-color: var(--danger-red);
     box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
 }
 
-.success-message,
-.error-message {
+.successMessage,
+.errorMessage {
     padding: var(--spacing-lg);
     border-radius: var(--radius-md);
     margin: var(--spacing-lg) 0;
     font-weight: 500;
 }
 
-.success-message {
+.successMessage {
     background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
     color: #155724;
     border-left: 4px solid #28a745;
 }
 
-.error-message {
+.errorMessage {
     background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
     color: #721c24;
     border-left: 4px solid #dc3545;
@@ -626,18 +627,18 @@
 /* ========================================
    CHARACTER COUNTERS - Mobile First
    ======================================== */
-.character-counter {
+.characterCounter {
     text-align: right;
     font-size: 0.8rem;
     color: var(--gray-500);
     margin-top: var(--spacing-xs);
 }
 
-.character-counter.warning {
+.characterCounter.warning {
     color: #ffc107;
 }
 
-.character-counter.error {
+.characterCounter.error {
     color: var(--danger-red);
 }
 
@@ -647,93 +648,93 @@
 
 /* iPhone Standard (375px+) */
 @media (min-width: 375px) {
-    .send-listing-header h1 {
+    .sendListingHeader h1 {
         font-size: 2rem;
     }
 
-    .city-tag {
+    .cityTag {
         font-size: 0.85rem;
         padding: 5px 10px;
     }
 
-    .image-upload-icon {
+    .imageUploadIcon {
         font-size: 3rem;
     }
 }
 
 /* iPhone Plus/Max (414px+) */
 @media (min-width: 414px) {
-    .send-listing-container {
+    .sendListingContainer {
         padding: 0 calc(var(--padding-mobile) + 4px);
     }
 
-    .submission-form {
+    .submissionForm {
         padding: var(--spacing-xl) var(--spacing-xl);
     }
 
-    .social-links-grid {
+    .socialLinksGrid {
         grid-template-columns: 1fr 1fr;
     }
 }
 
 /* Small Mobile to Large Mobile (480px+) */
 @media (min-width: 480px) {
-    .send-listing-container {
+    .sendListingContainer {
         padding: 0 var(--padding-tablet);
     }
 
-    .form-row {
+    .formRow {
         flex-direction: row;
     }
 
-    .form-group.half {
+    .formGroup.half {
         width: calc(50% - var(--spacing-sm));
     }
 
-    .cities-dropdown {
+    .citiesDropdown {
         max-height: 250px;
     }
 
-    .cities-list {
+    .citiesList {
         max-height: 200px;
     }
 
-    .image-preview-img {
+    .imagePreviewImg {
         max-width: 250px;
     }
 }
 
 /* Tablet Portrait (768px+) */
 @media (min-width: 768px) {
-    .send-listing-page {
+    .sendListingPage {
         padding: var(--spacing-2xl) 0;
     }
 
-    .send-listing-container {
+    .sendListingContainer {
         padding: 0 var(--padding-desktop);
     }
 
-    .send-listing-header {
+    .sendListingHeader {
         padding: var(--spacing-2xl) var(--spacing-xl);
     }
 
-    .send-listing-header h1 {
+    .sendListingHeader h1 {
         font-size: 2.5rem;
     }
 
-    .send-listing-header p {
+    .sendListingHeader p {
         font-size: 1.1rem;
     }
 
-    .submission-form {
+    .submissionForm {
         padding: var(--spacing-2xl) var(--spacing-xl);
     }
 
-    .form-section-title {
+    .formSectionTitle {
         font-size: 1.3rem;
     }
 
-    .form-actions {
+    .formActions {
         flex-direction: row;
         justify-content: space-between;
     }
@@ -744,16 +745,16 @@
         padding: 16px var(--spacing-xl);
     }
 
-    .cities-selected-display {
+    .citiesSelectedDisplay {
         gap: 8px;
     }
 
-    .city-tag {
+    .cityTag {
         font-size: 0.9rem;
         padding: 6px 12px;
     }
 
-    .social-links-grid {
+    .socialLinksGrid {
         grid-template-columns: 1fr 1fr;
         gap: var(--spacing-lg);
     }
@@ -761,54 +762,54 @@
 
 /* Large Tablet / Small Desktop (1024px+) */
 @media (min-width: 1024px) {
-    .send-listing-container {
+    .sendListingContainer {
         max-width: 900px;
     }
 
-    .form-row {
+    .formRow {
         gap: var(--spacing-xl);
     }
 
-    .cities-dropdown {
+    .citiesDropdown {
         max-height: 300px;
     }
 
-    .cities-list {
+    .citiesList {
         max-height: 240px;
     }
 
-    .image-preview-img {
+    .imagePreviewImg {
         max-width: 200px;
     }
 
-    .social-links-grid {
+    .socialLinksGrid {
         grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 }
 
 /* Desktop (1200px+) */
 @media (min-width: 1200px) {
-    .send-listing-container {
+    .sendListingContainer {
         max-width: 1000px;
     }
 
-    .send-listing-header h1 {
+    .sendListingHeader h1 {
         font-size: 3rem;
     }
 
-    .submission-form {
+    .submissionForm {
         padding: var(--spacing-3xl) var(--spacing-2xl);
     }
 
-    .form-section-title {
+    .formSectionTitle {
         font-size: 1.4rem;
     }
 
-    .cities-selected-display {
+    .citiesSelectedDisplay {
         gap: 10px;
     }
 
-    .city-tag {
+    .cityTag {
         font-size: 1rem;
         padding: 8px 14px;
     }
@@ -820,11 +821,11 @@
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-    .city-tag,
+    .cityTag,
     .btn,
-    .image-upload-container,
-    .cities-multiselect-trigger,
-    .certificate-description-group {
+    .imageUploadContainer,
+    .citiesMultiselectTrigger,
+    .certificateDescriptionGroup {
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
     }
@@ -832,10 +833,10 @@
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-    .form-input,
-    .form-select,
-    .form-textarea,
-    .cities-multiselect-trigger {
+    .formInput,
+    .formSelect,
+    .formTextarea,
+    .citiesMultiselectTrigger {
         border-width: 3px;
     }
 
@@ -843,13 +844,13 @@
         border-width: 3px;
     }
 
-    .image-upload-container {
+    .imageUploadContainer {
         border-width: 3px;
     }
 }
 
 /* Focus management for screen readers */
-.visually-hidden {
+.visuallyHidden {
     position: absolute !important;
     width: 1px !important;
     height: 1px !important;

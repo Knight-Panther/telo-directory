@@ -7,7 +7,8 @@ const ImageUpload = ({
     error,
     required = true,
     maxSize = 10, // MB
-    acceptedFormats = ['JPEG', 'JPG', 'PNG', 'WebP', 'AVIF', 'TIFF', 'GIF']
+    acceptedFormats = ['JPEG', 'JPG', 'PNG', 'WebP', 'AVIF', 'TIFF', 'GIF'],
+    classNames = {}
 }) => {
     const [dragOver, setDragOver] = useState(false);
     const [preview, setPreview] = useState(null);
@@ -115,11 +116,11 @@ const ImageUpload = ({
     const displayError = error || validationError;
 
     return (
-        <div className="image-upload-wrapper">
+        <div className={classNames.wrapper || "image-upload-wrapper"}>
             {!preview ? (
                 /* Upload Area */
                 <div
-                    className={`image-upload-container ${dragOver ? 'dragover' : ''} ${displayError ? 'error' : ''}`}
+                    className={`${classNames.container || "image-upload-container"} ${dragOver ? (classNames.dragover || 'dragover') : ''} ${displayError ? (classNames.error || 'error') : ''}`}
                     onDragEnter={handleDragEnter}
                     onDragLeave={handleDragLeave}
                     onDragOver={handleDragOver}
@@ -133,22 +134,22 @@ const ImageUpload = ({
                     <input
                         ref={fileInputRef}
                         type="file"
-                        className="image-upload-input"
+                        className={classNames.input || "image-upload-input"}
                         accept="image/*"
                         onChange={handleInputChange}
                         aria-hidden="true"
                     />
 
-                    <div className="image-upload-content">
-                        <div className="image-upload-icon">
+                    <div className={classNames.content || "image-upload-content"}>
+                        <div className={classNames.icon || "image-upload-icon"}>
                             📷
                         </div>
 
-                        <div className="image-upload-text">
+                        <div className={classNames.text || "image-upload-text"}>
                             <strong>Click to upload</strong> or drag and drop
                         </div>
 
-                        <div className="image-upload-hint">
+                        <div className={classNames.hint || "image-upload-hint"}>
                             {acceptedFormats.join(', ')} up to {maxSize}MB
                             {required && (
                                 <div style={{ marginTop: '4px', color: 'var(--danger-red)' }}>
@@ -160,14 +161,14 @@ const ImageUpload = ({
                 </div>
             ) : (
                 /* Preview Area */
-                <div className="image-preview">
+                <div className={classNames.preview || "image-preview"}>
                     <img
                         src={preview}
                         alt="Business profile preview"
-                        className="image-preview-img"
+                        className={classNames.previewImg || "image-preview-img"}
                     />
 
-                    <div className="image-preview-info">
+                    <div className={classNames.previewInfo || "image-preview-info"}>
                         <div style={{ marginBottom: '8px' }}>
                             <strong>📁 {fileInfo?.name}</strong>
                         </div>
@@ -201,7 +202,7 @@ const ImageUpload = ({
 
                     <button
                         type="button"
-                        className="image-preview-remove"
+                        className={classNames.previewRemove || "image-preview-remove"}
                         onClick={clearImage}
                         aria-label="Remove selected image"
                     >
@@ -212,8 +213,8 @@ const ImageUpload = ({
 
             {/* Error Messages */}
             {displayError && (
-                <div className="field-error" style={{ marginTop: '8px' }}>
-                    <span className="field-error-icon">⚠</span>
+                <div className={classNames.fieldError || "field-error"} style={{ marginTop: '8px' }}>
+                    <span className={classNames.fieldErrorIcon || "field-error-icon"}>⚠</span>
                     {displayError}
                 </div>
             )}
