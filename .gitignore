@@ -14,6 +14,10 @@ server/node_modules/
 # Ignore all new files in uploads/businesses/
 server/uploads/businesses/*
 
-# Don't ignore .gitkeep in case you use it later
+# Ignore all files in uploads/submissions/
+server/uploads/submissions/*
+
+# Don't ignore .gitkeep files in case you use them later
 !server/uploads/businesses/.gitkeep
+!server/uploads/submissions/.gitkeep
 
