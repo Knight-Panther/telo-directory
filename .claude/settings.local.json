@@ -17,7 +17,8 @@
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
       "Bash(set PORT=3002)",
-      "Bash(cmd /c:*)"
+      "Bash(cmd /c:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

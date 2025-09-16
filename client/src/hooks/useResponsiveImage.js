@@ -1,13 +1,13 @@
 // client/src/hooks/useResponsiveImage.js
-// Custom hook for responsive image loading with format support
+// Custom hook for responsive image loading with format support for hero sections
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 import {
     supportsImageFormat,
     getOptimalImageSize,
     getResponsiveImageUrl,
-    preloadImage
-} from '../utils/imageUtils';
+    preloadImage,
+} from "../utils/imageUtils";
 
 /**
  * Custom hook for managing responsive images with format fallbacks
@@ -16,22 +16,18 @@ import {
  * @returns {Object} - Hook state and utilities
  */
 export const useResponsiveImage = (imageName, options = {}) => {
-    const {
-        preload = true,
-        fallbackToJpeg = true,
-        debounceMs = 100
-    } = options;
+    const { preload = true, fallbackToJpeg = true, debounceMs = 100 } = options;
 
     // State management
     const [formatSupport, setFormatSupport] = useState({
         avif: false,
         webp: false,
-        checked: false
+        checked: false,
     });
     const [screenWidth, setScreenWidth] = useState(
-        typeof window !== 'undefined' ? window.innerWidth : 1200
+        typeof window !== "undefined" ? window.innerWidth : 1200
     );
-    const [currentImageUrl, setCurrentImageUrl] = useState('');
+    const [currentImageUrl, setCurrentImageUrl] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -54,21 +50,21 @@ export const useResponsiveImage = (imageName, options = {}) => {
         const checkFormats = async () => {
             try {
                 const [avifSupported, webpSupported] = await Promise.all([
-                    supportsImageFormat('avif'),
-                    supportsImageFormat('webp')
+                    supportsImageFormat("avif"),
+                    supportsImageFormat("webp"),
                 ]);
 
                 setFormatSupport({
                     avif: avifSupported,
                     webp: webpSupported,
-                    checked: true
+                    checked: true,
                 });
             } catch (err) {
-                console.warn('Format detection failed:', err);
+                console.warn("Format detection failed:", err);
                 setFormatSupport({
                     avif: false,
                     webp: false,
-                    checked: true
+                    checked: true,
                 });
             }
         };
@@ -78,13 +74,13 @@ export const useResponsiveImage = (imageName, options = {}) => {
 
     // Set up resize listener
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
         const resizeHandler = handleResize();
-        window.addEventListener('resize', resizeHandler, { passive: true });
+        window.addEventListener("resize", resizeHandler, { passive: true });
 
         return () => {
-            window.removeEventListener('resize', resizeHandler);
+            window.removeEventListener("resize", resizeHandler);
         };
     }, [handleResize]);
 
@@ -100,10 +96,14 @@ export const useResponsiveImage = (imageName, options = {}) => {
                 const size = getOptimalImageSize(screenWidth);
 
                 // getResponsiveImageUrl now returns a Promise
-                let imageUrl = await getResponsiveImageUrl(imageName, size, formatSupport);
+                let imageUrl = await getResponsiveImageUrl(
+                    imageName,
+                    size,
+                    formatSupport
+                );
 
                 if (!imageUrl) {
-                    throw new Error('No suitable image format found');
+                    throw new Error("No suitable image format found");
                 }
 
                 // If we should preload, try loading the image first
@@ -112,9 +112,18 @@ export const useResponsiveImage = (imageName, options = {}) => {
                         await preloadImage(imageUrl);
                     } catch (preloadError) {
                         // If preload fails and fallback is enabled, try WebP fallback
-                        if (fallbackToJpeg && (formatSupport.avif || formatSupport.webp)) {
-                            console.warn(`Failed to load ${imageUrl}, falling back to WebP fallback`);
-                            imageUrl = await getResponsiveImageUrl(imageName, size, { avif: false, webp: true });
+                        if (
+                            fallbackToJpeg &&
+                            (formatSupport.avif || formatSupport.webp)
+                        ) {
+                            console.warn(
+                                `Failed to load ${imageUrl}, falling back to WebP fallback`
+                            );
+                            imageUrl = await getResponsiveImageUrl(
+                                imageName,
+                                size,
+                                { avif: false, webp: true }
+                            );
                             if (imageUrl) {
                                 await preloadImage(imageUrl);
                             } else {
@@ -129,7 +138,7 @@ export const useResponsiveImage = (imageName, options = {}) => {
                 setCurrentImageUrl(imageUrl);
             } catch (err) {
                 setError(`Failed to load image: ${err.message}`);
-                console.error('Image loading error:', err);
+                console.error("Image loading error:", err);
             } finally {
                 setIsLoading(false);
             }
@@ -143,8 +152,8 @@ export const useResponsiveImage = (imageName, options = {}) => {
         if (!currentImageUrl) return {};
 
         return {
-            '--hero-bg-image': `url("${currentImageUrl}")`,
-            '--hero-image-loaded': isLoading ? '0' : '1'
+            "--hero-bg-image": `url("${currentImageUrl}")`,
+            "--hero-image-loaded": isLoading ? "0" : "1",
         };
     }, [currentImageUrl, isLoading]);
 
@@ -170,6 +179,6 @@ export const useResponsiveImage = (imageName, options = {}) => {
 
         // Status flags
         isReady: formatSupport.checked && !isLoading && !error,
-        hasError: !!error
+        hasError: !!error,
     };
 };
