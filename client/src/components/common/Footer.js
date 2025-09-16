@@ -2,8 +2,24 @@
 import React from "react";
 // CSS loaded at page level - removed duplicate import
 
+// Social Media URL Placeholders - Update these when you have real URLs
+const SOCIAL_URLS = {
+    facebook: "https://www.facebook.com/giorgi.teliashvili.473015", // Placeholder
+    instagram: "https://www.facebook.com/giorgi.teliashvili.473015", // Placeholder - update with real Instagram URL
+    tiktok: "https://www.facebook.com/giorgi.teliashvili.473015", // Placeholder - update with real TikTok URL
+    email: "mailto:contact@businessdirectory.com"
+};
+
 const Footer = () => {
     const currentYear = new Date().getFullYear();
+
+    // Smooth scroll to top function
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
 
     return (
         <footer className="footer">
@@ -22,7 +38,12 @@ const Footer = () => {
                         <h4 className="footer-title">Quick Links</h4>
                         <ul className="footer-links">
                             <li>
-                                <a href="/">Home</a>
+                                <button
+                                    onClick={scrollToTop}
+                                    className="footer-link-button"
+                                >
+                                    Back to Top ↑
+                                </button>
                             </li>
                             <li>
                                 <a href="/browse">Browse Businesses</a>
@@ -51,10 +72,10 @@ const Footer = () => {
                         </div>
                         <div className="footer-social">
                             <a
-                                href="https://www.facebook.com/giorgi.teliashvili.473015"
+                                href={SOCIAL_URLS.facebook}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="social-link"
+                                className="footer-social-link"
                                 aria-label="Facebook"
                             >
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -62,10 +83,10 @@ const Footer = () => {
                                 </svg>
                             </a>
                             <a
-                                href="https://www.facebook.com/giorgi.teliashvili.473015"
+                                href={SOCIAL_URLS.instagram}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="social-link"
+                                className="footer-social-link"
                                 aria-label="Instagram"
                             >
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -73,10 +94,10 @@ const Footer = () => {
                                 </svg>
                             </a>
                             <a
-                                href="https://www.facebook.com/giorgi.teliashvili.473015"
+                                href={SOCIAL_URLS.tiktok}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="social-link"
+                                className="footer-social-link"
                                 aria-label="TikTok"
                             >
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -84,8 +105,8 @@ const Footer = () => {
                                 </svg>
                             </a>
                             <a
-                                href="mailto:contact@businessdirectory.com"
-                                className="social-link"
+                                href={SOCIAL_URLS.email}
+                                className="footer-social-link"
                                 aria-label="Email"
                             >
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -98,7 +119,12 @@ const Footer = () => {
 
                 {/* Mobile-only links */}
                 <div className="footer-mobile-links">
-                    <a href="/">Home</a>
+                    <button
+                        onClick={scrollToTop}
+                        className="footer-mobile-button"
+                    >
+                        Back to Top ↑
+                    </button>
                     <a href="/list-business">List Your Business</a>
                 </div>
 

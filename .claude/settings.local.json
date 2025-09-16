@@ -18,7 +18,8 @@
       "Bash(taskkill:*)",
       "Bash(set PORT=3002)",
       "Bash(cmd /c:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(npm start:*)"
     ],
     "deny": [],
     "ask": []
