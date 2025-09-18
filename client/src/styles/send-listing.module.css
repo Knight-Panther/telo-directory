@@ -471,16 +471,6 @@
     position: relative;
 }
 
-.mobilePrefix {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--gray-600, #4b5563);
-    font-weight: 600;
-    pointer-events: none;
-    font-size: 0.95rem;
-}
 
 .mobileInput {
     padding-left: 80px;
@@ -995,15 +985,3 @@
     }
 }
 
-/* Focus management for screen readers */
-.visuallyHidden {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
-}
