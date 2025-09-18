@@ -811,7 +811,7 @@
 /* iPhone Plus/Max (414px+) */
 @media (min-width: 414px) {
     .sendListingContainer {
-        padding: 0 calc(var(--padding-mobile) + 4px);
+        padding: 0 calc(var(--padding-mobile, 16px) + 4px);
     }
 
     .submissionForm {
