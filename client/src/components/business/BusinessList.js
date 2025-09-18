@@ -43,6 +43,9 @@ const BusinessList = memo(({ searchTerm, filters }) => {
         },
         // Keep previous data while refetching
         keepPreviousData: true,
+        // Cache configuration for optimal performance
+        staleTime: 2 * 60 * 1000,  // 2 minutes - data considered fresh
+        cacheTime: 5 * 60 * 1000,  // 5 minutes - keep in memory when unused
     });
 
     // Memoized flatten all pages into single businesses array - prevents unnecessary recalculations

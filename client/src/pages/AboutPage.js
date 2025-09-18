@@ -142,11 +142,17 @@ const AboutPage = () => {
         return () => window.removeEventListener("scroll", throttledScroll);
     }, [handleScroll]);
 
-    // 🎯 KEEP: Preload team images (since only 4 images)
+    // 🎯 Optimized: Preload team images with cache tracking
     useEffect(() => {
+        // Simple cache tracking to prevent re-downloading same images
+        const preloadedImages = new Set();
+
         teamMembers.forEach((member) => {
-            const img = new Image();
-            img.src = member.photo;
+            if (!preloadedImages.has(member.photo)) {
+                const img = new Image();
+                img.src = member.photo;
+                preloadedImages.add(member.photo);
+            }
         });
     }, [teamMembers]);
 

@@ -75,8 +75,12 @@ const startServer = async () => {
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
 
-        // Serve uploaded images statically
-        app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+        // Serve uploaded images statically with cache headers
+        app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
+            maxAge: '1d', // Cache for 1 day
+            etag: true,   // Enable ETags for 304 responses
+            lastModified: true // Enable Last-Modified headers
+        }));
 
         // Health check routes (should be first for monitoring)
         app.use("/api/health", healthRoutes);
