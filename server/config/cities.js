@@ -3,6 +3,9 @@
 // Organized by regions for better management
 
 const GEORGIAN_CITIES = [
+    // Special Option
+    'All Georgia',      // 🇬🇪 Nationwide service coverage
+
     // Major Cities
     'Tbilisi',          // Capital - largest business hub
     'Batumi',           // Adjara region capital - port & tourism
@@ -114,7 +117,17 @@ const validateCities = (cities) => {
         return { valid: false, error: 'At least one city must be selected' };
     }
 
-    if (cities.length > 10) {
+    // Special validation for "All Georgia"
+    const hasAllGeorgia = cities.includes('All Georgia');
+    if (hasAllGeorgia && cities.length > 1) {
+        return {
+            valid: false,
+            error: '"All Georgia" cannot be combined with specific cities'
+        };
+    }
+
+    // Regular max limit check (skip if "All Georgia" is selected)
+    if (!hasAllGeorgia && cities.length > 10) {
         return { valid: false, error: 'Maximum 10 cities allowed' };
     }
 
@@ -132,7 +145,8 @@ const validateCities = (cities) => {
     return {
         valid: true,
         cities: uniqueCities,
-        count: uniqueCities.length
+        count: uniqueCities.length,
+        isNationwide: hasAllGeorgia
     };
 };
 

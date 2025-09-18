@@ -154,6 +154,8 @@ const submissionService = {
 
         if (!formData.cities || formData.cities.length === 0) {
             errors.cities = 'At least one city must be selected';
+        } else if (formData.cities.includes('All Georgia') && formData.cities.length > 1) {
+            errors.cities = '"All Georgia" cannot be combined with specific cities';
         }
 
         if (!formData.mobile?.trim()) {

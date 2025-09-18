@@ -2,6 +2,9 @@
 // Static data for SendListing form
 
 export const GEORGIAN_CITIES = [
+    // Special Option
+    'All Georgia',      // 🇬🇪 Nationwide service coverage
+
     // Major Cities
     'Tbilisi',          // Capital - largest business hub
     'Batumi',           // Adjara region capital - port & tourism

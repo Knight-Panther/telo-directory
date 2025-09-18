@@ -1,5 +1,5 @@
 // client/src/components/forms/GenericMultiSelect.js
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 
 const GenericMultiSelect = ({
     items = [],
@@ -11,10 +11,10 @@ const GenericMultiSelect = ({
     placeholder = "Select items",
     searchPlaceholder = "Search...",
     itemName = "item",
-    classNames = {}
+    classNames = {},
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState("");
     const containerRef = useRef(null);
     const searchInputRef = useRef(null);
 
@@ -22,7 +22,7 @@ const GenericMultiSelect = ({
     const warningThreshold = Math.floor(maxItems * 0.8);
 
     // Filter items based on search term
-    const filteredItems = items.filter(item =>
+    const filteredItems = items.filter((item) =>
         item.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -32,13 +32,25 @@ const GenericMultiSelect = ({
 
         if (selectedItems.includes(itemName)) {
             // Remove item
-            newSelectedItems = selectedItems.filter(item => item !== itemName);
+            newSelectedItems = selectedItems.filter(
+                (item) => item !== itemName
+            );
         } else {
-            // Add item (respect max limit)
-            if (selectedItems.length >= maxItems) {
-                return; // Prevent adding more than max items
+            // Special handling for "All Georgia"
+            if (itemName === "All Georgia") {
+                // If "All Georgia" is selected, clear all other cities
+                newSelectedItems = ["All Georgia"];
+            } else if (selectedItems.includes("All Georgia")) {
+                // If user selects specific city while "All Georgia" is selected,
+                // replace "All Georgia" with the specific city
+                newSelectedItems = [itemName];
+            } else {
+                // Regular behavior - respect max limit
+                if (selectedItems.length >= maxItems) {
+                    return; // Prevent adding more than max items
+                }
+                newSelectedItems = [...selectedItems, itemName];
             }
-            newSelectedItems = [...selectedItems, itemName];
         }
 
         onChange(newSelectedItems);
@@ -58,45 +70,56 @@ const GenericMultiSelect = ({
     // Handle item tag removal
     const handleRemoveItem = (itemName, event) => {
         event.stopPropagation();
-        const newSelectedItems = selectedItems.filter(item => item !== itemName);
+        const newSelectedItems = selectedItems.filter(
+            (item) => item !== itemName
+        );
         onChange(newSelectedItems);
     };
 
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(event.target)
+            ) {
                 setIsOpen(false);
-                setSearchTerm(''); // Reset search when closing
+                setSearchTerm(""); // Reset search when closing
             }
         };
 
         if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => document.removeEventListener('mousedown', handleClickOutside);
+            document.addEventListener("mousedown", handleClickOutside);
+            return () =>
+                document.removeEventListener("mousedown", handleClickOutside);
         }
     }, [isOpen]);
 
     // Handle keyboard navigation
     const handleKeyDown = (event) => {
-        if (event.key === 'Escape') {
+        if (event.key === "Escape") {
             setIsOpen(false);
-            setSearchTerm('');
+            setSearchTerm("");
         }
     };
 
     // Clear search when dropdown closes
     useEffect(() => {
         if (!isOpen) {
-            setSearchTerm('');
+            setSearchTerm("");
         }
     }, [isOpen]);
 
     return (
-        <div className={classNames.container || "multiselect-container"} ref={containerRef}>
+        <div
+            className={classNames.container || "multiselect-container"}
+            ref={containerRef}
+        >
             {/* Trigger */}
             <div
-                className={`${classNames.trigger || "multiselect-trigger"} ${isOpen ? (classNames.open || 'open') : ''} ${error ? (classNames.error || 'error') : ''}`}
+                className={`${classNames.trigger || "multiselect-trigger"} ${
+                    isOpen ? classNames.open || "open" : ""
+                } ${error ? classNames.error || "error" : ""}`}
                 onClick={handleToggleDropdown}
                 onKeyDown={handleKeyDown}
                 tabIndex={0}
@@ -105,18 +128,56 @@ const GenericMultiSelect = ({
                 aria-haspopup="listbox"
                 aria-label={`Select ${itemName}. ${selectedItems.length} selected`}
             >
-                <div className={`${classNames.selectedDisplay || "selected-display"} ${selectedItems.length === 0 ? (classNames.empty || 'empty') : ''}`}>
+                <div
+                    className={`${
+                        classNames.selectedDisplay || "selected-display"
+                    } ${
+                        selectedItems.length === 0
+                            ? classNames.empty || "empty"
+                            : ""
+                    }`}
+                >
                     {selectedItems.length === 0 ? (
                         <span>
-                            {placeholder}{required && ' *'}
+                            {placeholder}
+                            {required && " *"}
                         </span>
                     ) : (
-                        selectedItems.map(item => (
-                            <div key={item} className={classNames.itemTag || "item-tag"}>
-                                <span>{item}</span>
+                        selectedItems.map((item) => (
+                            <div
+                                key={item}
+                                className={classNames.itemTag || "item-tag"}
+                                style={
+                                    item === "All Georgia"
+                                        ? {
+                                              background:
+                                                  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                              fontWeight: "bold",
+                                              boxShadow:
+                                                  "0 2px 4px rgba(102, 126, 234, 0.3)",
+                                          }
+                                        : {}
+                                }
+                            >
+                                {item === "All Georgia" ? (
+                                    <span
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "4px",
+                                        }}
+                                    >
+                                        {item}
+                                    </span>
+                                ) : (
+                                    <span>{item}</span>
+                                )}
                                 <button
                                     type="button"
-                                    className={classNames.itemTagRemove || "item-tag-remove"}
+                                    className={
+                                        classNames.itemTagRemove ||
+                                        "item-tag-remove"
+                                    }
                                     onClick={(e) => handleRemoveItem(item, e)}
                                     aria-label={`Remove ${item}`}
                                     tabIndex={-1}
@@ -157,39 +218,92 @@ const GenericMultiSelect = ({
                     {/* Items list */}
                     <div className={classNames.list || "list"}>
                         {filteredItems.length === 0 ? (
-                            <div className={classNames.itemOption || "item-option"} style={{ color: '#999', fontStyle: 'italic' }}>
-                                {searchTerm ? `No ${itemName} found` : `No ${itemName} available`}
+                            <div
+                                className={
+                                    classNames.itemOption || "item-option"
+                                }
+                                style={{ color: "#999", fontStyle: "italic" }}
+                            >
+                                {searchTerm
+                                    ? `No ${itemName} found`
+                                    : `No ${itemName} available`}
                             </div>
                         ) : (
-                            filteredItems.map(item => {
+                            filteredItems.map((item) => {
                                 const isSelected = selectedItems.includes(item);
-                                const isMaxReached = selectedItems.length >= maxItems && !isSelected;
+                                const isMaxReached =
+                                    selectedItems.length >= maxItems &&
+                                    !isSelected;
 
                                 return (
                                     <div
                                         key={item}
-                                        className={`${classNames.itemOption || "item-option"} ${isSelected ? (classNames.selected || 'selected') : ''} ${isMaxReached ? (classNames.disabled || 'disabled') : ''}`}
-                                        onClick={() => !isMaxReached && handleItemToggle(item)}
+                                        className={`${
+                                            classNames.itemOption ||
+                                            "item-option"
+                                        } ${
+                                            isSelected
+                                                ? classNames.selected ||
+                                                  "selected"
+                                                : ""
+                                        } ${
+                                            isMaxReached
+                                                ? classNames.disabled ||
+                                                  "disabled"
+                                                : ""
+                                        }`}
+                                        onClick={() =>
+                                            !isMaxReached &&
+                                            handleItemToggle(item)
+                                        }
                                         role="option"
                                         aria-selected={isSelected}
-                                        style={isMaxReached ? {
-                                            opacity: 0.5,
-                                            cursor: 'not-allowed',
-                                            color: '#999'
-                                        } : {}}
+                                        style={
+                                            isMaxReached
+                                                ? {
+                                                      opacity: 0.5,
+                                                      cursor: "not-allowed",
+                                                      color: "#999",
+                                                  }
+                                                : {}
+                                        }
                                     >
                                         <input
                                             type="checkbox"
-                                            className={classNames.itemCheckbox || "item-checkbox"}
+                                            className={
+                                                classNames.itemCheckbox ||
+                                                "item-checkbox"
+                                            }
                                             checked={isSelected}
                                             onChange={() => {}} // Handled by parent onClick
                                             tabIndex={-1}
                                             disabled={isMaxReached}
                                             aria-hidden="true"
                                         />
-                                        <span>{item}</span>
+                                        {item === "All Georgia" ? (
+                                            <span
+                                                style={{
+                                                    fontWeight: "bold",
+                                                    color: isSelected
+                                                        ? "#fff"
+                                                        : "#667eea",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "6px",
+                                                }}
+                                            >
+                                                {item}
+                                            </span>
+                                        ) : (
+                                            <span>{item}</span>
+                                        )}
                                         {isMaxReached && (
-                                            <span style={{ fontSize: '0.7rem', marginLeft: '8px' }}>
+                                            <span
+                                                style={{
+                                                    fontSize: "0.7rem",
+                                                    marginLeft: "8px",
+                                                }}
+                                            >
                                                 (Max {maxItems})
                                             </span>
                                         )}
@@ -203,15 +317,16 @@ const GenericMultiSelect = ({
                     {selectedItems.length > 0 && (
                         <div
                             style={{
-                                padding: '8px 12px',
-                                background: '#f8f9fa',
-                                borderTop: '1px solid #e9ecef',
-                                fontSize: '0.8rem',
-                                color: '#6c757d',
-                                textAlign: 'center'
+                                padding: "8px 12px",
+                                background: "#f8f9fa",
+                                borderTop: "1px solid #e9ecef",
+                                fontSize: "0.8rem",
+                                color: "#6c757d",
+                                textAlign: "center",
                             }}
                         >
-                            {selectedItems.length} of {maxItems} {itemName} selected
+                            {selectedItems.length} of {maxItems} {itemName}{" "}
+                            selected
                         </div>
                     )}
                 </div>
@@ -220,34 +335,50 @@ const GenericMultiSelect = ({
             {/* Error message */}
             {error && (
                 <div className={classNames.fieldError || "field-error"}>
-                    <span className={classNames.fieldErrorIcon || "field-error-icon"}>⚠</span>
+                    <span
+                        className={
+                            classNames.fieldErrorIcon || "field-error-icon"
+                        }
+                    >
+                        ⚠
+                    </span>
                     {error}
                 </div>
             )}
 
             {/* Helper text */}
             {!error && selectedItems.length === 0 && (
-                <div style={{
-                    fontSize: '0.8rem',
-                    color: '#6c757d',
-                    marginTop: '6px',
-                    fontStyle: 'italic'
-                }}>
-                    You can select up to {maxItems} {itemName} that best describe your business
+                <div
+                    style={{
+                        fontSize: "0.8rem",
+                        color: "#6c757d",
+                        marginTop: "6px",
+                        fontStyle: "italic",
+                    }}
+                >
+                    You can select up to {maxItems} {itemName} that best
+                    describe your business
                 </div>
             )}
 
             {/* Selected count helper */}
             {!error && selectedItems.length > 0 && (
-                <div style={{
-                    fontSize: '0.8rem',
-                    color: selectedItems.length >= warningThreshold ? '#ffc107' : '#28a745',
-                    marginTop: '6px',
-                    textAlign: 'right'
-                }}>
+                <div
+                    style={{
+                        fontSize: "0.8rem",
+                        color:
+                            selectedItems.length >= warningThreshold
+                                ? "#ffc107"
+                                : "#28a745",
+                        marginTop: "6px",
+                        textAlign: "right",
+                    }}
+                >
                     {selectedItems.length}/{maxItems} {itemName} selected
-                    {selectedItems.length >= warningThreshold && selectedItems.length < maxItems && ' (almost at limit)'}
-                    {selectedItems.length === maxItems && ' (maximum reached)'}
+                    {selectedItems.length >= warningThreshold &&
+                        selectedItems.length < maxItems &&
+                        " (almost at limit)"}
+                    {selectedItems.length === maxItems && " (maximum reached)"}
                 </div>
             )}
         </div>
