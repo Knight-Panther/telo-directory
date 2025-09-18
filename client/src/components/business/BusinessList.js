@@ -29,7 +29,7 @@ const BusinessList = memo(({ searchTerm, filters }) => {
         error,
         refetch,
     } = useInfiniteQuery({
-        queryKey: ["businesses", searchTerm, filters],
+        queryKey: ["businesses", searchTerm, JSON.stringify(filters)],
         queryFn: ({ pageParam = 1 }) =>
             businessService.getBusinesses({
                 page: pageParam,
