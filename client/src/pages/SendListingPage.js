@@ -39,6 +39,7 @@ const SendListingPage = () => {
     const [imageClearTrigger, setImageClearTrigger] = useState(0);
     const [hasError, setHasError] = useState(false);
     const [lastSubmissionTime, setLastSubmissionTime] = useState(0);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
 
     // Use static data arrays
     const cities = GEORGIAN_CITIES;
@@ -183,13 +184,13 @@ const SendListingPage = () => {
     };
 
     // Handle image change
-    const handleImageChange = (file) => {
+    const handleImageChange = useCallback((file) => {
         setFormData(prev => ({ ...prev, profileImage: file }));
 
         if (errors.profileImage) {
             setErrors(prev => ({ ...prev, profileImage: '' }));
         }
-    };
+    }, [errors.profileImage]);
 
     // Character count helpers
     const getCharacterCount = (text, maxLength) => {
@@ -311,33 +312,42 @@ const SendListingPage = () => {
 
     // Handle form reset
     const handleReset = () => {
-        if (window.confirm('Are you sure you want to clear all form data?')) {
-            setFormData({
-                businessName: '',
-                categories: [], // Changed from category to categories array
-                businessType: 'individual',
-                cities: [],
-                mobile: '+995',
-                shortDescription: '',
-                hasCertificate: false,
-                certificateDescription: '',
-                profileImage: null,
-                socialLinks: {
-                    facebook: '',
-                    instagram: '',
-                    tiktok: '',
-                    youtube: ''
-                },
-                submitterEmail: '',
-                submitterName: ''
-            });
-            setErrors({});
-            setSubmitStatus(null);
-            setSubmitMessage('');
+        setShowClearConfirm(true);
+    };
 
-            // Clear image by triggering clearTrigger
-            setImageClearTrigger(Date.now());
-        }
+    // Confirm form reset
+    const confirmReset = () => {
+        setFormData({
+            businessName: '',
+            categories: [], // Changed from category to categories array
+            businessType: 'individual',
+            cities: [],
+            mobile: '+995',
+            shortDescription: '',
+            hasCertificate: false,
+            certificateDescription: '',
+            profileImage: null,
+            socialLinks: {
+                facebook: '',
+                instagram: '',
+                tiktok: '',
+                youtube: ''
+            },
+            submitterEmail: '',
+            submitterName: ''
+        });
+        setErrors({});
+        setSubmitStatus(null);
+        setSubmitMessage('');
+        setShowClearConfirm(false);
+
+        // Clear image by triggering clearTrigger
+        setImageClearTrigger(Date.now());
+    };
+
+    // Cancel form reset
+    const cancelReset = () => {
+        setShowClearConfirm(false);
     };
 
     return (
@@ -625,6 +635,55 @@ const SendListingPage = () => {
                     </form>
                 </div>
             </div>
+
+            {/* Clear Form Confirmation Modal */}
+            {showClearConfirm && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        padding: '2rem',
+                        borderRadius: '8px',
+                        maxWidth: '400px',
+                        width: '90%',
+                        textAlign: 'center',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+                    }}>
+                        <h3 style={{ marginBottom: '1rem', color: '#374151' }}>
+                            Clear Form Data?
+                        </h3>
+                        <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
+                            Are you sure you want to clear all form data? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button
+                                onClick={cancelReset}
+                                className={`${styles.btn} ${styles.btnSecondary}`}
+                                style={{ minWidth: '100px' }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmReset}
+                                className={`${styles.btn} ${styles.btnPrimary}`}
+                                style={{ minWidth: '100px' }}
+                            >
+                                Clear Form
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
