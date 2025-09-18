@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-    baseURL: '/api/submissions',
+    baseURL: `${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/submissions`,
     timeout: 30000, // 30 seconds for file uploads
     headers: {
         'Content-Type': 'multipart/form-data',

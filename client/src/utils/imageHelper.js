@@ -18,7 +18,7 @@
 const IMAGE_CONFIG = {
     // Current local development setup
     LOCAL: {
-        baseUrl: "http://localhost:3000",
+        baseUrl: process.env.REACT_APP_IMAGE_BASE_URL || "http://localhost:3000",
         fallbackImage: "/placeholder-business.png",
     },
 

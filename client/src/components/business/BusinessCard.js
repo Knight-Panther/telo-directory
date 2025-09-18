@@ -211,7 +211,7 @@ const BusinessCard = memo(({ business }) => {
                     <div className="business-image-circular">
                         {profileImage ? (
                             <LazyImage
-                                src={`http://localhost:3000${profileImage}`}
+                                src={`${process.env.REACT_APP_IMAGE_BASE_URL || "http://localhost:3000"}${profileImage}`}
                                 alt={businessName}
                                 onError={handleImageError}
                                 placeholder={
