@@ -4,10 +4,15 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import businessService from "../../services/businessService";
 import BusinessCard from "./BusinessCard";
 import LoadingSpinner from "../common/LoadingSpinner";
+import { useUserAuth } from "../../contexts/UserAuthContext";
 // CSS loaded at page level - removed duplicate import
 
 const BusinessList = memo(({ searchTerm, filters }) => {
     const [businesses, setBusinesses] = useState([]);
+
+    // Get user context for BusinessCard re-rendering when auth state changes
+    const { user, isAuthenticated } = useUserAuth();
+
 
     // Transform filters for API call
     const apiFilters = {
@@ -230,7 +235,7 @@ const BusinessList = memo(({ searchTerm, filters }) => {
                     <main id="business-grid" role="main" tabIndex="-1">
                         <div className="business-grid" role="list">
                             {businesses.map((business) => (
-                                <div key={business._id} role="listitem">
+                                <div key={`${business._id}-${user?._id || 'guest'}`} role="listitem">
                                     <BusinessCard business={business} />
                                 </div>
                             ))}

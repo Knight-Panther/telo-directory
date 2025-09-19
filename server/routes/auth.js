@@ -262,12 +262,13 @@ router.post("/login", validateUserLogin, async (req, res) => {
             success: true,
             message: loginMessage,
             user: {
-                id: user._id,
+                _id: user._id,
                 email: user.email,
                 name: user.name,
                 phone: user.phone,
                 isEmailVerified: user.isEmailVerified,
                 lastLoginAt: user.lastLoginAt,
+                favorites: user.favorites,
                 favoritesCount: user.favorites.length,
             },
             accessToken: tokens.accessToken,
@@ -309,7 +310,7 @@ router.get("/me", verifyAccessToken, async (req, res) => {
         res.json({
             success: true,
             user: {
-                id: req.user._id,
+                _id: req.user._id,
                 email: req.user.email,
                 name: req.user.name,
                 phone: req.user.phone,
@@ -408,11 +409,13 @@ router.put("/profile", verifyAccessToken, async (req, res) => {
             success: true,
             message: "Profile updated successfully",
             user: {
-                id: updatedUser._id,
+                _id: updatedUser._id,
                 email: updatedUser.email,
                 name: updatedUser.name,
                 phone: updatedUser.phone,
                 isEmailVerified: updatedUser.isEmailVerified,
+                favorites: updatedUser.favorites,
+                favoritesCount: updatedUser.favorites.length,
                 updatedAt: updatedUser.updatedAt,
             },
         });
