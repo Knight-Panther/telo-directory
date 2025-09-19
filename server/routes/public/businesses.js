@@ -86,6 +86,13 @@ router.get("/", async (req, res) => {
             });
         }
 
+        // Set cache headers for business listings (shorter cache for dynamic data)
+        res.set({
+            'Cache-Control': 'public, max-age=120, s-maxage=300', // 2min browser, 5min CDN
+            'ETag': `"businesses-${total}-${page}-${Date.now()}"`,
+            'Vary': 'Accept-Encoding'
+        });
+
         res.json({
             businesses,
             pagination: {
@@ -212,6 +219,13 @@ router.get("/categories/list", async (req, res) => {
         const categories = await Category.find({ isActive: true }).sort({
             name: 1,
         });
+
+        // Cache categories for longer (they change less frequently)
+        res.set({
+            'Cache-Control': 'public, max-age=900', // 15 minutes
+            'ETag': `"categories-${categories.length}"`,
+        });
+
         res.json(categories);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -222,6 +236,13 @@ router.get("/categories/list", async (req, res) => {
 router.get("/cities/list", async (req, res) => {
     try {
         const cities = await Business.distinct("city");
+
+        // Cache cities for moderate duration
+        res.set({
+            'Cache-Control': 'public, max-age=600', // 10 minutes
+            'ETag': `"cities-${cities.length}"`,
+        });
+
         res.json(cities.sort());
     } catch (error) {
         res.status(500).json({ error: error.message });

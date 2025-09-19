@@ -8,11 +8,8 @@ import { useUserAuth } from "../../contexts/UserAuthContext";
 // CSS loaded at page level - removed duplicate import
 
 const BusinessList = memo(({ searchTerm, filters }) => {
-    const [businesses, setBusinesses] = useState([]);
-
     // Get user context for BusinessCard re-rendering when auth state changes
     const { user, isAuthenticated } = useUserAuth();
-
 
     // Transform filters for API call
     const apiFilters = {
@@ -48,20 +45,13 @@ const BusinessList = memo(({ searchTerm, filters }) => {
         },
         // Keep previous data while refetching
         keepPreviousData: true,
-        // Cache configuration for optimal performance
-        staleTime: 2 * 60 * 1000,  // 2 minutes - data considered fresh
-        cacheTime: 5 * 60 * 1000,  // 5 minutes - keep in memory when unused
+        // Use global cache settings for consistency
     });
 
-    // Memoized flatten all pages into single businesses array - prevents unnecessary recalculations
-    const allBusinesses = useMemo(() => {
+    // Direct calculation - no unnecessary state
+    const businesses = useMemo(() => {
         return data ? data.pages.flatMap((page) => page.businesses) : [];
     }, [data]);
-
-    // Update businesses state when memoized array changes
-    useEffect(() => {
-        setBusinesses(allBusinesses);
-    }, [allBusinesses]);
 
     // Infinite scroll handler
     const handleScroll = useCallback(() => {
