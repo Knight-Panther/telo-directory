@@ -168,6 +168,198 @@
     color: #ffc107;
 }
 
+/* Enhanced Category Manager Styles */
+.category-manager-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.category-manager-header h2 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.75rem;
+}
+
+.category-manager-header p {
+    margin: 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+.category-info-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.info-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.info-card h4 {
+    margin: 0 0 0.75rem 0;
+    color: #495057;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.info-card ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.info-card li {
+    margin-bottom: 0.25rem;
+}
+
+.stat-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.stat-item strong {
+    color: #495057;
+    font-size: 1.1rem;
+}
+
+/* Enhanced table styling */
+.category-manager .categories-list table {
+    margin-top: 1rem;
+}
+
+.category-manager .categories-list th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.category-manager .categories-list td {
+    vertical-align: middle;
+}
+
+.category-manager .actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Enhanced status badges */
+.status.active {
+    background: #d4edda;
+    color: #155724;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status.inactive {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Enhanced confirmation dialogs */
+.confirmation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.confirmation-dialog {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.confirmation-header {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+}
+
+.confirmation-header h3 {
+    margin: 0;
+    color: #495057;
+    font-size: 1.25rem;
+}
+
+.confirmation-content {
+    padding: 1.5rem;
+    line-height: 1.5;
+}
+
+.confirmation-content p {
+    margin: 0 0 1rem 0;
+    color: #495057;
+}
+
+.confirmation-content p:last-child {
+    margin-bottom: 0;
+}
+
+.confirmation-actions {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    background: #f8f9fa;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Responsive design for category manager */
+@media (max-width: 768px) {
+    .category-info-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-grid {
+        justify-content: center;
+    }
+
+    .category-manager .actions {
+        flex-direction: column;
+    }
+
+    .confirmation-dialog {
+        width: 95%;
+        margin: 1rem;
+    }
+}
+
 .stat-label {
     font-size: 0.8rem;
     color: #666;

@@ -44,18 +44,6 @@ export const GEORGIAN_CITIES = [
     'Khoni',            // Imereti region
 ];
 
-export const BUSINESS_CATEGORIES = [
-    'General Construction',
-    'Kitchen Renovation',
-    'Bathroom Renovation',
-    'Flooring & Tiling',
-    'Plumbing Services',
-    'Electrical Services',
-    'Painting & Decorating',
-    'Roofing Services',
-    'HVAC Services',
-    'Landscaping & Gardening',
-    'Cleaning Services',
-    'Home Security',
-    'Interior Design'
-];
+// BUSINESS_CATEGORIES removed - now fetched dynamically from API
+// Categories are managed through the admin panel and fetched from /api/submissions/categories
+// This ensures admin control over which categories are available for submissions

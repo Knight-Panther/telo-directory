@@ -4,7 +4,7 @@ import GenericMultiSelect from '../components/forms/GenericMultiSelect';
 import ImageUpload from '../components/forms/ImageUpload';
 import BusinessInfoSection from '../components/forms/BusinessInfoSection';
 import submissionService from '../services/submissionService';
-import { GEORGIAN_CITIES, BUSINESS_CATEGORIES } from '../constants/formData';
+import { GEORGIAN_CITIES } from '../constants/formData';
 import styles from '../styles/send-listing.module.css';
 
 // Static data loaded from constants
@@ -41,11 +41,35 @@ const SendListingPage = () => {
     const [lastSubmissionTime, setLastSubmissionTime] = useState(0);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
 
-    // Use static data arrays
+    // Data arrays - cities static, categories from API
     const cities = GEORGIAN_CITIES;
-    const categories = BUSINESS_CATEGORIES;
     const citiesLoading = false;
-    const categoriesLoading = false;
+
+    // State for categories from API
+    const [categories, setCategories] = useState([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+    // Fetch categories from API on component mount
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                setCategoriesLoading(true);
+                const response = await submissionService.getCategories();
+
+                // Extract category names from response
+                const categoryNames = response.categories?.map(cat => cat.name) || [];
+                setCategories(categoryNames);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                // Fallback to empty array if API fails
+                setCategories([]);
+            } finally {
+                setCategoriesLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     // Debounce utility function
     const debounce = useCallback((func, wait) => {

@@ -197,24 +197,31 @@ router.get('/cities', (req, res) => {
 
 /**
  * GET /api/submissions/categories
- * Returns list of available categories from business service
+ * Returns list of categories available for submissions (admin controlled)
+ * Only returns active categories that admins have enabled for submissions
  */
 router.get('/categories', async (req, res) => {
     try {
-        const categories = await Category.find().sort({ name: 1 });
+        // Only return active categories for submissions
+        // Future enhancement: Add 'availableForSubmissions' field to Category model
+        const categories = await Category.find({
+            isActive: true
+        }).sort({ name: 1 });
+
         res.json({
             success: true,
             categories: categories.map(cat => ({
                 _id: cat._id,
                 name: cat.name
             })),
-            count: categories.length
+            count: categories.length,
+            message: 'Only active categories available for submissions'
         });
     } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching submission categories:', error);
         res.status(500).json({
             success: false,
-            error: 'Failed to fetch categories'
+            error: 'Failed to fetch submission categories'
         });
     }
 });
