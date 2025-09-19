@@ -52,7 +52,7 @@ const Footer = () => {
                                 <a href="/categories">Categories</a>
                             </li>
                             <li>
-                                <a href="/list-business">List Your Business</a>
+                                <a href="/send-listing">List Your Business</a>
                             </li>
                         </ul>
                     </div>
@@ -125,7 +125,7 @@ const Footer = () => {
                     >
                         Back to Top ↑
                     </button>
-                    <a href="/list-business">List Your Business</a>
+                    <a href="/send-listing">List Your Business</a>
                 </div>
 
                 {/* Bottom Bar */}
