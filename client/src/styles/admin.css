@@ -164,6 +164,10 @@
     color: #007bff;
 }
 
+.stat-number.pending {
+    color: #ffc107;
+}
+
 .stat-label {
     font-size: 0.8rem;
     color: #666;

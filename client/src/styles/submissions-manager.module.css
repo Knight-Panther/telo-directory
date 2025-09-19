@@ -1,0 +1,666 @@
+/* client/src/styles/submissions-manager.module.css */
+/*
+   SUBMISSIONS MANAGER - Mobile First Responsive Design (CSS Modules)
+
+   Extends the existing Gmail-style layout from pages.css for submissions management
+   Uses CSS Modules to scope styles and avoid global conflicts
+
+   Responsive Breakpoints (following existing system):
+   - Base style up to 375px (Mobile First)
+   - iPhone Standard (375px+)
+   - iPhone Plus/Max (414px+)
+   - Small Mobile to Large Mobile (480px+)
+   - Tablet Portrait (768px+)
+   - Large Tablet / Small Desktop (1024px+)
+   - Desktop (1200px+)
+   - Extra Large Desktop (1400px+)
+*/
+
+/* ========================================
+   SUBMISSIONS MANAGER LAYOUT - Mobile First
+   ======================================== */
+.submissionsManager {
+    padding: var(--spacing-lg, 24px);
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: calc(100vh - 140px); /* Account for admin header */
+}
+
+.submissionsHeader {
+    margin-bottom: var(--spacing-xl, 32px);
+}
+
+.submissionsHeader h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #1a1a1a);
+    margin: 0 0 var(--spacing-sm, 8px) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 8px);
+}
+
+.submissionsHeader p {
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ========================================
+   FILTERS & CONTROLS
+   ======================================== */
+.filtersContainer {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius-md, 8px);
+    padding: var(--spacing-lg, 24px);
+    margin-bottom: var(--spacing-lg, 24px);
+    box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+}
+
+.filtersGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md, 16px);
+}
+
+.filterGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs, 4px);
+}
+
+.filterLabel {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary, #1a1a1a);
+}
+
+.filterSelect,
+.filterInput {
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.875rem;
+    background: white;
+    transition: border-color 0.2s ease;
+}
+
+.filterSelect:focus,
+.filterInput:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filtersActions {
+    display: flex;
+    gap: var(--spacing-sm, 8px);
+    margin-top: var(--spacing-md, 16px);
+}
+
+.filterBtn {
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius-sm, 4px);
+    background: white;
+    color: var(--color-text-primary, #1a1a1a);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.filterBtn.primary {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.filterBtn.primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+/* ========================================
+   BULK ACTIONS BAR
+   ======================================== */
+.bulkActions {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md, 8px);
+    padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+    margin-bottom: var(--spacing-lg, 24px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-md, 16px);
+}
+
+.selectionControls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md, 16px);
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 8px);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-primary, #1a1a1a);
+    cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.bulkActionsButtons {
+    display: flex;
+    gap: var(--spacing-sm, 8px);
+    flex-wrap: wrap;
+}
+
+.bulkBtn {
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+    border: 1px solid;
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 4px);
+}
+
+.bulkBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.bulkBtn.approve {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+}
+
+.bulkBtn.approve:hover:not(:disabled) {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+
+.bulkBtn.reject {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+}
+
+.bulkBtn.reject:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.bulkBtn.delete {
+    background: #f97316;
+    border-color: #f97316;
+    color: white;
+}
+
+.bulkBtn.delete:hover:not(:disabled) {
+    background: #ea580c;
+    border-color: #ea580c;
+}
+
+/* ========================================
+   SUBMISSIONS LIST (Gmail Style)
+   ======================================== */
+.submissionsList {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+}
+
+.submissionItem {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+    min-height: 68px; /* Ensure consistent height */
+}
+
+.submissionItem:last-child {
+    border-bottom: none;
+}
+
+.submissionItem:hover {
+    background-color: #f8f9fa;
+}
+
+.submissionItem.selected {
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
+}
+
+.submissionCheckbox {
+    margin-right: var(--spacing-md, 16px);
+    flex-shrink: 0;
+}
+
+.submissionCheckbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.submissionInfo {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 8px);
+    flex-wrap: wrap;
+    min-width: 0; /* Allow text truncation */
+}
+
+.submissionDate {
+    color: #6b7280;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.submissionName {
+    font-weight: 600;
+    color: #1d4ed8;
+    cursor: pointer;
+    text-decoration: none;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+.submissionName:hover {
+    color: #1e40af;
+    text-decoration: underline;
+}
+
+.submissionCategories {
+    display: flex;
+    gap: var(--spacing-xs, 4px);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.categoryTag {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 2px var(--spacing-xs, 6px);
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.submissionCities {
+    display: flex;
+    gap: var(--spacing-xs, 4px);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.cityTag {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 2px var(--spacing-xs, 6px);
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.submissionStatus {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 4px);
+    flex-shrink: 0;
+}
+
+.statusBadge {
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.statusBadge.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.statusBadge.approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.statusBadge.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.submissionActions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 8px);
+    margin-left: var(--spacing-md, 16px);
+    flex-shrink: 0;
+}
+
+/* ========================================
+   DUPLICATE DETECTION INDICATOR
+   ======================================== */
+.duplicateIndicator {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.duplicateIcon {
+    font-size: 1.25rem;
+    color: #f59e0b;
+    animation: pulse 2s infinite;
+    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+}
+
+.duplicateIcon.hasDuplicates {
+    animation: bounce 1s infinite alternate;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes bounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-2px); }
+}
+
+.duplicateTooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: var(--spacing-xs, 4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+}
+
+.duplicateTooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #1f2937;
+}
+
+.duplicateIndicator:hover .duplicateTooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ========================================
+   ACTION BUTTONS
+   ======================================== */
+.actionBtn {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm, 4px);
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 4px);
+}
+
+.actionBtn:hover {
+    background: #f3f4f6;
+}
+
+.actionBtn.approve {
+    color: #059669;
+    border-color: #d1fae5;
+}
+
+.actionBtn.approve:hover {
+    background: #d1fae5;
+    border-color: #a7f3d0;
+}
+
+.actionBtn.reject {
+    color: #dc2626;
+    border-color: #fee2e2;
+}
+
+.actionBtn.reject:hover {
+    background: #fee2e2;
+    border-color: #fecaca;
+}
+
+.actionBtn.delete {
+    color: #d97706;
+    border-color: #fed7aa;
+}
+
+.actionBtn.delete:hover {
+    background: #fed7aa;
+    border-color: #fdba74;
+}
+
+/* ========================================
+   LOADING & EMPTY STATES
+   ======================================== */
+.loadingState {
+    text-align: center;
+    padding: var(--spacing-2xl, 48px) var(--spacing-lg, 24px);
+}
+
+.loadingSpinner {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md, 16px);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.emptyState {
+    text-align: center;
+    padding: var(--spacing-2xl, 48px) var(--spacing-lg, 24px);
+    color: var(--color-text-secondary, #6b7280);
+}
+
+.emptyIcon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-lg, 24px);
+    opacity: 0.5;
+}
+
+.emptyState h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text-primary, #1a1a1a);
+    margin: 0 0 var(--spacing-sm, 8px) 0;
+}
+
+.emptyState p {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   PAGINATION
+   ======================================== */
+.paginationContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-lg, 24px);
+    padding: var(--spacing-lg, 24px);
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius-md, 8px);
+}
+
+.paginationInfo {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary, #6b7280);
+}
+
+.paginationButtons {
+    display: flex;
+    gap: var(--spacing-sm, 8px);
+}
+
+.paginationBtn {
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius-sm, 4px);
+    background: white;
+    color: var(--color-text-primary, #1a1a1a);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.paginationBtn:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.paginationBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Small Mobile (375px+) */
+@media (min-width: 375px) {
+    .submissionInfo {
+        gap: var(--spacing-sm, 10px);
+    }
+}
+
+/* Large Mobile (480px+) */
+@media (min-width: 480px) {
+    .filtersGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .submissionItem {
+        padding: var(--spacing-md, 16px) var(--spacing-xl, 20px);
+    }
+
+    .submissionInfo {
+        gap: var(--spacing-md, 12px);
+    }
+}
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+    .filtersGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .submissionInfo {
+        flex-wrap: nowrap;
+        gap: var(--spacing-md, 16px);
+    }
+
+    .submissionDate {
+        min-width: 100px;
+    }
+
+    .submissionName {
+        min-width: 150px;
+    }
+}
+
+/* Large Tablet / Small Desktop (1024px+) */
+@media (min-width: 1024px) {
+    .filtersGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .bulkActions {
+        flex-wrap: nowrap;
+    }
+
+    .submissionItem {
+        padding: var(--spacing-lg, 20px) var(--spacing-xl, 24px);
+    }
+
+    .submissionDate {
+        min-width: 120px;
+    }
+
+    .submissionName {
+        min-width: 200px;
+    }
+}
+
+/* Desktop (1200px+) */
+@media (min-width: 1200px) {
+    .filtersGrid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .submissionInfo {
+        gap: var(--spacing-lg, 24px);
+    }
+}
+
+/* Extra Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+    .submissionsManager {
+        padding: var(--spacing-xl, 32px);
+    }
+
+    .filtersGrid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}

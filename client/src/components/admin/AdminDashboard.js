@@ -11,6 +11,7 @@ import BusinessForm from "./BusinessForm";
 import CategoryManager from "./CategoryManager";
 import ReportsManagement from "./ReportsManagement"; // NEW: Import reports component
 import UserManagement from "./UserManagement"; // NEW: Import user management component
+import SubmissionsManager from "./SubmissionsManager"; // NEW: Import submissions component
 import "../../styles/admin.css";
 
 const AdminDashboard = ({ onLogout }) => {
@@ -81,6 +82,9 @@ const AdminDashboard = ({ onLogout }) => {
                         <Link to="/admin/categories" className="admin-nav-link">
                             Categories
                         </Link>
+                        <Link to="/admin/submissions" className="admin-nav-link">
+                            Submissions
+                        </Link>
                         <Link to="/admin/reports" className="admin-nav-link">
                             Reports
                         </Link>
@@ -123,6 +127,10 @@ const AdminDashboard = ({ onLogout }) => {
                             <Route
                                 path="/categories"
                                 element={<CategoryManager />}
+                            />
+                            <Route
+                                path="/submissions"
+                                element={<SubmissionsManager />}
                             />
                             <Route
                                 path="/reports"

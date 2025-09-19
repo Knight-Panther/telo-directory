@@ -21,7 +21,8 @@
       "Bash(powershell:*)",
       "Bash(npm start:*)",
       "Bash(curl:*)",
-      "Bash(set PORT=3001)"
+      "Bash(set PORT=3001)",
+      "Bash(del \"C:\\Users\\User\\Desktop\\telo-directory\\test-component.js\")"
     ],
     "deny": [],
     "ask": []

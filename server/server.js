@@ -52,6 +52,7 @@ const emailVerificationRoutes = require("./routes/emailVerification");
 // NEW: Import report routes
 const reportsRoutes = require("./routes/reports");
 const adminReportsRoutes = require("./routes/admin/reports");
+const adminSubmissionsRoutes = require("./routes/admin/submissions");
 
 // NEW: Import user cleanup service for delayed deletion
 const userCleanupService = require("./services/userCleanupService");
@@ -108,6 +109,7 @@ const startServer = async () => {
 
         // NEW: Admin reports routes (for report management)
         app.use("/api/admin/reports", adminReportsRoutes);
+        app.use("/api/admin/submissions", adminSubmissionsRoutes);
 
         // Test route
         app.get("/api/test", (req, res) => {

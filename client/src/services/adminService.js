@@ -72,6 +72,18 @@ export const adminService = {
         return response.data;
     },
 
+    // NEW: Delete category (with business count validation)
+    deleteCategory: async (id) => {
+        const response = await api.delete(`/admin/categories/${id}`);
+        return response.data;
+    },
+
+    // NEW: Get categories available for submissions
+    getSubmissionCategories: async () => {
+        const response = await api.get("/admin/categories/submission-available");
+        return response.data;
+    },
+
     // Dashboard data
     getDashboardStats: async () => {
         const response = await api.get("/admin/dashboard/stats");
@@ -166,6 +178,74 @@ export const adminService = {
 
     triggerManualCleanup: async () => {
         const response = await api.post("/admin/dashboard/cleanup-service/manual-run");
+        return response.data;
+    },
+
+    // NEW: Submissions Management API Calls
+    // Following the same patterns as existing admin service calls
+
+    // Get submissions with pagination and filtering
+    getSubmissions: async (params = {}) => {
+        const queryParams = new URLSearchParams();
+
+        if (params.page) queryParams.append("page", params.page);
+        if (params.limit) queryParams.append("limit", params.limit);
+        if (params.status) queryParams.append("status", params.status);
+        if (params.category) queryParams.append("category", params.category);
+        if (params.search) queryParams.append("search", params.search);
+        if (params.dateFrom) queryParams.append("dateFrom", params.dateFrom);
+        if (params.dateTo) queryParams.append("dateTo", params.dateTo);
+
+        const response = await api.get(
+            `/admin/submissions?${queryParams.toString()}`
+        );
+        return response.data;
+    },
+
+    // Get single submission details
+    getSubmission: async (id) => {
+        const response = await api.get(`/admin/submissions/${id}`);
+        return response.data;
+    },
+
+    // Get submission statistics for dashboard
+    getSubmissionStats: async () => {
+        const response = await api.get("/admin/submissions/stats");
+        return response.data;
+    },
+
+    // Update submission status (approve/reject/pending)
+    updateSubmissionStatus: async (id, status, rejectionReason = null) => {
+        const data = { status };
+        if (rejectionReason) {
+            data.rejectionReason = rejectionReason;
+        }
+
+        const response = await api.put(`/admin/submissions/${id}/status`, data);
+        return response.data;
+    },
+
+    // Bulk delete submissions
+    bulkDeleteSubmissions: async (submissionIds) => {
+        const response = await api.delete("/admin/submissions", {
+            data: { submissionIds }
+        });
+        return response.data;
+    },
+
+    // NEW: Duplicate Detection API Calls
+
+    // Check duplicates for a single submission
+    checkSubmissionDuplicates: async (submissionId) => {
+        const response = await api.get(`/admin/submissions/${submissionId}/duplicates`);
+        return response.data;
+    },
+
+    // Batch check duplicates for multiple submissions
+    batchCheckDuplicates: async (submissionIds) => {
+        const response = await api.post("/admin/submissions/batch-duplicates", {
+            submissionIds
+        });
         return response.data;
     },
 };

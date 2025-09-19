@@ -146,4 +146,89 @@ router.patch("/:id/toggle", async (req, res) => {
     }
 });
 
+/**
+ * DELETE /api/admin/categories/:id
+ * Delete category (only if no businesses are using it)
+ */
+router.delete("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the category
+        const category = await Category.findById(id);
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                error: "Category not found"
+            });
+        }
+
+        // Check if any businesses are using this category
+        const businessCount = await Business.countDocuments({
+            category: category.name
+        });
+
+        if (businessCount > 0) {
+            return res.status(400).json({
+                success: false,
+                error: "Cannot delete category with active businesses",
+                details: {
+                    categoryName: category.name,
+                    businessCount,
+                    message: `${businessCount} business${businessCount === 1 ? '' : 'es'} still use this category. Please reassign them to another category first.`
+                }
+            });
+        }
+
+        // Safe to delete - no businesses using this category
+        await Category.findByIdAndDelete(id);
+
+        res.json({
+            success: true,
+            message: `Category "${category.name}" deleted successfully`,
+            deletedCategory: {
+                id: category._id,
+                name: category.name
+            }
+        });
+
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to delete category'
+        });
+    }
+});
+
+/**
+ * GET /api/admin/categories/submission-available
+ * Get categories available for user submissions (admin controlled)
+ */
+router.get("/submission-available", async (req, res) => {
+    try {
+        // For now, return all active categories
+        // Later, this can be enhanced with a 'availableForSubmissions' field
+        const categories = await Category.find({
+            isActive: true
+        }).sort({ name: 1 }).select('_id name');
+
+        res.json({
+            success: true,
+            categories: categories.map(cat => ({
+                _id: cat._id,
+                name: cat.name
+            })),
+            count: categories.length
+        });
+
+    } catch (error) {
+        console.error('Error fetching submission categories:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch submission categories'
+        });
+    }
+});
+
 module.exports = router;
