@@ -593,7 +593,10 @@ const SubmissionsManager = () => {
 
                                 {/* Status */}
                                 <div className={styles.submissionStatus}>
-                                    <span className={`${styles.statusBadge} ${styles[submission.status]}`}>
+                                    <span
+                                        className={`${styles.statusBadge} ${styles[submission.status]}`}
+                                        title={submission.status === 'rejected' && submission.rejectionReason ? submission.rejectionReason : ''}
+                                    >
                                         {submission.status}
                                     </span>
                                 </div>
