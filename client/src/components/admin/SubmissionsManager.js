@@ -1,5 +1,5 @@
 // client/src/components/admin/SubmissionsManager.js
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import adminService from "../../services/adminService";
 import styles from "../../styles/submissions-manager.module.css";
@@ -217,41 +217,35 @@ const SubmissionsManager = () => {
         setSelectedSubmissions([]); // Clear selections when changing page
     };
 
-    // Format date for display
+    // Format date for display - absolute format as per UIimprove.md
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) return "Today";
-        if (diffDays === 2) return "Yesterday";
-        if (diffDays <= 7) return `${diffDays - 1} days ago`;
-        return date.toLocaleDateString();
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = date.toLocaleDateString('en-US', { month: 'short' });
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
     };
 
-    // Format categories for display
+    // Format time for display - HH:mm format
+    const formatTime = (dateString) => {
+        const date = new Date(dateString);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
+    // Format categories for display - show all with proper wrapping
     const formatCategories = (categories) => {
         if (!categories || categories.length === 0) return null;
-        return categories.slice(0, 2); // Show first 2 categories
+        return categories; // Show all categories
     };
 
-    // Format cities for display
+    // Format cities for display - show all with proper wrapping
     const formatCities = (cities) => {
         if (!cities || cities.length === 0) return null;
-        return cities.slice(0, 2); // Show first 2 cities
+        return cities; // Show all cities
     };
 
-    // Get social link for business name
-    const getBusinessLink = (submission) => {
-        if (submission.socialLinks?.facebook) {
-            return submission.socialLinks.facebook;
-        }
-        if (submission.socialLinks?.instagram) {
-            return submission.socialLinks.instagram;
-        }
-        return null;
-    };
 
     // Render duplicate indicator
     const renderDuplicateIndicator = (submission) => {
@@ -442,6 +436,23 @@ const SubmissionsManager = () => {
                 </div>
             )}
 
+            {/* Column Headers */}
+            {submissions.length > 0 && (
+                <div className={styles.submissionsHeaders}>
+                    <div className={styles.headerCheckbox}></div>
+                    <div className={styles.headerDateTime}>
+                        <span>Date</span>
+                        <span>Time</span>
+                    </div>
+                    <div className={styles.headerName}>Company</div>
+                    <div className={styles.headerCategories}>Sector</div>
+                    <div className={styles.headerCities}>City</div>
+                    <div className={styles.headerDuplicate}>Duplication</div>
+                    <div className={styles.headerStatus}>Status</div>
+                    <div className={styles.headerActions}></div>
+                </div>
+            )}
+
             {/* Submissions List */}
             {submissions.length === 0 ? (
                 <div className={styles.emptyState}>
@@ -457,7 +468,6 @@ const SubmissionsManager = () => {
             ) : (
                 <div className={styles.submissionsList}>
                     {submissions.map((submission) => {
-                        const businessLink = getBusinessLink(submission);
                         const isSelected = selectedSubmissions.includes(submission._id);
 
                         return (
@@ -474,60 +484,101 @@ const SubmissionsManager = () => {
                                     />
                                 </div>
 
-                                {/* Submission Info */}
-                                <div className={styles.submissionInfo}>
+                                {/* Date/Time */}
+                                <div className={styles.submissionDateTime}>
                                     <span className={styles.submissionDate}>
                                         {formatDate(submission.submittedAt)}
                                     </span>
+                                    <span className={styles.submissionTime}>
+                                        {formatTime(submission.submittedAt)}
+                                    </span>
+                                </div>
 
+                                {/* Company Name with Social Icons */}
+                                <div className={styles.submissionNameSection}>
                                     <span className={styles.submissionName}>
-                                        {businessLink ? (
+                                        {submission.businessName}
+                                    </span>
+                                    <div className={styles.socialIcons}>
+                                        {submission.socialLinks?.facebook && (
                                             <a
-                                                href={businessLink}
+                                                href={submission.socialLinks.facebook}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
+                                                className={`${styles.socialIcon} ${styles.facebook}`}
                                                 onClick={(e) => e.stopPropagation()}
+                                                title="Facebook"
                                             >
-                                                {submission.businessName}
+                                                F
                                             </a>
-                                        ) : (
-                                            submission.businessName
                                         )}
-                                    </span>
-
-                                    <div className={styles.submissionCategories}>
-                                        {formatCategories(submission.categories)?.map((category, index) => (
-                                            <span key={index} className={styles.categoryTag}>
-                                                {category}
-                                            </span>
-                                        ))}
-                                        {submission.categories?.length > 2 && (
-                                            <span className={styles.categoryTag}>
-                                                +{submission.categories.length - 2} more
-                                            </span>
+                                        {submission.socialLinks?.instagram && (
+                                            <a
+                                                href={submission.socialLinks.instagram}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={`${styles.socialIcon} ${styles.instagram}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                title="Instagram"
+                                            >
+                                                IG
+                                            </a>
+                                        )}
+                                        {submission.socialLinks?.tiktok && (
+                                            <a
+                                                href={submission.socialLinks.tiktok}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={`${styles.socialIcon} ${styles.tiktok}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                title="TikTok"
+                                            >
+                                                TT
+                                            </a>
+                                        )}
+                                        {submission.socialLinks?.youtube && (
+                                            <a
+                                                href={submission.socialLinks.youtube}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={`${styles.socialIcon} ${styles.youtube}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                title="YouTube"
+                                            >
+                                                YT
+                                            </a>
                                         )}
                                     </div>
+                                </div>
 
-                                    <div className={styles.submissionCities}>
-                                        {formatCities(submission.cities)?.map((city, index) => (
-                                            <span key={index} className={styles.cityTag}>
-                                                {city}
-                                            </span>
-                                        ))}
-                                        {submission.cities?.length > 2 && (
-                                            <span className={styles.cityTag}>
-                                                +{submission.cities.length - 2} more
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {renderDuplicateIndicator(submission)}
-
-                                    <div className={styles.submissionStatus}>
-                                        <span className={`${styles.statusBadge} ${styles[submission.status]}`}>
-                                            {submission.status}
+                                {/* Categories */}
+                                <div className={styles.submissionCategories}>
+                                    {formatCategories(submission.categories)?.map((category, index) => (
+                                        <span key={index} className={styles.categoryTag}>
+                                            {category}
                                         </span>
-                                    </div>
+                                    ))}
+                                </div>
+
+                                {/* Cities */}
+                                <div className={styles.submissionCities}>
+                                    {formatCities(submission.cities)?.map((city, index) => (
+                                        <span key={index} className={styles.cityTag}>
+                                            {city}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                {/* Duplicate Flag */}
+                                <div className={styles.submissionDuplicate}>
+                                    {renderDuplicateIndicator(submission)}
+                                </div>
+
+                                {/* Status */}
+                                <div className={styles.submissionStatus}>
+                                    <span className={`${styles.statusBadge} ${styles[submission.status]}`}>
+                                        {submission.status}
+                                    </span>
                                 </div>
 
                                 {/* Actions */}

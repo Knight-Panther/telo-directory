@@ -223,18 +223,95 @@
 }
 
 /* ========================================
+   SUBMISSIONS HEADERS
+   ======================================== */
+.submissionsHeaders {
+    display: grid;
+    grid-template-columns:
+        40px        /* checkbox */
+        120px       /* date/time */
+        200px       /* company name - reduced from 1fr */
+        1fr         /* categories - expanded */
+        1fr         /* cities - expanded */
+        120px       /* duplicate - increased from 80px */
+        100px       /* status */
+        120px;      /* actions */
+    gap: var(--spacing-md, 16px);
+    align-items: center;
+    padding: var(--spacing-sm, 12px) var(--spacing-lg, 24px);
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: var(--radius-md, 8px) var(--radius-md, 8px) 0 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.headerCheckbox {
+    /* Grid item will auto-size */
+}
+
+.headerDateTime {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.headerName {
+    /* Grid item will auto-size */
+}
+
+.headerCategories {
+    /* Grid item will auto-size */
+}
+
+.headerCities {
+    /* Grid item will auto-size */
+}
+
+.headerDuplicate {
+    /* Grid item will auto-size */
+}
+
+.headerStatus {
+    /* Grid item will auto-size */
+}
+
+.headerActions {
+    /* Grid item will auto-size */
+}
+
+/* ========================================
    SUBMISSIONS LIST (Gmail Style)
    ======================================== */
 .submissionsList {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: var(--radius-md, 8px);
+    border-radius: 0 0 var(--radius-md, 8px) var(--radius-md, 8px);
     overflow: hidden;
     box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
 }
 
+/* When there are no headers, maintain full border radius */
+.submissionsList:first-child {
+    border-radius: var(--radius-md, 8px);
+}
+
 .submissionItem {
-    display: flex;
+    display: grid;
+    grid-template-columns:
+        40px        /* checkbox */
+        120px       /* date/time */
+        200px       /* company name - reduced from 1fr */
+        1fr         /* categories - expanded */
+        1fr         /* cities - expanded */
+        120px       /* duplicate - increased from 80px */
+        100px       /* status */
+        120px;      /* actions */
+    gap: var(--spacing-md, 16px);
     align-items: center;
     padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
     border-bottom: 1px solid #f3f4f6;
@@ -255,53 +332,95 @@
     border-left: 4px solid #3b82f6;
 }
 
-.submissionCheckbox {
-    margin-right: var(--spacing-md, 16px);
-    flex-shrink: 0;
-}
-
 .submissionCheckbox input[type="checkbox"] {
     width: 18px;
     height: 18px;
     cursor: pointer;
 }
 
-.submissionInfo {
-    flex: 1;
+.submissionDateTime {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-sm, 8px);
-    flex-wrap: wrap;
-    min-width: 0; /* Allow text truncation */
+    flex-direction: column;
+    gap: 2px;
 }
 
 .submissionDate {
     color: #6b7280;
     font-size: 0.8125rem;
     font-weight: 500;
-    min-width: 80px;
-    flex-shrink: 0;
+}
+
+.submissionTime {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+.submissionNameSection {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .submissionName {
     font-weight: 600;
-    color: #1d4ed8;
-    cursor: pointer;
+    color: #1a1a1a;
     text-decoration: none;
-    min-width: 120px;
-    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.submissionName:hover {
-    color: #1e40af;
-    text-decoration: underline;
+.socialIcons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.socialIcon {
+    font-size: 0.625rem;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.socialIcon:hover {
+    transform: scale(1.05);
+}
+
+.socialIcon.facebook {
+    background-color: #1877f2;
+    color: white;
+}
+
+.socialIcon.instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+}
+
+.socialIcon.tiktok {
+    background-color: #000000;
+    color: white;
+}
+
+.socialIcon.youtube {
+    background-color: #ff0000;
+    color: white;
 }
 
 .submissionCategories {
     display: flex;
     gap: var(--spacing-xs, 4px);
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
+    overflow: hidden;
 }
 
 .categoryTag {
@@ -318,7 +437,8 @@
     display: flex;
     gap: var(--spacing-xs, 4px);
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
+    overflow: hidden;
 }
 
 .cityTag {
@@ -334,8 +454,7 @@
 .submissionStatus {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs, 4px);
-    flex-shrink: 0;
+    justify-content: flex-start;
 }
 
 .statusBadge {
@@ -366,13 +485,18 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-sm, 8px);
-    margin-left: var(--spacing-md, 16px);
-    flex-shrink: 0;
+    justify-content: flex-end;
 }
 
 /* ========================================
    DUPLICATE DETECTION INDICATOR
    ======================================== */
+.submissionDuplicate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .duplicateIndicator {
     position: relative;
     display: inline-flex;
@@ -578,25 +702,10 @@
    RESPONSIVE DESIGN
    ======================================== */
 
-/* Small Mobile (375px+) */
-@media (min-width: 375px) {
-    .submissionInfo {
-        gap: var(--spacing-sm, 10px);
-    }
-}
-
 /* Large Mobile (480px+) */
 @media (min-width: 480px) {
     .filtersGrid {
         grid-template-columns: repeat(2, 1fr);
-    }
-
-    .submissionItem {
-        padding: var(--spacing-md, 16px) var(--spacing-xl, 20px);
-    }
-
-    .submissionInfo {
-        gap: var(--spacing-md, 12px);
     }
 }
 
@@ -605,22 +714,26 @@
     .filtersGrid {
         grid-template-columns: repeat(3, 1fr);
     }
+}
 
-    .submissionInfo {
-        flex-wrap: nowrap;
-        gap: var(--spacing-md, 16px);
-    }
-
-    .submissionDate {
-        min-width: 100px;
-    }
-
-    .submissionName {
-        min-width: 150px;
+/* Large Tablet (900px+) - Adjust grid for better fit */
+@media (min-width: 900px) {
+    .submissionsHeaders,
+    .submissionItem {
+        grid-template-columns:
+            40px        /* checkbox */
+            100px       /* date/time */
+            180px       /* company name */
+            1fr         /* categories */
+            1fr         /* cities */
+            100px       /* duplicate flag */
+            90px        /* status */
+            100px;      /* actions */
+        gap: var(--spacing-sm, 12px);
     }
 }
 
-/* Large Tablet / Small Desktop (1024px+) */
+/* Small Desktop (1024px+) */
 @media (min-width: 1024px) {
     .filtersGrid {
         grid-template-columns: repeat(4, 1fr);
@@ -630,16 +743,18 @@
         flex-wrap: nowrap;
     }
 
+    .submissionsHeaders,
     .submissionItem {
-        padding: var(--spacing-lg, 20px) var(--spacing-xl, 24px);
-    }
-
-    .submissionDate {
-        min-width: 120px;
-    }
-
-    .submissionName {
-        min-width: 200px;
+        grid-template-columns:
+            40px        /* checkbox */
+            120px       /* date/time */
+            200px       /* company name - reduced from 1fr */
+            1fr         /* categories - expanded */
+            1fr         /* cities - expanded */
+            120px       /* duplicate - increased from 80px */
+            100px       /* status */
+            120px;      /* actions */
+        gap: var(--spacing-md, 16px);
     }
 }
 
@@ -647,10 +762,6 @@
 @media (min-width: 1200px) {
     .filtersGrid {
         grid-template-columns: repeat(5, 1fr);
-    }
-
-    .submissionInfo {
-        gap: var(--spacing-lg, 24px);
     }
 }
 
@@ -662,5 +773,48 @@
 
     .filtersGrid {
         grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+/* Mobile-first: Stack items on very small screens */
+@media (max-width: 899px) {
+    .submissionsHeaders {
+        display: none;
+    }
+
+    .submissionItem {
+        display: block;
+        padding: var(--spacing-md, 16px);
+        border-left: none;
+    }
+
+    .submissionItem.selected {
+        border-left: 4px solid #3b82f6;
+    }
+
+    .submissionCheckbox {
+        float: right;
+        margin-bottom: var(--spacing-sm, 8px);
+    }
+
+    .submissionDateTime {
+        margin-bottom: var(--spacing-sm, 8px);
+    }
+
+    .submissionNameSection {
+        margin-bottom: var(--spacing-sm, 8px);
+    }
+
+    .submissionCategories,
+    .submissionCities {
+        margin-bottom: var(--spacing-sm, 8px);
+    }
+
+    .submissionStatus {
+        margin-bottom: var(--spacing-sm, 8px);
+    }
+
+    .submissionActions {
+        justify-content: flex-start;
     }
 }

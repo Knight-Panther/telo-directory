@@ -22,7 +22,8 @@
       "Bash(npm start:*)",
       "Bash(curl:*)",
       "Bash(set PORT=3001)",
-      "Bash(del \"C:\\Users\\User\\Desktop\\telo-directory\\test-component.js\")"
+      "Bash(del \"C:\\Users\\User\\Desktop\\telo-directory\\test-component.js\")",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
