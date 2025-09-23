@@ -497,66 +497,249 @@
     align-items: center;
 }
 
-.duplicateIndicator {
+.duplicateButton {
     position: relative;
     display: inline-flex;
     align-items: center;
+    gap: 2px;
+    padding: 4px 6px;
+    border: 1px solid;
+    border-radius: var(--radius-sm, 4px);
+    background: transparent;
     cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.duplicateButton:hover {
+    transform: scale(1.05);
+}
+
+.duplicateButton.low {
+    color: #92400e;
+    border-color: #f59e0b;
+    background: #fef3c7;
+}
+
+.duplicateButton.medium {
+    color: #c2410c;
+    border-color: #f97316;
+    background: #fed7aa;
+}
+
+.duplicateButton.high {
+    color: #991b1b;
+    border-color: #dc2626;
+    background: #fee2e2;
 }
 
 .duplicateIcon {
-    font-size: 1.25rem;
-    color: #f59e0b;
-    animation: pulse 2s infinite;
-    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+    font-size: 0.875rem;
 }
 
-.duplicateIcon.hasDuplicates {
-    animation: bounce 1s infinite alternate;
+.duplicateBadge {
+    font-size: 0.625rem;
+    font-weight: 600;
+    min-width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-@keyframes bounce {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-2px); }
-}
-
-.duplicateTooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1f2937;
-    color: white;
-    padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
-    border-radius: var(--radius-sm, 4px);
-    font-size: 0.8125rem;
-    white-space: nowrap;
+/* ========================================
+   DUPLICATION MODAL
+   ======================================== */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg, 24px);
+}
+
+.modalContent {
+    background: white;
+    border-radius: var(--radius-lg, 12px);
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg, 24px);
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.modalCloseBtn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.modalCloseBtn:hover {
+    background: #f3f4f6;
+    color: #1a1a1a;
+}
+
+.modalBody {
+    padding: var(--spacing-lg, 24px);
+    overflow-y: auto;
+}
+
+.businessInfo h3 {
+    margin: 0 0 var(--spacing-md, 16px) 0;
+    font-size: 1.125rem;
+    color: #1a1a1a;
+}
+
+.duplicateSummary p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 8px);
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.riskBadge {
+    padding: 2px 6px;
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.riskBadge.low {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.riskBadge.medium {
+    background: #fed7aa;
+    color: #c2410c;
+}
+
+.riskBadge.high {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.fieldAnalysis {
+    margin: var(--spacing-lg, 24px) 0;
+}
+
+.fieldAnalysis h4 {
+    margin: 0 0 var(--spacing-md, 12px) 0;
+    font-size: 1rem;
+    color: #1a1a1a;
+}
+
+.fieldsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm, 8px);
+}
+
+.fieldMatch {
+    display: flex;
+    gap: var(--spacing-sm, 8px);
+    align-items: center;
+}
+
+.fieldName {
+    font-weight: 600;
+    color: #374151;
+    min-width: 80px;
+}
+
+.fieldValue {
+    color: #6b7280;
+    font-size: 0.875rem;
+    background: #f9fafb;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm, 4px);
+}
+
+.recommendations {
+    margin: var(--spacing-lg, 24px) 0 0 0;
+}
+
+.recommendations h4 {
+    margin: 0 0 var(--spacing-md, 12px) 0;
+    font-size: 1rem;
+    color: #1a1a1a;
+}
+
+.recommendations ul {
+    margin: 0;
+    padding-left: var(--spacing-lg, 20px);
+    color: #6b7280;
+}
+
+.recommendations li {
     margin-bottom: var(--spacing-xs, 4px);
-    opacity: 0;
-    visibility: hidden;
+    font-size: 0.875rem;
+}
+
+.modalActions {
+    padding: var(--spacing-lg, 24px);
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md, 12px);
+}
+
+.modalBtn {
+    padding: var(--spacing-sm, 8px) var(--spacing-lg, 20px);
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius-md, 6px);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
 }
 
-.duplicateTooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 4px solid transparent;
-    border-top-color: #1f2937;
+.modalBtn.primary {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
 }
 
-.duplicateIndicator:hover .duplicateTooltip {
-    opacity: 1;
-    visibility: visible;
+.modalBtn.primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.modalBtn:hover {
+    background: #f9fafb;
 }
 
 /* ========================================

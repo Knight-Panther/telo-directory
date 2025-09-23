@@ -11,6 +11,10 @@ const SubmissionsManager = () => {
     const [selectedSubmissions, setSelectedSubmissions] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [duplicateInfo, setDuplicateInfo] = useState({});
+    const [duplicationModal, setDuplicationModal] = useState({
+        isOpen: false,
+        submission: null
+    });
 
     // Filter state
     const [filters, setFilters] = useState({
@@ -246,25 +250,38 @@ const SubmissionsManager = () => {
         return cities; // Show all cities
     };
 
+    // Handle duplication modal
+    const openDuplicationModal = (submission) => {
+        setDuplicationModal({
+            isOpen: true,
+            submission: submission
+        });
+    };
+
+    const closeDuplicationModal = () => {
+        setDuplicationModal({
+            isOpen: false,
+            submission: null
+        });
+    };
+
 
     // Render duplicate indicator
     const renderDuplicateIndicator = (submission) => {
         const duplicates = duplicateInfo[submission._id];
         if (!duplicates?.hasDuplicates) return null;
 
-        const tooltipText = `${duplicates.matchCount} duplicate(s) found: ${
-            duplicates.matches.map(m => m.field).join(', ')
-        }`;
+        const riskLevel = duplicates.matchCount > 5 ? 'high' : duplicates.matchCount > 2 ? 'medium' : 'low';
 
         return (
-            <div className={styles.duplicateIndicator}>
-                <span className={`${styles.duplicateIcon} ${styles.hasDuplicates}`}>
-                    🔄
-                </span>
-                <div className={styles.duplicateTooltip}>
-                    {tooltipText}
-                </div>
-            </div>
+            <button
+                className={`${styles.duplicateButton} ${styles[riskLevel]}`}
+                onClick={() => openDuplicationModal(submission)}
+                title={`${duplicates.matchCount} duplicates found - Click for details`}
+            >
+                <span className={styles.duplicateIcon}>🔄</span>
+                <span className={styles.duplicateBadge}>{duplicates.matchCount}</span>
+            </button>
         );
     };
 
@@ -641,6 +658,87 @@ const SubmissionsManager = () => {
                         >
                             Next →
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Duplication Analysis Modal */}
+            {duplicationModal.isOpen && (
+                <div className={styles.modalOverlay} onClick={closeDuplicationModal}>
+                    <div
+                        className={styles.modalContent}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className={styles.modalHeader}>
+                            <h2>🔄 Duplication Analysis</h2>
+                            <button
+                                className={styles.modalCloseBtn}
+                                onClick={closeDuplicationModal}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className={styles.modalBody}>
+                            <div className={styles.businessInfo}>
+                                <h3>Business: "{duplicationModal.submission?.businessName}"</h3>
+                                <div className={styles.duplicateSummary}>
+                                    {(() => {
+                                        const duplicates = duplicateInfo[duplicationModal.submission?._id];
+                                        if (!duplicates) return null;
+
+                                        const riskLevel = duplicates.matchCount > 5 ? 'HIGH' :
+                                                        duplicates.matchCount > 2 ? 'MEDIUM' : 'LOW';
+
+                                        return (
+                                            <p>
+                                                <span className={`${styles.riskBadge} ${styles[riskLevel.toLowerCase()]}`}>
+                                                    {riskLevel} RISK
+                                                </span>
+                                                - {duplicates.matchCount} potential duplicate(s) found
+                                            </p>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+
+                            <div className={styles.fieldAnalysis}>
+                                <h4>📊 Matching Fields:</h4>
+                                {(() => {
+                                    const duplicates = duplicateInfo[duplicationModal.submission?._id];
+                                    if (!duplicates?.matches) return <p>No detailed analysis available</p>;
+
+                                    return (
+                                        <div className={styles.fieldsList}>
+                                            {duplicates.matches.map((match, index) => (
+                                                <div key={index} className={styles.fieldMatch}>
+                                                    <span className={styles.fieldName}>{match.field}:</span>
+                                                    <span className={styles.fieldValue}>{match.value || 'Multiple matches'}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+
+                            <div className={styles.recommendations}>
+                                <h4>💡 Recommendations:</h4>
+                                <ul>
+                                    <li>Review these submissions for potential duplicates</li>
+                                    <li>Check if they represent the same business</li>
+                                    <li>Consider flagging for manual review if unsure</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button
+                                className={`${styles.modalBtn} ${styles.primary}`}
+                                onClick={closeDuplicationModal}
+                            >
+                                Got it
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
