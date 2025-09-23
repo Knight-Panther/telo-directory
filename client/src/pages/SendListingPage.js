@@ -1,5 +1,6 @@
 // client/src/pages/SendListingPage.js
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import GenericMultiSelect from '../components/forms/GenericMultiSelect';
 import ImageUpload from '../components/forms/ImageUpload';
 import BusinessInfoSection from '../components/forms/BusinessInfoSection';
@@ -261,6 +262,18 @@ const SendListingPage = () => {
         if (!validateForm()) {
             setSubmitStatus('error');
             setSubmitMessage('Please fix the errors below and try again.');
+
+            // Show centered toast warning
+            toast.error('Please check and fill all fields correctly!', {
+                duration: 2000,
+                position: 'top-center',
+                style: {
+                    background: '#ef4444',
+                    color: 'white',
+                    fontWeight: '500',
+                    textAlign: 'center'
+                }
+            });
 
             // Scroll to first error
             setTimeout(() => {
