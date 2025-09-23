@@ -92,6 +92,15 @@ const SendListingPage = () => {
         [debounce]
     );
 
+    // Handle image change
+    const handleImageChange = useCallback((file) => {
+        setFormData(prev => ({ ...prev, profileImage: file }));
+
+        if (errors.profileImage) {
+            setErrors(prev => ({ ...prev, profileImage: '' }));
+        }
+    }, [errors]);
+
     // Error boundary effect
     useEffect(() => {
         const handleError = (error) => {
@@ -206,15 +215,6 @@ const SendListingPage = () => {
             setErrors(prev => ({ ...prev, categories: '' }));
         }
     };
-
-    // Handle image change
-    const handleImageChange = useCallback((file) => {
-        setFormData(prev => ({ ...prev, profileImage: file }));
-
-        if (errors.profileImage) {
-            setErrors(prev => ({ ...prev, profileImage: '' }));
-        }
-    }, [errors.profileImage]);
 
     // Character count helpers
     const getCharacterCount = (text, maxLength) => {

@@ -73,7 +73,6 @@ const ForgotPasswordPage = () => {
     };
 
     const handleTryAgain = () => {
-        setSuccess(false);
         setSubmitted(false);
         setEmail("");
         setError("");
