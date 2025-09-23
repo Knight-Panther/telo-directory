@@ -652,40 +652,107 @@
     color: #991b1b;
 }
 
-.fieldAnalysis {
+.businessMatches {
     margin: var(--spacing-lg, 24px) 0;
 }
 
-.fieldAnalysis h4 {
-    margin: 0 0 var(--spacing-md, 12px) 0;
+.businessMatches h4 {
+    margin: 0 0 var(--spacing-md, 16px) 0;
     font-size: 1rem;
     color: #1a1a1a;
 }
 
-.fieldsList {
+.businessGroupsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md, 16px);
+}
+
+.businessCard {
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius-md, 8px);
+    padding: var(--spacing-md, 16px);
+    background: #f9fafb;
+}
+
+.businessCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm, 12px);
+    padding-bottom: var(--spacing-sm, 8px);
+    border-bottom: 1px solid #d1d5db;
+}
+
+.businessCardHeader h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.businessId {
+    font-size: 0.75rem;
+    color: #6b7280;
+    background: white;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid #d1d5db;
+    font-family: monospace;
+}
+
+.matchingFields {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm, 8px);
+}
+
+.matchingFields strong {
+    font-size: 0.875rem;
+    color: #374151;
+    margin-bottom: var(--spacing-xs, 4px);
 }
 
 .fieldMatch {
     display: flex;
     gap: var(--spacing-sm, 8px);
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .fieldName {
     font-weight: 600;
     color: #374151;
     min-width: 80px;
+    font-size: 0.875rem;
 }
 
 .fieldValue {
     color: #6b7280;
     font-size: 0.875rem;
-    background: #f9fafb;
+    background: white;
     padding: 2px 6px;
     border-radius: var(--radius-sm, 4px);
+    border: 1px solid #d1d5db;
+    flex: 1;
+}
+
+.matchType {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm, 4px);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.matchType.exact {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.matchType.social_url {
+    background: #dbeafe;
+    color: #1e40af;
 }
 
 .recommendations {

@@ -702,18 +702,54 @@ const SubmissionsManager = () => {
                                 </div>
                             </div>
 
-                            <div className={styles.fieldAnalysis}>
-                                <h4>📊 Matching Fields:</h4>
+                            <div className={styles.businessMatches}>
+                                <h4>📊 Duplicate Business Matches:</h4>
                                 {(() => {
                                     const duplicates = duplicateInfo[duplicationModal.submission?._id];
                                     if (!duplicates?.matches) return <p>No detailed analysis available</p>;
 
+                                    // Group matches by business
+                                    const businessGroups = duplicates.matches.reduce((groups, match) => {
+                                        const businessId = match.businessId;
+                                        if (!groups[businessId]) {
+                                            groups[businessId] = {
+                                                businessName: match.businessName,
+                                                businessId: match.businessId,
+                                                matchingFields: []
+                                            };
+                                        }
+                                        groups[businessId].matchingFields.push({
+                                            field: match.field,
+                                            value: match.value,
+                                            matchType: match.matchType
+                                        });
+                                        return groups;
+                                    }, {});
+
                                     return (
-                                        <div className={styles.fieldsList}>
-                                            {duplicates.matches.map((match, index) => (
-                                                <div key={index} className={styles.fieldMatch}>
-                                                    <span className={styles.fieldName}>{match.field}:</span>
-                                                    <span className={styles.fieldValue}>{match.value || 'Multiple matches'}</span>
+                                        <div className={styles.businessGroupsList}>
+                                            {Object.values(businessGroups).map((business, index) => (
+                                                <div key={index} className={styles.businessCard}>
+                                                    <div className={styles.businessCardHeader}>
+                                                        <h5>🏢 {business.businessName}</h5>
+                                                        <span className={styles.businessId}>ID: {business.businessId}</span>
+                                                    </div>
+                                                    <div className={styles.matchingFields}>
+                                                        <strong>Matching Fields:</strong>
+                                                        {business.matchingFields.map((field, fieldIndex) => (
+                                                            <div key={fieldIndex} className={styles.fieldMatch}>
+                                                                <span className={styles.fieldName}>
+                                                                    {field.field.replace('socialLinks.', '')}:
+                                                                </span>
+                                                                <span className={styles.fieldValue}>
+                                                                    {field.value || 'Exact match'}
+                                                                </span>
+                                                                <span className={`${styles.matchType} ${styles[field.matchType]}`}>
+                                                                    {field.matchType}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
